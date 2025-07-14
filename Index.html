@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selettas - Asesoría Inmobiliaria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <button class="menu-toggle" aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <nav class="sidebar" id="sidebar">
+    <button class="close-btn" aria-label="Cerrar menú">&times;</button>
+    <a href="#hero">Inicio</a>
+    <a href="#sobre-nosotros">Sobre Nosotros</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#testimonios">Testimonios</a>
+    <a href="#novedades">Novedades</a>
+    <a href="#faq">Preguntas Frecuentes</a>
+    <a href="#contacto">Contáctanos</a>
+    <a href="anuncio.html">Subir Anuncio</a>
+    <a href="ver-anuncios.html">Ver Anuncios</a>
+  </nav>
+
+  <header id="hero" class="hero-section">
+    <div class="carousel-container">
+      <img src="Images/Carrusel1.jpg" alt="Interior moderno" class="carousel-image active">
+      <img src="Images/Carrusel-2.jpg" alt="Casa con piscina" class="carousel-image">
+      <img src="Images/Carrusel-3.png" alt="Oficina de bienes raíces" class="carousel-image">
+      <div class="carousel-caption">
+        <h1>Selettas</h1>
+        <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
+      </div>
+      <button class="carousel-arrow left" aria-label="Diapositiva anterior"><i class="fas fa-chevron-left"></i></button>
+      <button class="carousel-arrow right" aria-label="Siguiente diapositiva"><i class="fas fa-chevron-right"></i></button>
+      <div class="carousel-dots"></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="sobre-nosotros">
+      <h2 class="section-title"><i class="fas fa-info-circle"></i> Sobre Nosotros</h2>
+      <p>En Selettas, somos una empresa dedicada exclusivamente al asesoramiento inmobiliario. Ayudamos a nuestros clientes en todo el proceso de compra o venta de propiedades.</p>
+      <p>Nuestra misión es conectar a las personas con sus hogares ideales, ofreciendo un servicio transparente, ético y personalizado en Gerona.</p>
+    </section>
+
+    <section id="servicios">
+      <h2 class="section-title"><i class="fas fa-cogs"></i> Nuestros Servicios</h2>
+      <div class="services-grid">
+        <div class="service-item"><i class="fas fa-home service-icon"></i><h3>Compra y Venta</h3><p>Asesoramiento en la adquisición o venta de viviendas, pisos y terrenos.</p></div>
+        <div class="service-item"><i class="fas fa-chart-line service-icon"></i><h3>Análisis de Mercado</h3><p>Estudio detallado para asegurar el mejor precio y oportunidad.</p></div>
+        <div class="service-item"><i class="fas fa-balance-scale service-icon"></i><h3>Asesoramiento Legal</h3><p>Acompañamiento legal y documental para una transacción segura.</p></div>
+        <div class="service-item"><i class="fas fa-piggy-bank service-icon"></i><h3>Inversiones</h3><p>Asesoría experta para maximizar el retorno de tus inversiones.</p></div>
+      </div>
+    </section>
+
+    <section id="testimonios" class="testimonials-section">
+      <h2 class="section-title"><i class="fas fa-comments"></i> Lo que dicen nuestros clientes</h2>
+      <div class="testimonial-carousel" id="testimonial-carousel"></div>
+      <div class="testimonial-dots" id="testimonial-dots"></div>
+    </section>
+
+    <section id="novedades" class="news-section">
+      <h2 class="section-title"><i class="fas fa-newspaper"></i> Novedades y Blog</h2>
+      <div class="news-grid" id="newsGrid">
+        </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2 class="section-title"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</h2>
+      <div class="faq-item"><h4>¿Cómo subo un anuncio?</h4><p>Desde el menú lateral, accede a "Subir Anuncio" y rellena el formulario. ¡Es muy sencillo!</p></div>
+      <div class="faq-item"><h4>¿Cuánto cuesta publicar?</h4><p>Actualmente, todos los servicios básicos son **completamente gratuitos**.</p></div>
+      <div class="faq-item"><h4>¿Cuánto dura el anuncio?</h4><p>Un anuncio estándar permanece visible por **30 días**. Podrás renovarlo fácilmente.</p></div>
+      <div class="faq-item"><h4>¿Asesoran a primerizos?</h4><p>¡Sí! Nos especializamos en guiar a compradores primerizos en cada paso del proceso.</p></div>
+    </section>
+
+    <section id="contacto">
+      <h2 class="section-title"><i class="fas fa-envelope"></i> Contáctanos</h2>
+      <form id="contactForm" class="contact-form" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
+        <input type="text" name="name" placeholder="Tu nombre" required /><input type="email" name="email" placeholder="Tu email" required /><textarea name="message" rows="4" placeholder="Tu mensaje" required></textarea><button type="submit">Enviar mensaje</button>
+      </form>
+    </section>
+  </main>
+  
+  <div class="social-links">
+    <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+    <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+    <a href="https://tiktok.com" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+  </div>
+
+  <a class="whatsapp-button" href="https://wa.me/34632125872" target="_blank" title="Escríbenos por WhatsApp"><i class="fab fa-whatsapp"></i></a>
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
+
+  <footer><p>&copy; 2025 Selettas S.L. | Todos los derechos reservados</p></footer>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <button class="close-button" aria-label="Cerrar modal">&times;</button>
+      <h2 id="newsModalTitle"></h2>
+      <img id="newsModalImage" src="" alt="Imagen de la novedad" class="modal-news-image">
+      <p id="newsModalContent"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

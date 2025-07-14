@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subir Anuncio - Selettas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    main {
+      padding: 3rem 2rem;
+      max-width: 700px;
+      margin: 80px auto 40px;
+      background-color: rgba(18, 18, 18, 0.85);
+      border-radius: 12px;
+      color: var(--font-color);
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+
+    main h1 {
+      margin-top: 0;
+      color: var(--accent-color);
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 6px;
+      background: #1e1e1e;
+      color: white;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    form label {
+      color: var(--font-color);
+      font-size: 0.95rem;
+      margin-bottom: -0.5rem;
+    }
+
+    form button {
+      padding: 0.8rem;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.3s;
+    }
+
+    form button:hover {
+      background: #1ebe4f;
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-top: -0.8rem;
+      margin-bottom: 0.5rem;
+      min-height: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        margin: 80px 1rem 40px;
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <button class="menu-toggle" aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <nav class="sidebar" id="sidebar">
+    <button class="close-btn" aria-label="Cerrar menú">&times;</button>
+    <a href="index.html">Inicio</a>
+    <a href="ver-anuncios.html">Ver Anuncios</a>
+    <a href="anuncio.html">Subir Anuncio</a>
+  </nav>
+
+  <main>
+    <h1><i class="fas fa-upload"></i> Subir Anuncio</h1>
+    <form id="anuncioForm" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST" novalidate>
+      <label for="titulo">Título</label>
+      <input type="text" name="titulo" id="titulo" placeholder="Título del anuncio" required />
+      <div id="tituloError" class="error-message"></div>
+
+      <label for="direccion">Dirección</label>
+      <input type="text" name="direccion" id="direccion" placeholder="Dirección" required />
+      <div id="direccionError" class="error-message"></div>
+
+      <label for="email">Email de Contacto</label>
+      <input type="email" name="email" id="email" placeholder="Tu email de contacto" required />
+      <div id="emailError" class="error-message"></div>
+
+      <label for="descripcion">Descripción</label>
+      <textarea name="descripcion" id="descripcion" rows="5" placeholder="Descripción completa de la propiedad" required></textarea>
+      <div id="descripcionError" class="error-message"></div>
+      
+      <label for="imagen1">URL Imagen Principal (ej. https://ejemplo.com/img1.jpg):</label>
+      <input type="text" name="imagen1" id="imagen1" placeholder="URL de la imagen principal">
+      
+      <label for="imagen2">URL Imagen Adicional 1 (opcional):</label>
+      <input type="text" name="imagen2" id="imagen2" placeholder="URL de imagen adicional">
+
+      <label for="imagen3">URL Imagen Adicional 2 (opcional):</label>
+      <input type="text" name="imagen3" id="imagen3" placeholder="URL de imagen adicional">
+
+      <label for="imagen4">URL Imagen Adicional 3 (opcional):</label>
+      <input type="text" name="imagen4" id="imagen4" placeholder="URL de imagen adicional">
+
+      <button type="submit">Enviar anuncio</button>
+    </form>
+  </main>
+
+  <script src="script.js"></script>
+  
+</body>
+</html>
