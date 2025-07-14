@@ -7,14 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.querySelector('.menu-toggle');
     const closeBtn = document.querySelector('.close-btn');
 
-    // --- PEGA TUS DATOS DE CLOUDINARY AQUÍ ---
-    // Reemplaza "EL_NOMBRE_DE_TU_NUBE" con el valor de tu Cloud Name
-    const CLOUD_NAME = "dlcal40xj"
-
-    // Reemplaza "EL_NOMBRE_DE_TU_PRESET" con el nombre de tu Upload Preset (el que pusiste en modo "Unsigned")
-    const UPLOAD_PRESET = "selettas"
-    // -----------------------------------------
-
     if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
     }
@@ -118,6 +110,124 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =================================================================
+    // LÓGICA SOLO PARA LA PÁGINA DE ANUNCIO (anuncio.html)
+    // =================================================================
+    const anuncioForm = document.getElementById('anuncioForm');
+    if (anuncioForm) {
+
+        // --- CONFIGURACIÓN DE CLOUDINARY ---
+        // ¡¡IMPORTANTE!! Reemplaza los valores de ejemplo por tus datos reales.
+        const CLOUD_NAME = "djcal40xx"; // Pon aquí tu "Cloud Name" entre comillas
+        const UPLOAD_PRESET = "selettas";  // Pon aquí tu "Upload Preset" entre comillas
+        
+        const uploadStatus = document.getElementById('uploadStatus');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const uploadToCloudinary = async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', UPLOAD_PRESET);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+                return data.secure_url;
+            } catch (error) {
+                console.error('Error subiendo a Cloudinary:', error);
+                return null;
+            }
+        };
+
+        anuncioForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            let isValid = true;
+            const fieldsToValidate = [
+                { input: 'titulo', errorDiv: 'tituloError', message: 'El título es obligatorio.' },
+                { input: 'direccion', errorDiv: 'direccionError', message: 'La dirección es obligatoria.' },
+                { input: 'email', errorDiv: 'emailError', message: 'El email es obligatorio.', isEmail: true, invalidMessage: 'Por favor, introduce un email válido.' },
+                { input: 'descripcion', errorDiv: 'descripcionError', message: 'La descripción es obligatoria.' }
+            ];
+            fieldsToValidate.forEach(field => {
+                const errorDiv = document.getElementById(field.errorDiv);
+                if (errorDiv) errorDiv.textContent = '';
+            });
+
+            fieldsToValidate.forEach(field => {
+                const inputElement = document.getElementById(field.input);
+                const errorElement = document.getElementById(field.errorDiv);
+                if (!inputElement.value.trim()) {
+                    if (errorElement) errorElement.textContent = field.message;
+                    isValid = false;
+                } else if (field.isEmail) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(inputElement.value)) {
+                        if (errorElement) errorElement.textContent = field.invalidMessage;
+                        isValid = false;
+                    }
+                }
+            });
+
+            if (!isValid) return;
+
+            submitBtn.disabled = true;
+            uploadStatus.textContent = 'Subiendo imágenes, por favor espera...';
+
+            const imageFiles = [
+                document.getElementById('imagen1').files[0],
+                document.getElementById('imagen2').files[0],
+                document.getElementById('imagen3').files[0],
+                document.getElementById('imagen4').files[0]
+            ].filter(file => file);
+
+            if (document.getElementById('imagen1').files.length === 0) {
+                 uploadStatus.textContent = '¡Debes subir al menos la imagen principal!';
+                 submitBtn.disabled = false;
+                 return;
+            }
+
+            try {
+                const uploadPromises = imageFiles.map(uploadToCloudinary);
+                const imageUrls = await Promise.all(uploadPromises);
+                
+                if (imageUrls.some(url => url === null)) {
+                    throw new Error("Una de las imágenes no se pudo subir.");
+                }
+
+                const finalFormData = new FormData();
+                finalFormData.append('titulo', document.getElementById('titulo').value);
+                finalFormData.append('direccion', document.getElementById('direccion').value);
+                finalFormData.append('email', document.getElementById('email').value);
+                finalFormData.append('descripcion', document.getElementById('descripcion').value);
+
+                imageUrls.forEach((url, index) => {
+                    finalFormData.append(`imagen_${index + 1}`, url);
+                });
+                
+                uploadStatus.textContent = 'Imágenes subidas. Enviando formulario...';
+
+                await fetch("https://formsubmit.co/miky.tv098@gmail.com", {
+                    method: 'POST',
+                    body: finalFormData
+                });
+                
+                uploadStatus.textContent = '¡Anuncio enviado con éxito!';
+                anuncioForm.reset();
+                setTimeout(() => { uploadStatus.textContent = ''; }, 4000);
+
+            } catch (error) {
+                console.error(error);
+                uploadStatus.textContent = 'Hubo un error. Revisa la consola o inténtalo de nuevo.';
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    // =================================================================
     // LÓGICA SOLO PARA LA PÁGINA DE ANUNCIOS (ver-anuncios.html)
     // =================================================================
     const anunciosContainer = document.getElementById('anunciosContainer');
@@ -174,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 updateGallery();
                             });
                             thumbnailContainer.appendChild(thumb);
-                        });
+});
                     }
                     prevBtn.onclick = () => {
                         currentImageIndex = (currentImageIndex - 1 + anuncio.imagenes.length) % anuncio.imagenes.length;
@@ -217,101 +327,5 @@ document.addEventListener('DOMContentLoaded', () => {
             aplicarFiltrosYOrdenar();
         });
         aplicarFiltrosYOrdenar();
-    }
-
-    // =================================================================
-    // LÓGICA PARA SUBIR ANUNCIOS CON CLOUDINARY
-    // =================================================================
-    const anuncioFormCloudinary = document.getElementById('anuncioForm');
-    if (anuncioFormCloudinary) {
-
-        const uploadStatus = document.getElementById('uploadStatus');
-        const submitBtn = document.getElementById('submitBtn');
-
-        const uploadToCloudinary = async (file) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', UPLOAD_PRESET);
-            try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                const data = await response.json();
-                return data.secure_url;
-            } catch (error) {
-                console.error('Error subiendo a Cloudinary:', error);
-                return null;
-            }
-        };
-
-        anuncioFormCloudinary.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            let isValid = true;
-            const fieldsToValidate = [
-                { input: 'titulo', errorDiv: 'tituloError', message: 'El título es obligatorio.' },
-                { input: 'direccion', errorDiv: 'direccionError', message: 'La dirección es obligatoria.' },
-                { input: 'email', errorDiv: 'emailError', message: 'El email es obligatorio.', isEmail: true, invalidMessage: 'Por favor, introduce un email válido.' },
-                { input: 'descripcion', errorDiv: 'descripcionError', message: 'La descripción es obligatoria.' }
-            ];
-            fieldsToValidate.forEach(field => {
-                const errorDiv = document.getElementById(field.errorDiv);
-                if (errorDiv) errorDiv.textContent = '';
-            });
-            fieldsToValidate.forEach(field => {
-                const inputElement = document.getElementById(field.input);
-                const errorElement = document.getElementById(field.errorDiv);
-                if (!inputElement.value.trim()) {
-                    if(errorElement) errorElement.textContent = field.message;
-                    isValid = false;
-                } else if (field.isEmail) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(inputElement.value)) {
-                       if(errorElement) errorElement.textContent = field.invalidMessage;
-                        isValid = false;
-                    }
-                }
-            });
-            if (!isValid) return;
-
-            submitBtn.disabled = true;
-            uploadStatus.textContent = 'Subiendo imágenes, por favor espera...';
-            const imageFiles = [
-                document.getElementById('imagen1').files[0],
-                document.getElementById('imagen2').files[0],
-                document.getElementById('imagen3').files[0],
-                document.getElementById('imagen4').files[0]
-            ].filter(file => file);
-            if (imageFiles.length === 0) {
-                 uploadStatus.textContent = '¡Debes subir al menos la imagen principal!';
-                 submitBtn.disabled = false;
-                 return;
-            }
-            try {
-                const uploadPromises = imageFiles.map(uploadToCloudinary);
-                const imageUrls = await Promise.all(uploadPromises);
-                const finalFormData = new FormData();
-                finalFormData.append('titulo', document.getElementById('titulo').value);
-                finalFormData.append('direccion', document.getElementById('direccion').value);
-                finalFormData.append('email', document.getElementById('email').value);
-                finalFormData.append('descripcion', document.getElementById('descripcion').value);
-                imageUrls.forEach((url, index) => {
-                    if (url) {
-                        finalFormData.append(`imagen_${index + 1}`, url);
-                    }
-                });
-                uploadStatus.textContent = 'Imágenes subidas. Enviando formulario...';
-                await fetch("https://formsubmit.co/miky.tv098@gmail.com", {
-                    method: 'POST',
-                    body: finalFormData
-                });
-                uploadStatus.textContent = '¡Anuncio enviado con éxito!';
-                anuncioFormCloudinary.reset();
-                submitBtn.disabled = false;
-            } catch (error) {
-                uploadStatus.textContent = 'Hubo un error al subir las imágenes. Inténtalo de nuevo.';
-                submitBtn.disabled = false;
-            }
-        });
     }
 });
