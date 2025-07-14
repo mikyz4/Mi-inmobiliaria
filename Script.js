@@ -1,7 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Módulo 1: Lógica Común (Menús, Modales, Botón de Scroll)
-    // Esta parte se ejecutará siempre.
+    // =================================================================
+    // DEPURADOR DE ERRORES - ¡ESTE CÓDIGO ES TEMPORAL!
+    // =================================================================
+    window.onerror = function(message, source, lineno, colno, error) {
+        const errorBox = document.createElement('div');
+        errorBox.style.position = 'fixed';
+        errorBox.style.bottom = '0';
+        errorBox.style.left = '0';
+        errorBox.style.width = '100%';
+        errorBox.style.padding = '10px';
+        errorBox.style.backgroundColor = 'rgba(200, 0, 0, 0.9)';
+        errorBox.style.color = 'white';
+        errorBox.style.zIndex = '9999';
+        errorBox.style.fontFamily = 'monospace';
+        errorBox.style.fontSize = '12px';
+        errorBox.style.borderTop = '2px solid white';
+        errorBox.innerHTML = `
+            <strong>¡ERROR DETECTADO!</strong><br>
+            <strong>Mensaje:</strong> ${message}<br>
+            <strong>Archivo:</strong> ${source.split('/').pop()}<br>
+            <strong>Línea:</strong> ${lineno}, <strong>Col:</strong> ${colno}
+        `;
+        document.body.appendChild(errorBox);
+        return true; 
+    };
+
+    // =================================================================
+    // LÓGICA DE LA PÁGINA (el resto del código sigue aquí)
+    // =================================================================
     try {
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.querySelector('.menu-toggle');
@@ -35,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     modal.classList.remove('active');
                 }
             });
-            // Añadimos también el cierre para los botones con la clase 'close-button' dentro de cualquier modal
             const modalCloseButton = modal.querySelector('.close-button');
             if (modalCloseButton) {
                 modalCloseButton.addEventListener('click', () => modal.classList.remove('active'));
@@ -45,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Error en la lógica común:", error);
     }
 
-    // Módulo 2: Lógica de la Página de Inicio
-    // Solo se ejecutará si encuentra el elemento 'hero'.
     if (document.getElementById('hero')) {
         try {
             const carouselImages = document.querySelectorAll('.hero-section .carousel-image');
@@ -119,15 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Módulo 3: Lógica de la Página "Subir Anuncio"
-    // Solo se ejecutará si encuentra el formulario 'anuncioForm'.
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
         try {
             // --- CONFIGURACIÓN DE CLOUDINARY ---
-            // ¡¡IMPORTANTE!! Reemplaza los valores de ejemplo por tus datos reales.
-            const CLOUD_NAME = "djcal40xx"; // Pon aquí tu "Cloud Name" entre comillas
-            const UPLOAD_PRESET = "Selettas";  // Pon aquí tu "Upload Preset" entre comillas
+            const CLOUD_NAME = "djcal40xx";    // Tu "Cloud Name" va aquí
+            const UPLOAD_PRESET = "Selettas"; // Tu "Upload Preset" va aquí (con la 'S' mayúscula)
             
             const uploadStatus = document.getElementById('uploadStatus');
             const submitBtn = document.getElementById('submitBtn');
@@ -141,7 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData,
                 });
                 if (!response.ok) {
-                    throw new Error(`Error de Cloudinary: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`Error de Cloudinary: ${errorData.error.message}`);
                 }
                 const data = await response.json();
                 return data.secure_url;
@@ -149,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             anuncioForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 let isValid = true;
                 const fieldsToValidate = [
                     { input: 'titulo', errorDiv: 'tituloError', message: 'El título es obligatorio.' },
@@ -161,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const errorDiv = document.getElementById(field.errorDiv);
                     if (errorDiv) errorDiv.textContent = '';
                 });
-
                 fieldsToValidate.forEach(field => {
                     const inputElement = document.getElementById(field.input);
                     const errorElement = document.getElementById(field.errorDiv);
@@ -176,17 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-
                 if (!isValid) return;
-
                 if (document.getElementById('imagen1').files.length === 0) {
                     uploadStatus.textContent = '¡Debes subir al menos la imagen principal!';
                     return;
                 }
-
                 submitBtn.disabled = true;
                 uploadStatus.textContent = 'Subiendo imágenes, por favor espera...';
-
                 try {
                     const imageFiles = [
                         document.getElementById('imagen1').files[0],
@@ -194,10 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('imagen3').files[0],
                         document.getElementById('imagen4').files[0]
                     ].filter(file => file);
-
                     const uploadPromises = imageFiles.map(uploadToCloudinary);
                     const imageUrls = await Promise.all(uploadPromises);
-                    
                     const finalFormData = new FormData();
                     finalFormData.append('titulo', document.getElementById('titulo').value);
                     finalFormData.append('direccion', document.getElementById('direccion').value);
@@ -206,21 +220,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     imageUrls.forEach((url, index) => {
                         finalFormData.append(`imagen_${index + 1}`, url);
                     });
-                    
                     uploadStatus.textContent = 'Imágenes subidas. Enviando formulario...';
-
                     await fetch("https://formsubmit.co/miky.tv098@gmail.com", {
                         method: 'POST',
                         body: finalFormData
                     });
-                    
                     uploadStatus.textContent = '¡Anuncio enviado con éxito!';
                     anuncioForm.reset();
                     setTimeout(() => { uploadStatus.textContent = ''; }, 4000);
-
                 } catch (error) {
                     console.error("Error durante la subida o envío:", error);
-                    uploadStatus.textContent = 'Hubo un error. Por favor, inténtalo de nuevo.';
+                    // Muestra el mensaje de error específico de Cloudinary
+                    uploadStatus.textContent = `Error: ${error.message}`;
                 } finally {
                     submitBtn.disabled = false;
                 }
@@ -230,8 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Módulo 4: Lógica de la Página "Ver Anuncios"
-    // Solo se ejecutará si encuentra el elemento 'anunciosContainer'.
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         try {
@@ -312,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const superficieMin = parseInt(document.getElementById('filtro-superficie').value) || 0;
                 const precioMax = parseInt(document.getElementById('filtro-precio').value) || 999999999;
                 const orden = document.getElementById('ordenar-por').value;
-                let anunciosFiltrados = anunciosData.filter(anuncio => (tipo === 'todos' || anuncio.tipo === tipo) && (anuncio.habitaciones >= habMin && anuncio.habitaciones <= habMax) && (anuncio.banos >= banosMin && anuncio.banos <= banosMax) && (anuncio.superficie >= superficieMin) && (anuncio.precio <= precioMax));
+                let anunciosFiltrados = anunciosData.filter(anuncio => (tipo === 'todos' || anuncio.tipo === tipo) && (anuncion.habitaciones >= habMin && anuncio.habitaciones <= habMax) && (anuncio.banos >= banosMin && anuncio.banos <= banosMax) && (anuncio.superficie >= superficieMin) && (anuncio.precio <= precioMax));
                 if (orden === 'precio-asc') anunciosFiltrados.sort((a, b) => a.precio - b.precio);
                 if (orden === 'precio-desc') anunciosFiltrados.sort((a, b) => b.precio - a.precio);
                 mostrarAnuncios(anunciosFiltrados);
