@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIGURACIÓN DE CLOUDINARY ---
             // ¡¡IMPORTANTE!! Reemplaza los valores de ejemplo por tus datos reales.
             const CLOUD_NAME = "djcal40xx"; // Pon aquí tu "Cloud Name" entre comillas
-            const UPLOAD_PRESET = "selettas";  // Pon aquí tu "Upload Preset" entre comillas
+            const UPLOAD_PRESET = "Selettas";  // Pon aquí tu "Upload Preset" entre comillas
             
             const uploadStatus = document.getElementById('uploadStatus');
             const submitBtn = document.getElementById('submitBtn');
