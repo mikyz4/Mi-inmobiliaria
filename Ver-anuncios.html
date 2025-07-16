@@ -11,12 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-
-    <header>
-        <div class="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </div>
+<body id="anuncios-page">  <header>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
         <nav class="sidebar">
             <span class="close-btn">&times;</span>
             <ul>
@@ -47,8 +43,25 @@
                     </select>
                 </div>
                 <div class="filtro">
+                    <label for="filtro-ubicacion">Ubicación</label>
+                    <select id="filtro-ubicacion">
+                        <option value="todas">Todas</option>
+                        <option value="Centro">Centro</option>
+                        <option value="Eixample">Eixample</option>
+                        <option value="Montjuïc">Montjuïc</option>
+                    </select>
+                </div>
+                <div class="filtro">
                     <label for="filtro-habitaciones">Habitaciones (mín)</label>
                     <input type="number" id="filtro-habitaciones" placeholder="Cualquiera" min="0">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-banos">Baños (mín)</label>
+                    <input type="number" id="filtro-banos" placeholder="Cualquiera" min="0">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-metros">Metros² (mín)</label>
+                    <input type="number" id="filtro-metros" placeholder="Cualquiera" min="0">
                 </div>
                 <div class="filtro">
                     <label for="filtro-precio">Precio Máximo (€)</label>
@@ -58,15 +71,14 @@
             </div>
         </section>
 
-        <section id="anunciosContainer" class="anuncios-container">
-            </section>
+        <section id="anunciosContainer" class="anuncios-container"></section>
     </main>
     
     <footer>
         <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>
 
-    <a href="https://wa.me/34632125872" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://wa.me/34632125872" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
     <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
     <div id="anuncioModal" class="modal">
@@ -81,7 +93,6 @@
             <p id="modal-descripcion"></p>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
