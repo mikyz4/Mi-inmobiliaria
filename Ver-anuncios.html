@@ -35,7 +35,24 @@
         <section class="filtros-section">
             <button id="toggle-filtros" class="btn"><i class="fas fa-filter"></i> Mostrar Filtros</button>
             <div id="filtros-wrapper" style="display: none;">
-                <p>Próximamente: filtros por tipo, precio y más.</p>
+                <div class="filtro">
+                    <label for="filtro-tipo">Tipo de Propiedad</label>
+                    <select id="filtro-tipo">
+                        <option value="todos">Todos</option>
+                        <option value="Piso">Piso</option>
+                        <option value="Casa">Casa</option>
+                        <option value="Ático">Ático</option>
+                    </select>
+                </div>
+                <div class="filtro">
+                    <label for="filtro-habitaciones">Habitaciones (mín)</label>
+                    <input type="number" id="filtro-habitaciones" placeholder="Cualquiera" min="0">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-precio">Precio Máximo (€)</label>
+                    <input type="number" id="filtro-precio" placeholder="Sin límite" step="10000">
+                </div>
+                <button id="reset-filtros" class="btn-secondary">Limpiar Filtros</button>
             </div>
         </section>
 

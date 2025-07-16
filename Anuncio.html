@@ -49,10 +49,22 @@
                     <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
                 </div>
 
-                <h3>Subir Imágenes</h3>
+                <h3>Subir Imágenes (hasta 4)</h3>
                 <div class="form-group">
-                    <label for="imagen1">Imagen Principal</label>
+                    <label for="imagen1">Imagen Principal (Obligatoria)</label>
                     <input type="file" id="imagen1" name="attachment_1" accept="image/*" required>
+                </div>
+                 <div class="form-group">
+                    <label for="imagen2">Imagen 2</label>
+                    <input type="file" id="imagen2" name="attachment_2" accept="image/*">
+                </div>
+                 <div class="form-group">
+                    <label for="imagen3">Imagen 3</label>
+                    <input type="file" id="imagen3" name="attachment_3" accept="image/*">
+                </div>
+                 <div class="form-group">
+                    <label for="imagen4">Imagen 4</label>
+                    <input type="file" id="imagen4" name="attachment_4" accept="image/*">
                 </div>
                 
                 <button type="submit">Enviar Anuncio</button>
