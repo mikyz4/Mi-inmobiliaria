@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
-    // --- SECCIÓN DE NOVEDADES RESTAURADA ---
     const newsContainer = document.getElementById('news-container');
     if(newsContainer) {
         const newsData = [
@@ -72,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const card = document.createElement('div');
             card.className = 'anuncio-card';
             card.innerHTML = `
-                <img src="${news.imagen}" alt="${news.titulo}">
+                <img src="${news.imagen}" alt="${news.titulo}" loading="lazy">
                 <div class="anuncio-card-content">
                     <h3>${news.titulo}</h3>
                 </div>
@@ -134,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
                 card.innerHTML = `
-                    <img src="${anuncio.imagen}" alt="${anuncio.titulo}">
+                    <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
