@@ -1,99 +1,327 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selettas - Asesoría Inmobiliaria</title>
-    <link rel="icon" type="image/png" href="Images/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seletta's</title>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
-<body id="home-page">
-    <header>
-        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
-        <nav class="sidebar">
-            <span class="close-btn">&times;</span>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
-                <li><a href="anuncio.html">Publicar Anuncio</a></li>
-                <li><a href="#contact">Contacto</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <section id="hero" class="hero-section">
-            <div class="carousel-container">
-                <div class="carousel-slide active" style="background-image: url('Images/Carrusel1.jpg');"></div>
-                <div class="carousel-slide" style="background-image: url('Images/Carrusel-2.jpg');"></div>
-                <div class="carousel-slide" style="background-image: url('Images/Carrusel-3.png');"></div>
-            </div>
-            <div class="hero-content">
-                <h1><span style="color: var(--accent-color);">Selettas</span></h1>
-                <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
-                <a href="#contact" class="btn">Contactar</a>
-            </div>
-            <div class="carousel-nav">
-                <button id="prev-slide" class="carousel-arrow"><i class="fas fa-chevron-left"></i></button>
-                <button id="next-slide" class="carousel-arrow"><i class="fas fa-chevron-right"></i></button>
-            </div>
-            <div class="carousel-dots"></div>
-        </section>
+<body>
 
-        <section id="services">
-            <h2>Nuestros Servicios</h2>
-            <div class="services-container"></div>
-        </section>
-        
-        <section id="testimonials">
-            <h2>Lo que dicen nuestros clientes</h2>
-            <div class="testimonial-carousel-container">
-                <div class="testimonial-carousel">
-                    </div>
-                <div class="testimonial-dots"></div>
+  <header class="header">
+
+    <div class="menu container">
+      <a href="index.html" class="logo">Seletta's</a>
+      <input type="checkbox" id="menu" />
+      <label for="menu">
+        <img src="img/menu.png" class="menu-icono" alt="menu">
+      </label>
+      <nav class="navbar">
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="html/nosotros.html">Nosotros</a></li>
+          <li><a href="html/servicios.html">Servicios</a></li>
+          <li><a href="html/vender.html">Vender</a></li>
+          <li><a href="html/contacto.html">Contacto</a></li>
+        </ul>
+      </nav>
+      <div>
+        <ul>
+          <li class="submenu">
+            <img src="img/car.svg" id="img-carrito" alt="carrito">
+            <div id="carrito">
+              <table id="lista-carrito">
+                <thead>
+                  <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <a href="#" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
             </div>
-        </section>
-        <section id="news">
-            <h2>Últimas Novedades</h2>
-            <div id="news-container" class="anuncios-container"></div>
-        </section>
-
-        <section id="faq">
-             <h2>Preguntas Frecuentes</h2>
-             <div class="faq-container"></div>
-        </section>
-
-        <section id="contact">
-            <h2>Contáctanos</h2>
-            <form action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
-                <input type="text" name="name" placeholder="Nombre" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <textarea name="message" placeholder="Tu mensaje" rows="5" required></textarea>
-                <button type="submit">Enviar</button>
-            </form>
-        </section>
-    </main>
-    
-    <div id="newsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img">
-            <h3 id="news-modal-titulo"></h3>
-            <p id="news-modal-descripcion"></p>
-        </div>
+          </li>
+        </ul>
+      </div>
     </div>
+    <div class="header-content container">
+      <div class="swiper mySwiper-1">
+        <div class="swiper-wrapper">
 
-    <footer>
-        <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
-    </footer>
+          <div class="swiper-slide">
+            <div class="header-info">
+              <div class="header-txt">
+                <h1>Tu casa de lujo en la mejor zona del pais</h1>
+                <div class="botones">
+                  <a href="#" class="btn-1">Comprar</a>
+                </div>
+              </div>
+              <div class="header-img">
+                <img src="img/slider1.png" alt="">
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="header-info">
+              <div class="header-txt">
+                <h1>Tu casa de lujo en la mejor zona del pais</h1>
+                <div class="botones">
+                  <a href="#" class="btn-1">Comprar</a>
+                </div>
+              </div>
+              <div class="header-img">
+                <img src="img/slider2.png" alt="">
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="header-info">
+              <div class="header-txt">
+                <h1>Tu casa de lujo en la mejor zona del pais</h1>
+                <div class="botones">
+                  <a href="#" class="btn-1">Comprar</a>
+                </div>
+              </div>
+              <div class="header-img">
+                <img src="img/slider3.png" alt="">
+              </div>
+            </div>
+          </div>
 
-    <a href="https://wa.me/34632125872" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
-    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
 
-    <script src="script.js"></script>
+      </div>
+    </div>
+  </header>
+
+  <section class="products container" id="lista-1">
+    <h2>Casas y Apartamentos</h2>
+    <div class="swiper mySwiper-2">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p1.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="1">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p2.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="2">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p3.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="3">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p1.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="4">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p2.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="5">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/p3.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="6">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="products container" id="lista-2">
+    <h2>Terrenos</h2>
+    <div class="swiper mySwiper-3">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t1.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="7">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t2.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="8">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t3.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="9">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t1.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="10">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t2.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="11">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="product">
+            <img src="img/t3.png" alt="">
+            <div class="product-txt">
+              <h3>El Encanto</h3>
+              <p>calidad premium</p>
+              <p class="precio">$200.00</p>
+              <a href="#" class="agregar-carrito btn-3" data-id="12">
+                Agregar al carrito
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </section>
+
+  <footer class="footer container">
+    <div class="link">
+      <h3>Lorem</h3>
+      <ul>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+      </ul>
+    </div>
+    <div class="link">
+      <h3>Lorem</h3>
+      <ul>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+      </ul>
+    </div>
+    <div class="link">
+      <h3>Lorem</h3>
+      <ul>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+        <li><a href="#">lorem</a></li>
+      </ul>
+    </div>
+    <div class="link">
+      <h3>Lorem</h3>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="js/script.js"></script>
 </body>
+
 </html>
