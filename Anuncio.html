@@ -1,49 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seletta's - Detalle del Anuncio</title>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="Styles.css">
+    <title>Publica tu Anuncio - Selettas</title>
+    <link rel="icon" type="image/png" href="Images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <header class="header">
-        <div class="menu container">
-            <a href="Index.html" class="logo">Seletta's</a>
-            <input type="checkbox" id="menu" />
-            <label for="menu">
-                <img src="Images/menu.png" class="menu-icono" alt="menu">
-            </label>
-            <nav class="navbar">
-                <ul>
-                    <li><a href="Index.html">Inicio</a></li>
-                    <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
-                    <li><a href="Anuncio.html">Anuncio Ejemplo</a></li>
-                    <li><a href="Legal.html">Aviso Legal</a></li>
-                </ul>
-            </nav>
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
         </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="anuncio.html">Publicar Anuncio</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="main-anuncio container">
-        <h1 id="anuncio-titulo">Título del Anuncio</h1>
-        <div class="anuncio-gallery">
-            </div>
-        <div class="anuncio-details">
-            <p id="anuncio-descripcion">Descripción detallada de la propiedad...</p>
-            <p class="precio" id="anuncio-precio">Precio</p>
-            <ul id="anuncio-caracteristicas">
-                </ul>
-        </div>
+    <main>
+        <section class="form-container">
+            <h2>Publica tu Anuncio</h2>
+            <p>Rellena el formulario para que podamos gestionar tu propiedad.</p>
+            
+            <form id="anuncioForm" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="titulo">Título del Anuncio</label>
+                    <input type="text" id="titulo" name="titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email de Contacto</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
+                </div>
+
+                <h3>Subir Imágenes (hasta 4)</h3>
+                <div class="form-group">
+                    <label for="imagen1">Imagen Principal (Obligatoria)</label>
+                    <input type="file" id="imagen1" name="attachment_1" accept="image/*" required>
+                </div>
+                 <div class="form-group">
+                    <label for="imagen2">Imagen 2</label>
+                    <input type="file" id="imagen2" name="attachment_2" accept="image/*">
+                </div>
+                 <div class="form-group">
+                    <label for="imagen3">Imagen 3</label>
+                    <input type="file" id="imagen3" name="attachment_3" accept="image/*">
+                </div>
+                 <div class="form-group">
+                    <label for="imagen4">Imagen 4</label>
+                    <input type="file" id="imagen4" name="attachment_4" accept="image/*">
+                </div>
+                
+                <button type="submit">Enviar Anuncio</button>
+            </form>
+        </section>
     </main>
+    
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
+    </footer>
 
-    <footer class="footer container">
-        </footer>
-
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    <script src="Script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

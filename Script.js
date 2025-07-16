@@ -1,117 +1,199 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- LÓGICA COMÚN ---
+    // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
-    if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
-    if (sidebar) sidebar.querySelector('.close-btn').addEventListener('click', () => sidebar.classList.remove('open'));
-
+    const closeBtn = document.querySelector('.close-btn');
     const scrollTopBtn = document.querySelector('.scroll-to-top');
-    if (scrollTopBtn) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 200) scrollTopBtn.classList.add('show');
-            else scrollTopBtn.classList.remove('show');
-        });
-        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    }
-
     const whatsappBtn = document.querySelector('.whatsapp-button');
-    if(whatsappBtn) {
-         window.addEventListener('scroll', () => {
-            if (window.scrollY > 200) whatsappBtn.classList.add('show');
-            else whatsappBtn.classList.remove('show');
+    const modals = document.querySelectorAll('.modal');
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
+    }
+    if (closeBtn && sidebar) {
+        closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+    }
+    
+    window.addEventListener('scroll', () => {
+        if (scrollTopBtn && whatsappBtn) {
+            const shouldShow = window.scrollY > 200;
+            scrollTopBtn.classList.toggle('show', shouldShow);
+            whatsappBtn.classList.toggle('show', shouldShow);
+        }
+    });
+
+    if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 
-    // --- LÓGICA PÁGINA DE INICIO ---
-    if (document.body.id === 'home-page') {
-        // --- LÓGICA DEL CARRUSEL HERO ---
-        const slides = document.querySelectorAll('.carousel-slide');
-        const dotsContainer = document.querySelector('.carousel-dots');
-        let currentSlide = 0;
-        let slideInterval;
-        if (slides.length > 0) {
-            const dots = [];
-            slides.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.classList.add('carousel-dot');
-                dot.addEventListener('click', () => { goToSlide(i); resetInterval(); });
-                dotsContainer.appendChild(dot);
-                dots.push(dot);
-            });
-            const goToSlide = (n) => {
-                slides[currentSlide].classList.remove('active');
-                dots[currentSlide].classList.remove('active');
-                currentSlide = (n + slides.length) % slides.length;
-                slides[currentSlide].classList.add('active');
-                dots[currentSlide].classList.add('active');
-            };
-            const nextSlide = () => goToSlide(currentSlide + 1);
-            const prevSlide = () => goToSlide(currentSlide - 1);
-            const resetInterval = () => { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 5000); };
-            document.getElementById('next-slide').addEventListener('click', () => { nextSlide(); resetInterval(); });
-            document.getElementById('prev-slide').addEventListener('click', () => { prevSlide(); resetInterval(); });
-            goToSlide(0); // Inicia en el primer slide
-            resetInterval();
+    modals.forEach(modal => {
+        const closeButton = modal.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => modal.classList.remove('active'));
         }
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                 modal.classList.remove('active');
+            }
+        });
+    });
 
-        // --- LÓGICA DE SERVICIOS, FAQ, NOTICIAS ---
-        // (código existente para servicios, faq y noticias)
-        
-        // --- LÓGICA DE TESTIMONIOS ---
-        const testimonialsData = [
-            { quote: "Encontraron la casa de mis sueños en tiempo récord. Un servicio excepcional y muy profesional. ¡Totalmente recomendados!", author: "Ana García, Compradora" },
-            { quote: "Vendieron mi piso en menos de un mes y por un precio superior al que esperaba. La mejor asesoría inmobiliaria de Gerona, sin duda.", author: "Javier Soler, Vendedor" },
-            { quote: "Como inversor, valoro la transparencia y el conocimiento del mercado. Selettas me ha guiado a la perfección en cada paso.", author: "Carlos Puig, Inversor" }
+    // --- LÓGICA DE LA PÁGINA DE INICIO ---
+    const servicesContainer = document.querySelector('.services-container');
+    if (servicesContainer) {
+        const services = [
+            { icon: 'fa-search-dollar', title: 'Valoración de Inmuebles', text: 'Obtén una valoración precisa y de mercado para tu propiedad.' },
+            { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.' },
+            { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
         ];
-        const testimonialCarousel = document.querySelector('.testimonial-carousel');
-        const testimonialDotsContainer = document.querySelector('.testimonial-dots');
-        if (testimonialCarousel) {
-            testimonialCarousel.innerHTML = testimonialsData.map(t => `<div class="testimonial-card"><p>"${t.quote}"</p><span class="author">${t.author}</span></div>`).join('');
-            
-            const testimonialSlides = document.querySelectorAll('.testimonial-card');
-            const testimonialDots = [];
-            let currentTestimonial = 0;
-            let testimonialInterval;
+        servicesContainer.innerHTML = services.map(service => `
+            <div class="service-item">
+                <i class="fas ${service.icon}"></i>
+                <h3>${service.title}</h3>
+                <p>${service.text}</p>
+            </div>
+        `).join('');
+    }
 
-            testimonialSlides.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.classList.add('testimonial-dot');
-                dot.addEventListener('click', () => { goToTestimonial(i); resetTestimonialInterval(); });
-                testimonialDotsContainer.appendChild(dot);
-                testimonialDots.push(dot);
-            });
+    const newsContainer = document.getElementById('news-container');
+    if(newsContainer) {
+        const newsData = [
+            { id: 1, titulo: 'Tendencias del Mercado', imagen: 'Images/Noticia1.jpg', descripcion: 'Descubre qué zonas de Gerona están en auge y qué tipo de propiedades son las más demandadas este año.'},
+            { id: 2, titulo: 'Consejos para Vender', imagen: 'Images/Noticia2.jpg', descripcion: 'Pequeños cambios pueden hacer una gran diferencia. Prepara tu casa para el éxito en el mercado.'},
+            { id: 3, titulo: 'Guía para Compradores', imagen: 'Images/Noticia3.jpg', descripcion: 'Desde la financiación hasta la firma, todo lo que necesitas saber para tu primera compra.'}
+        ];
+        const newsModal = document.getElementById('newsModal');
 
-            const goToTestimonial = (n) => {
-                testimonialCarousel.style.transform = `translateX(-${n * 100}%)`;
-                testimonialDots[currentTestimonial].classList.remove('active');
-                currentTestimonial = n;
-                testimonialDots[currentTestimonial].classList.add('active');
-            };
-
-            const nextTestimonial = () => {
-                let next = currentTestimonial + 1;
-                if (next >= testimonialSlides.length) {
-                    next = 0;
+        newsData.forEach(news => {
+            const card = document.createElement('div');
+            card.className = 'anuncio-card';
+            card.innerHTML = `
+                <img src="${news.imagen}" alt="${news.titulo}" loading="lazy">
+                <div class="anuncio-card-content">
+                    <h3>${news.titulo}</h3>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                if(newsModal) {
+                    newsModal.querySelector('#news-modal-img').src = news.imagen;
+                    newsModal.querySelector('#news-modal-titulo').textContent = news.titulo;
+                    newsModal.querySelector('#news-modal-descripcion').textContent = news.descripcion;
+                    newsModal.classList.add('active');
                 }
-                goToTestimonial(next);
-            };
+            });
+            newsContainer.appendChild(card);
+        });
+    }
 
-            const resetTestimonialInterval = () => {
-                clearInterval(testimonialInterval);
-                testimonialInterval = setInterval(nextTestimonial, 7000); // Rotan cada 7 segundos
-            };
-            
-            goToTestimonial(0);
-            resetTestimonialInterval();
+    const faqContainer = document.querySelector('.faq-container');
+    if (faqContainer) {
+        const faqs = [
+            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes. ¡Nosotros nos encargamos del resto!' },
+            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta se realiza a través de nuestros servicios.' },
+            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo o contactándonos.' },
+            { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
+        ];
+        faqContainer.innerHTML = faqs.map(faq => `
+            <div class="faq-item">
+                <h3>${faq.question}</h3>
+                <p>${faq.answer}</p>
+            </div>
+        `).join('');
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => item.classList.toggle('open'));
+        });
+    }
+    
+    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
+    const anunciosContainer = document.getElementById('anunciosContainer');
+    if (anunciosContainer) {
+        const anunciosData = [
+            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'Images/Anuncio1-1.jpg', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
+            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'Images/Anuncio2-1.jpg', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
+            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'Images/Anuncio3-1.jpg', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
+            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'Images/Anuncio4-1.jpg', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
+        ];
+
+        const modal = document.getElementById('anuncioModal');
+        const filtroTipo = document.getElementById('filtro-tipo');
+        const filtroHabitaciones = document.getElementById('filtro-habitaciones');
+        const filtroPrecio = document.getElementById('filtro-precio');
+        const resetFiltrosBtn = document.getElementById('reset-filtros');
+
+        const renderAnuncios = (anuncios) => {
+            anunciosContainer.innerHTML = '';
+            if (anuncios.length === 0) {
+                anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se encontraron anuncios con estos criterios.</p>';
+                return;
+            }
+            anuncios.forEach(anuncio => {
+                const card = document.createElement('div');
+                card.className = 'anuncio-card';
+                card.innerHTML = `
+                    <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
+                    <div class="anuncio-card-content">
+                        <h3>${anuncio.titulo}</h3>
+                        <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
+                        <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
+                    </div>`;
+                
+                card.addEventListener('click', () => {
+                    if (modal) {
+                        modal.querySelector('#modal-img').src = anuncio.imagen;
+                        modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                        modal.querySelector('#modal-precio').textContent = `${anuncio.precio.toLocaleString('es-ES')} €`;
+                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²`;
+                        modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                        modal.classList.add('active');
+                    }
+                });
+                anunciosContainer.appendChild(card);
+            });
+        };
+
+        const aplicarFiltros = () => {
+            let anunciosFiltrados = [...anunciosData];
+            const tipo = filtroTipo.value;
+            const habitaciones = parseInt(filtroHabitaciones.value) || 0;
+            const precio = parseInt(filtroPrecio.value) || 999999999;
+
+            if (tipo !== 'todos') {
+                anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
+            }
+            if (habitaciones > 0) {
+                anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
+            }
+            anunciosFiltrados = anunciosFiltrados.filter(a => a.precio <= precio);
+
+            renderAnuncios(anunciosFiltrados);
+        };
+        
+        if(filtroTipo) filtroTipo.addEventListener('change', aplicarFiltros);
+        if(filtroHabitaciones) filtroHabitaciones.addEventListener('input', aplicarFiltros);
+        if(filtroPrecio) filtroPrecio.addEventListener('input', aplicarFiltros);
+
+        if(resetFiltrosBtn) {
+            resetFiltrosBtn.addEventListener('click', () => {
+                filtroTipo.value = 'todos';
+                filtroHabitaciones.value = '';
+                filtroPrecio.value = '';
+                aplicarFiltros();
+            });
         }
+        
+        renderAnuncios(anunciosData);
     }
-
-    // --- LÓGICA PÁGINA VER ANUNCIOS ---
-    if (document.body.id === 'anuncios-page') {
-        // (código existente de la página de anuncios)
+    
+    // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
+    const toggleFiltrosBtn = document.getElementById('toggle-filtros');
+    const filtrosWrapper = document.getElementById('filtros-wrapper');
+    if (toggleFiltrosBtn && filtrosWrapper) {
+        toggleFiltrosBtn.addEventListener('click', () => {
+            const isVisible = filtrosWrapper.style.display === 'grid';
+            filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
+        });
     }
-
-    // --- LÓGICA PARA CERRAR MODALES ---
-    // (código existente para cerrar modales)
 });
