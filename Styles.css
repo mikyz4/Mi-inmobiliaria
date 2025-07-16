@@ -62,81 +62,60 @@ p { color: var(--font-color-secondary); line-height: 1.7; }
     height: 90vh; min-height: 400px;
     position: relative;
     display: flex; align-items: center; justify-content: center; text-align: center;
-    overflow: hidden; /* Oculta lo que se salga del contenedor */
+    overflow: hidden;
 }
 .carousel-container {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%; z-index: 0;
 }
 .carousel-slide {
-    position: absolute;
-    top: 0; left: 0;
+    position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
-    background-size: cover;
-    background-position: center;
+    background-size: cover; background-position: center;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
 }
-.carousel-slide.active {
-    opacity: 1;
-}
+.carousel-slide.active { opacity: 1; }
 .hero-section::after {
     content: ''; position: absolute; top:0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); z-index: 1;
 }
 .hero-content { position: relative; z-index: 2; padding: 20px; }
 .hero-content p { color: white; font-size: 1.2rem; }
-
 .carousel-nav {
-    position: absolute;
-    top: 50%;
-    left: 0;
+    position: absolute; top: 50%; left: 0;
     width: 100%;
-    display: flex;
-    justify-content: space-between;
+    display: flex; justify-content: space-between;
     transform: translateY(-50%);
-    z-index: 2;
-    padding: 0 20px;
+    z-index: 2; padding: 0 20px;
 }
 .carousel-arrow {
-    background: rgba(0,0,0,0.4);
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    padding: 10px 15px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    background: rgba(0,0,0,0.4); border: none;
+    color: white; font-size: 1.5rem;
+    padding: 10px 15px; border-radius: 50%;
+    cursor: pointer; transition: background-color 0.2s;
 }
-.carousel-arrow:hover {
-    background: rgba(0,0,0,0.7);
-}
+.carousel-arrow:hover { background: rgba(0,0,0,0.7); }
 .carousel-dots {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-    display: flex;
-    gap: 10px;
+    position: absolute; bottom: 20px; left: 50%;
+    transform: translateX(-50%); z-index: 2;
+    display: flex; gap: 10px;
 }
 .carousel-dot {
-    width: 12px;
-    height: 12px;
+    width: 12px; height: 12px;
     background: rgba(255,255,255,0.5);
-    border-radius: 50%;
-    cursor: pointer;
+    border-radius: 50%; cursor: pointer;
     transition: background-color 0.2s;
 }
-.carousel-dot.active {
-    background: white;
-}
+.carousel-dot.active { background: white; }
 
 /* --- SECCIONES --- */
 section { padding: 60px 5%; text-align: center; }
 .page-hero { padding: 100px 5% 40px; }
+.anuncios-container {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px; padding-top: 0;
+}
 
 /* --- COMPONENTES (SERVICIOS, FAQ) --- */
 .services-container, .faq-container {
@@ -155,7 +134,6 @@ section { padding: 60px 5%; text-align: center; }
 .faq-item.open p { display: block; }
 
 /* --- FORMULARIOS --- */
-.form-container { padding-top: 80px; }
 form { display: flex; flex-direction: column; gap: 20px; max-width: 700px; margin: 0 auto; }
 .form-group { display: flex; flex-direction: column; text-align: left; gap: 8px; }
 label { font-weight: 600; color: var(--font-color-secondary); }
@@ -164,7 +142,6 @@ input, textarea, select {
     background-color: var(--secondary-color); border: 1px solid #444;
     border-radius: 5px; color: var(--font-color-primary); font-size: 1rem;
 }
-/* --- BOTONES --- */
 button, .btn {
     padding: 12px 25px; background-color: var(--accent-color);
     color: var(--primary-color); border: none; border-radius: 5px; cursor: pointer;
@@ -173,27 +150,13 @@ button, .btn {
 }
 button:hover, .btn:hover { transform: scale(1.05); }
 
-/* --- ANUNCIOS Y MODAL --- */
-.anuncios-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px; padding-top: 0;
-}
-.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-.anuncio-card:hover { transform: translateY(-5px); }
-.anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
-.anuncio-card-content { padding: 15px; text-align: left; }
-.anuncio-card h3 { color: white; }
-.anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
-.anuncio-card-details { color: var(--font-color-secondary); }
-
 /* --- FOOTER Y BOTONES FLOTANTES --- */
 footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
 footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button, .scroll-to-top {
     position: fixed; right: 20px; z-index: 100;
     width: 50px; height: 50px; border-radius: 50%;
-    display: none;
-    place-items: center;
+    display: none; place-items: center;
     font-size: 1.5rem; text-decoration: none;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     transition: transform 0.2s, opacity 0.3s;
@@ -204,7 +167,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
 .scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
 
-/* --- MODAL (GENÉRICO Y DE NOTICIAS) --- */
+/* --- MODALES (NOTICIAS Y ANUNCIOS) --- */
 .modal {
     display: none; position: fixed; z-index: 103;
     left: 0; top: 0; width: 100%; height: 100%;
@@ -225,55 +188,70 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 .modal-img { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; margin-bottom: 15px; }
 .modal-content h3 { color: var(--accent-color); margin-bottom: 10px; }
-
-/* --- FILTROS --- */
-.filtros-section { 
-    padding-top: 0; 
-    padding-bottom: 40px; 
-}
-#filtros-wrapper {
-    display: none;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px; 
-    max-width: 1000px; 
-    margin: 20px auto 0 auto;
-    background-color: var(--secondary-color); 
-    padding: 20px; 
-    border-radius: 8px;
-    align-items: end;
-}
-.filtro {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    gap: 8px;
-}
-.btn-secondary { 
-    background-color: #555; 
-    color: white; 
-}
-
-/* --- ESTILOS PARA EL MODAL DE ANUNCIOS --- */
+.modal-price { color: var(--accent-color); font-size: 1.5rem; font-weight: bold; margin: 10px 0; }
 .modal-gallery { margin-bottom: 20px; }
-.modal-thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-}
+.modal-thumbnails { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 .modal-thumbnails img {
-    width: 80px;
-    height: 60px;
-    object-fit: cover;
-    cursor: pointer;
-    border-radius: 4px;
-    border: 2px solid transparent;
+    width: 80px; height: 60px; object-fit: cover;
+    cursor: pointer; border-radius: 4px; border: 2px solid transparent;
     transition: border-color 0.2s;
 }
 .modal-thumbnails img:hover { border-color: var(--accent-color); }
-.modal-price {
-    color: var(--accent-color);
-    font-size: 1.5rem;
+
+/* --- FILTROS --- */
+#filtros-wrapper {
+    display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; max-width: 1000px; margin: 20px auto 0 auto;
+    background-color: var(--secondary-color); padding: 20px; border-radius: 8px;
+    align-items: end;
+}
+.filtro { display: flex; flex-direction: column; text-align: left; gap: 8px; }
+.btn-secondary { background-color: #555; color: white; }
+
+/* ========= ESTILOS PARA LA NUEVA SECCIÓN DE TESTIMONIOS ========= */
+#testimonials {
+    background-color: var(--primary-color); /* Un fondo ligeramente diferente para destacar */
+}
+.testimonial-carousel-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+.testimonial-carousel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+.testimonial-card {
+    flex: 0 0 100%;
+    padding: 30px;
+    text-align: center;
+}
+.testimonial-card p {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--font-color-secondary);
+    max-width: 600px;
+    margin: 0 auto 15px auto;
+}
+.testimonial-card .author {
     font-weight: bold;
-    margin: 10px 0;
+    color: var(--font-color-primary);
+}
+.testimonial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.testimonial-dot {
+    width: 10px;
+    height: 10px;
+    background: #555;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.testimonial-dot.active {
+    background: var(--accent-color);
 }
