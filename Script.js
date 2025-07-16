@@ -1,203 +1,219 @@
-document.addEventListener('DOMContentLoaded', function() {
+/* --- RESET Y VARIABLES GLOBALES --- */
+:root {
+    --primary-color: #121212;
+    --secondary-color: #1E1E1E;
+    --accent-color: #2CFF8E;
+    --font-color-primary: #FFFFFF;
+    --font-color-secondary: #B3B3B3;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--primary-color);
+    color: var(--font-color-primary);
+    overflow-x: hidden;
+}
+/* --- TIPOGRAFÍA --- */
+h1, h2, h3, h4, .btn, button { font-family: 'Poppins', sans-serif; font-weight: 700; }
+h1 { font-size: clamp(2.2rem, 7vw, 3rem); color: white; }
+h2 {
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+    color: var(--accent-color);
+    text-align: center;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--accent-color);
+    display: inline-block;
+}
+p { color: var(--font-color-secondary); line-height: 1.7; }
 
-    // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES) ---
-    const menuToggle = document.querySelector('.menu-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    const closeBtn = document.querySelector('.close-btn');
-    const scrollTopBtn = document.querySelector('.scroll-to-top');
-    const whatsappBtn = document.querySelector('.whatsapp-button');
+/* --- NAVEGACIÓN Y HEADER --- */
+.menu-toggle {
+    position: fixed; top: 20px; left: 20px;
+    font-size: 1.8rem; color: var(--accent-color);
+    cursor: pointer; z-index: 102;
+    background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 5px;
+}
+.sidebar {
+    position: fixed; top: 0; left: -280px;
+    width: 250px; height: 100%;
+    background-color: #181818;
+    padding-top: 60px;
+    transition: left 0.3s ease-in-out;
+    z-index: 101;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.5);
+}
+.sidebar.open { left: 0; }
+.sidebar .close-btn {
+    position: absolute; top: 15px; right: 25px;
+    font-size: 2.5rem; color: var(--font-color-secondary); cursor: pointer;
+}
+.sidebar ul { list-style: none; }
+.sidebar ul li a {
+    display: block; padding: 15px 20px;
+    color: var(--font-color-primary); text-decoration: none;
+    font-size: 1.2rem; transition: background-color 0.2s;
+}
+.sidebar ul li a:hover { background-color: var(--secondary-color); color: var(--accent-color); }
 
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
-    }
-    if (closeBtn && sidebar) {
-        closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
-    }
-    
-    window.addEventListener('scroll', () => {
-        if (scrollTopBtn && whatsappBtn) {
-            if (window.scrollY > 200) {
-                scrollTopBtn.classList.add('show');
-                whatsappBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-                whatsappBtn.classList.remove('show');
-            }
-        }
-    });
+/* --- HERO SECTION --- */
+.hero-section {
+    height: 90vh; min-height: 400px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.hero-section::after {
+    content: ''; position: absolute; top:0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1;
+}
+.hero-content { position: relative; z-index: 2; padding: 20px; }
+.hero-content p { color: white; font-size: 1.2rem; }
 
-    if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
+/* --- SECCIONES --- */
+section { padding: 60px 5%; text-align: center; }
+.page-hero { padding: 100px 5% 40px; }
 
-    // --- LÓGICA DE LA PÁGINA DE INICIO ---
-    const servicesContainer = document.querySelector('.services-container');
-    if (servicesContainer) {
-        const services = [
-            { icon: 'fa-search-dollar', title: 'Valoración de Inmuebles', text: 'Obtén una valoración precisa y de mercado para tu propiedad.' },
-            { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.' },
-            { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
-        ];
-        servicesContainer.innerHTML = services.map(service => `
-            <div class="service-item">
-                <i class="fas ${service.icon}"></i>
-                <h3>${service.title}</h3>
-                <p>${service.text}</p>
-            </div>
-        `).join('');
-    }
+/* --- COMPONENTES (SERVICIOS, FAQ) --- */
+.services-container, .faq-container {
+    max-width: 1000px; margin: 0 auto; text-align: left;
+    display: grid; gap: 20px;
+}
+.service-item, .faq-item {
+    background-color: var(--secondary-color); padding: 25px; border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+.service-item i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
+.faq-item h3 { cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
+.faq-item h3::after { content: '+'; font-size: 1.5rem; color: var(--accent-color); }
+.faq-item.open h3::after { content: '-'; }
+.faq-item p { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;}
+.faq-item.open p { display: block; }
 
-    const faqContainer = document.querySelector('.faq-container');
-    if (faqContainer) {
-        const faqs = [
-            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos del formulario y adjunta tus imágenes. ¡Nosotros nos encargamos del resto!' },
-            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta o alquiler se realiza a través de nuestros servicios.' },
-            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo fácilmente contactándonos.' },
-            { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Es una de nuestras especialidades. Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
-        ];
-        faqContainer.innerHTML = faqs.map(faq => `
-            <div class="faq-item">
-                <h3>${faq.question}</h3>
-                <p>${faq.answer}</p>
-            </div>
-        `).join('');
-        
-        faqContainer.querySelectorAll('.faq-item h3').forEach(faqTitle => {
-            faqTitle.addEventListener('click', () => {
-                faqTitle.parentElement.classList.toggle('open');
-            });
-        });
-    }
+/* --- FORMULARIOS --- */
+.form-container { padding-top: 80px; }
+form { display: flex; flex-direction: column; gap: 20px; max-width: 700px; margin: 0 auto; }
+.form-group { display: flex; flex-direction: column; text-align: left; gap: 8px; }
+label { font-weight: 600; color: var(--font-color-secondary); }
+input, textarea, select {
+    width: 100%; padding: 12px;
+    background-color: var(--secondary-color); border: 1px solid #444;
+    border-radius: 5px; color: var(--font-color-primary); font-size: 1rem;
+}
+/* --- BOTONES --- */
+button, .btn {
+    padding: 12px 25px; background-color: var(--accent-color);
+    color: var(--primary-color); border: none; border-radius: 5px; cursor: pointer;
+    font-size: 1rem; font-weight: bold; text-decoration: none;
+    transition: transform 0.2s;
+}
+button:hover, .btn:hover { transform: scale(1.05); }
 
-    const newsContainer = document.getElementById('news-container');
-    if (newsContainer) {
-        const newsData = [
-            { id: 1, titulo: 'Tendencias del Mercado Inmobiliario en Gerona', imagen: 'Images/Noticia1.jpg', descripcion: 'Análisis detallado de las zonas con mayor crecimiento y potencial de inversión para este año.' },
-            { id: 2, titulo: '5 Consejos para Vender tu Casa Más Rápido', imagen: 'Images/Noticia2.jpg', descripcion: 'Descubre técnicas de home staging y marketing para acelerar la venta de tu propiedad al mejor precio.' },
-            { id: 3, titulo: 'Guía para la Compra de tu Primera Vivienda', imagen: 'Images/Noticia3.jpg', descripcion: 'Desde la financiación hasta la firma: te guiamos en cada paso para que el proceso sea claro y sin sorpresas.' }
-        ];
-        newsContainer.innerHTML = newsData.map(news => `
-            <div class="anuncio-card news-card" data-id="${news.id}">
-                <img src="${news.imagen}" alt="${news.titulo}">
-                <div class="anuncio-card-content">
-                    <h3>${news.titulo}</h3>
-                </div>
-            </div>
-        `).join('');
+/* --- ANUNCIOS Y MODAL --- */
+.anuncios-container {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px; padding-top: 0;
+}
+.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+.anuncio-card:hover { transform: translateY(-5px); }
+.anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
+.anuncio-card-content { padding: 15px; text-align: left; }
+.anuncio-card h3 { color: white; }
+.anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
+.anuncio-card-details { color: var(--font-color-secondary); }
 
-        const newsModal = document.getElementById('newsModal');
-        const newsModalImg = document.getElementById('news-modal-img');
-        const newsModalTitulo = document.getElementById('news-modal-titulo');
-        const newsModalDescripcion = document.getElementById('news-modal-descripcion');
-        const modalCloseButton = newsModal.querySelector('.close-button');
+/* --- FOOTER Y BOTONES FLOTANTES --- */
+footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
+footer a { color: var(--accent-color); text-decoration: none;}
+.whatsapp-button, .scroll-to-top {
+    position: fixed; right: 20px; z-index: 100;
+    width: 50px; height: 50px; border-radius: 50%;
+    display: none;
+    place-items: center;
+    font-size: 1.5rem; text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s, opacity 0.3s;
+    opacity: 0;
+}
+.whatsapp-button.show, .scroll-to-top.show { display: grid; opacity: 1; }
+.whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
+.whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
+.scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
 
-        newsContainer.querySelectorAll('.news-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const newsId = parseInt(card.dataset.id);
-                const newsItem = newsData.find(item => item.id === newsId);
-                if (newsItem) {
-                    newsModalImg.src = newsItem.imagen;
-                    newsModalTitulo.textContent = newsItem.titulo;
-                    newsModalDescripcion.textContent = newsItem.descripcion;
-                    newsModal.classList.add('show-modal');
-                }
-            });
-        });
+/* --- MODAL (GENÉRICO Y DE NOTICIAS) --- */
+.modal {
+    display: none; position: fixed; z-index: 103;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center; align-items: center;
+}
+.modal.show-modal { display: flex; }
+.modal-content {
+    background-color: var(--secondary-color); padding: 30px;
+    border-radius: 8px; max-width: 600px; width: 90%;
+    position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    text-align: left;
+}
+.modal-content .close-button {
+    position: absolute; top: 10px; right: 20px;
+    font-size: 2rem; color: var(--font-color-secondary);
+    cursor: pointer;
+}
+.modal-img { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; margin-bottom: 15px; }
+.modal-content h3 { color: var(--accent-color); margin-bottom: 10px; }
 
-        modalCloseButton.addEventListener('click', () => newsModal.classList.remove('show-modal'));
-        newsModal.addEventListener('click', (e) => {
-            if (e.target === newsModal) {
-                newsModal.classList.remove('show-modal');
-            }
-        });
-    }
+/* --- FILTROS --- */
+.filtros-section { 
+    padding-top: 0; 
+    padding-bottom: 40px; 
+}
+#filtros-wrapper {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; 
+    max-width: 1000px; 
+    margin: 20px auto 0 auto;
+    background-color: var(--secondary-color); 
+    padding: 20px; 
+    border-radius: 8px;
+    align-items: end;
+}
+.filtro {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 8px;
+}
+.btn-secondary { 
+    background-color: #555; 
+    color: white; 
+}
 
-    // --- LÓGICA PARA VER ANUNCIOS (FILTROS + MODAL) ---
-    const anunciosContainer = document.getElementById('anunciosContainer');
-    if (anunciosContainer) {
-        const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, descripcion: 'Espectacular piso reformado en el corazón de Gerona...', imagenes: ['Images/Anuncio1-1.jpg', 'Images/Anuncio1-2.jpg'] },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, descripcion: 'Magnífica casa unifamiliar en urbanización tranquila...', imagenes: ['Images/Anuncio2-1.jpg', 'Images/Anuncio2-2.jpg'] },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, descripcion: 'Luminoso ático con vistas despejadas y acabados de lujo...', imagenes: ['Images/Anuncio3-1.jpg', 'Images/Anuncio3-2.jpg'] },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, descripcion: 'Moderna casa de obra nueva con la máxima eficiencia energética...', imagenes: ['Images/Anuncio4-1.jpg'] }
-        ];
-
-        const filtroTipo = document.getElementById('filtro-tipo');
-        const filtroHabitaciones = document.getElementById('filtro-habitaciones');
-        const filtroPrecio = document.getElementById('filtro-precio');
-        const resetFiltrosBtn = document.getElementById('reset-filtros');
-        const toggleFiltrosBtn = document.getElementById('toggle-filtros');
-        const filtrosWrapper = document.getElementById('filtros-wrapper');
-
-        const renderAnuncios = (anuncios) => {
-            anunciosContainer.innerHTML = '';
-            if (anuncios.length === 0) {
-                anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se encontraron anuncios con estos criterios.</p>';
-                return;
-            }
-            anuncios.forEach(anuncio => {
-                const card = document.createElement('div');
-                card.className = 'anuncio-card';
-                // Añadimos un data-id para identificar el anuncio al hacer clic
-                card.dataset.id = anuncio.id;
-                card.innerHTML = `
-                    <img src="${anuncio.imagenes[0]}" alt="${anuncio.titulo}" loading="lazy">
-                    <div class="anuncio-card-content">
-                        <h3>${anuncio.titulo}</h3>
-                        <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
-                        <p class="anuncio-card-details">${anuncio.habitaciones} hab. | ${anuncio.tipo}</p>
-                    </div>`;
-                
-                // **AÑADIMOS EL EVENTO CLICK PARA ABRIR EL MODAL**
-                card.addEventListener('click', () => {
-                    const anuncioId = parseInt(card.dataset.id);
-                    const anuncioSeleccionado = anunciosData.find(a => a.id === anuncioId);
-                    if (anuncioSeleccionado) {
-                        // Aquí iría la lógica para abrir el modal con los detalles
-                        // Por ahora, un simple alert para confirmar que funciona:
-                        alert(`Has hecho clic en: ${anuncioSeleccionado.titulo}`);
-                    }
-                });
-                anunciosContainer.appendChild(card);
-            });
-        };
-
-        const aplicarFiltros = () => {
-            let anunciosFiltrados = [...anunciosData];
-            const tipo = filtroTipo.value;
-            const habitaciones = parseInt(filtroHabitaciones.value) || 0;
-            const precio = parseInt(filtroPrecio.value) || 999999999;
-
-            if (tipo !== 'todos') {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
-            }
-            if (habitaciones > 0) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
-            }
-            anunciosFiltrados = anunciosFiltrados.filter(a => a.precio <= precio);
-
-            renderAnuncios(anunciosFiltrados);
-        };
-
-        filtroTipo.addEventListener('change', aplicarFiltros);
-        filtroHabitaciones.addEventListener('input', aplicarFiltros);
-        filtroPrecio.addEventListener('input', aplicarFiltros);
-
-        resetFiltrosBtn.addEventListener('click', () => {
-            filtroTipo.value = 'todos';
-            filtroHabitaciones.value = '';
-            filtroPrecio.value = '';
-            aplicarFiltros();
-        });
-
-        toggleFiltrosBtn.addEventListener('click', () => {
-            const isVisible = filtrosWrapper.style.display === 'grid';
-            filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
-            toggleFiltrosBtn.innerHTML = isVisible ? '<i class="fas fa-filter"></i> Mostrar Filtros' : '<i class="fas fa-times"></i> Ocultar Filtros';
-        });
-        
-        renderAnuncios(anunciosData);
-    }
-});
+/* --- ESTILOS PARA EL MODAL DE ANUNCIOS --- */
+.modal-gallery {
+    margin-bottom: 20px;
+}
+.modal-thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+.modal-thumbnails img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+.modal-thumbnails img:hover {
+    border-color: var(--accent-color);
+}
+.modal-price {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+}

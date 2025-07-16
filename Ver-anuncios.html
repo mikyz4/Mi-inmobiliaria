@@ -36,7 +36,7 @@
 
         <section class="filtros-section">
             <button id="toggle-filtros" class="btn"><i class="fas fa-filter"></i> Mostrar Filtros</button>
-            <div id="filtros-wrapper" style="display: none;">
+            <div id="filtros-wrapper">
                 <div class="filtro">
                     <label for="filtro-tipo">Tipo de Propiedad</label>
                     <select id="filtro-tipo">
@@ -57,6 +57,7 @@
                 <button id="reset-filtros" class="btn-secondary">Limpiar Filtros</button>
             </div>
         </section>
+
         <section id="anunciosContainer" class="anuncios-container">
             </section>
     </main>
@@ -68,6 +69,19 @@
     <a href="https://wa.me/34632125872" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
     <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
+    <div id="anuncioModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="modal-gallery" class="modal-gallery">
+                <img id="modal-main-img" src="" alt="Imagen principal del anuncio" class="modal-img">
+                <div id="modal-thumbnails" class="modal-thumbnails">
+                    </div>
+            </div>
+            <h3 id="modal-titulo"></h3>
+            <p class="modal-price" id="modal-precio"></p>
+            <p id="modal-descripcion"></p>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
