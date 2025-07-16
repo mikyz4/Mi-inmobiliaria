@@ -39,13 +39,23 @@
         <section id="services">
             <h2>Nuestros Servicios</h2>
             <div class="services-container">
-                </div>
+                <!-- Se rellena con JS -->
+            </div>
         </section>
         
+        <!-- SECCIÓN DE NOVEDADES RESTAURADA -->
+        <section id="news">
+            <h2>Últimas Novedades</h2>
+            <div id="news-container" class="anuncios-container">
+                <!-- Las tarjetas de noticias se insertarán aquí -->
+            </div>
+        </section>
+
         <section id="faq">
              <h2>Preguntas Frecuentes</h2>
              <div class="faq-container">
-                </div>
+                <!-- Se rellena con JS -->
+             </div>
         </section>
 
         <section id="contact">
@@ -59,6 +69,16 @@
         </section>
     </main>
     
+    <!-- MODAL PARA LAS NOVEDADES -->
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img">
+            <h3 id="news-modal-titulo"></h3>
+            <p id="news-modal-descripcion"></p>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>

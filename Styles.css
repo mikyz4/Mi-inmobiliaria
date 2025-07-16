@@ -122,12 +122,60 @@ button:hover, .btn:hover { transform: scale(1.05); }
     display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px; padding-top: 0;
 }
-.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; }
+.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; cursor: pointer; }
 .anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
 .anuncio-card-content { padding: 15px; text-align: left; }
 .anuncio-card h3 { color: white; }
 .anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
 .anuncio-card-details { color: var(--font-color-secondary); }
+
+/* --- MODAL (VENTANA EMERGENTE) - CORREGIDO --- */
+.modal {
+    position: fixed; /* Posición fija sobre todo */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semitransparente */
+    z-index: 1000; /* Por encima de todo lo demás */
+    display: none; /* Oculto por defecto */
+    place-items: center; /* Centra el contenido vertical y horizontalmente */
+    padding: 20px;
+}
+.modal.active {
+    display: grid; /* Se muestra cuando tiene la clase 'active' */
+}
+.modal-content {
+    background-color: var(--secondary-color);
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    text-align: left;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-content .close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    color: var(--font-color-secondary);
+    cursor: pointer;
+}
+.modal-img {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.modal-content h3 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
 
 /* --- FOOTER Y BOTONES FLOTANTES --- */
 footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
@@ -135,7 +183,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button, .scroll-to-top {
     position: fixed; right: 20px; z-index: 100;
     width: 50px; height: 50px; border-radius: 50%;
-    display: none; /* Se muestra con JS */
+    display: none;
     place-items: center;
     font-size: 1.5rem; text-decoration: none;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);

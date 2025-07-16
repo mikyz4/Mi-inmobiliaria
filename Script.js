@@ -58,6 +58,37 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
+    // --- SECCIÓN DE NOVEDADES RESTAURADA ---
+    const newsContainer = document.getElementById('news-container');
+    if(newsContainer) {
+        const newsData = [
+            { id: 1, titulo: 'Tendencias del Mercado', imagen: 'Images/Noticia1.jpg', descripcion: 'Descubre qué zonas de Gerona están en auge y qué tipo de propiedades son las más demandadas este año.'},
+            { id: 2, titulo: 'Consejos para Vender', imagen: 'Images/Noticia2.jpg', descripcion: 'Pequeños cambios pueden hacer una gran diferencia. Prepara tu casa para el éxito en el mercado.'},
+            { id: 3, titulo: 'Guía para Compradores', imagen: 'Images/Noticia3.jpg', descripcion: 'Desde la financiación hasta la firma, todo lo que necesitas saber para tu primera compra.'}
+        ];
+        const newsModal = document.getElementById('newsModal');
+
+        newsData.forEach(news => {
+            const card = document.createElement('div');
+            card.className = 'anuncio-card';
+            card.innerHTML = `
+                <img src="${news.imagen}" alt="${news.titulo}">
+                <div class="anuncio-card-content">
+                    <h3>${news.titulo}</h3>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                if(newsModal) {
+                    newsModal.querySelector('#news-modal-img').src = news.imagen;
+                    newsModal.querySelector('#news-modal-titulo').textContent = news.titulo;
+                    newsModal.querySelector('#news-modal-descripcion').textContent = news.descripcion;
+                    newsModal.classList.add('active');
+                }
+            });
+            newsContainer.appendChild(card);
+        });
+    }
+
     const faqContainer = document.querySelector('.faq-container');
     if (faqContainer) {
         const faqs = [
@@ -81,10 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=800', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=800', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
+            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'Images/Anuncio1-1.jpg', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
+            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'Images/Anuncio2-1.jpg', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
+            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'Images/Anuncio3-1.jpg', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
+            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'Images/Anuncio4-1.jpg', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
         ];
 
         const modal = document.getElementById('anuncioModal');
@@ -110,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
                     </div>`;
                 
-                // --- EVENTO DE CLIC PARA ABRIR EL MODAL ---
                 card.addEventListener('click', () => {
                     if (modal) {
                         modal.querySelector('#modal-img').src = anuncio.imagen;
@@ -155,11 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Carga inicial de anuncios
         renderAnuncios(anunciosData);
     }
     
-    // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
     if (toggleFiltrosBtn && filtrosWrapper) {
