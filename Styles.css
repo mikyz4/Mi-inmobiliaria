@@ -108,74 +108,20 @@ button, .btn {
     transition: transform 0.2s;
 }
 button:hover, .btn:hover { transform: scale(1.05); }
-.btn-secondary { background-color: #555; color: white; }
 
-/* --- FILTROS Y ANUNCIOS --- */
-.filtros-section { padding-top: 0; padding-bottom: 40px; }
-#filtros-wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px; max-width: 1000px; margin: 20px auto 0 auto;
-    background-color: var(--secondary-color); padding: 20px; border-radius: 8px;
-}
+
+/* --- ANUNCIOS Y MODAL --- */
 .anuncios-container {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px; padding-top: 0;
 }
-.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; cursor: pointer; }
+.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+.anuncio-card:hover { transform: translateY(-5px); }
 .anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
 .anuncio-card-content { padding: 15px; text-align: left; }
 .anuncio-card h3 { color: white; }
 .anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
 .anuncio-card-details { color: var(--font-color-secondary); }
-
-/* --- MODAL (VENTANA EMERGENTE) - CORREGIDO --- */
-.modal {
-    position: fixed; /* Posición fija sobre todo */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semitransparente */
-    z-index: 1000; /* Por encima de todo lo demás */
-    display: none; /* Oculto por defecto */
-    place-items: center; /* Centra el contenido vertical y horizontalmente */
-    padding: 20px;
-}
-.modal.active {
-    display: grid; /* Se muestra cuando tiene la clase 'active' */
-}
-.modal-content {
-    background-color: var(--secondary-color);
-    padding: 30px;
-    border-radius: 8px;
-    max-width: 600px;
-    width: 100%;
-    position: relative;
-    text-align: left;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-.modal-content .close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 2rem;
-    color: var(--font-color-secondary);
-    cursor: pointer;
-}
-.modal-img {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-.modal-content h3 {
-    color: var(--accent-color);
-    margin-bottom: 10px;
-}
 
 /* --- FOOTER Y BOTONES FLOTANTES --- */
 footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
@@ -194,3 +140,55 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
 .whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
 .scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
+
+/* --- MODAL DE NOTICIAS --- */
+.modal {
+    display: none; position: fixed; z-index: 103;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center; align-items: center;
+}
+.modal.show-modal { display: flex; }
+.modal-content {
+    background-color: var(--secondary-color); padding: 30px;
+    border-radius: 8px; max-width: 600px; width: 90%;
+    position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.modal-content .close-button {
+    position: absolute; top: 10px; right: 20px;
+    font-size: 2rem; color: var(--font-color-secondary);
+    cursor: pointer;
+}
+.modal-img { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; margin-bottom: 15px; }
+.modal-content h3 { color: var(--accent-color); margin-bottom: 10px; }
+
+/* ========= ESTILOS NUEVOS PARA LOS FILTROS ========= */
+.filtros-section { 
+    padding-top: 0; 
+    padding-bottom: 40px; 
+}
+
+#filtros-wrapper {
+    display: none; /* Cambiado a none para que el JS lo controle */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; 
+    max-width: 1000px; 
+    margin: 20px auto 0 auto;
+    background-color: var(--secondary-color); 
+    padding: 20px; 
+    border-radius: 8px;
+    align-items: end; /* Alinea los elementos al final para que los botones queden bien */
+}
+
+.filtro {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 8px;
+}
+
+.btn-secondary { 
+    background-color: #555; 
+    color: white; 
+}
+/* ========= FIN DE LOS ESTILOS NUEVOS ========= */
