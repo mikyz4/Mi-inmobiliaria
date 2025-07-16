@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES) ---
+    // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
     const closeBtn = document.querySelector('.close-btn');
     const scrollTopBtn = document.querySelector('.scroll-to-top');
     const whatsappBtn = document.querySelector('.whatsapp-button');
+    const modals = document.querySelectorAll('.modal');
 
     if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
@@ -16,13 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.addEventListener('scroll', () => {
         if (scrollTopBtn && whatsappBtn) {
-            if (window.scrollY > 200) {
-                scrollTopBtn.classList.add('show');
-                whatsappBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-                whatsappBtn.classList.remove('show');
-            }
+            const shouldShow = window.scrollY > 200;
+            scrollTopBtn.classList.toggle('show', shouldShow);
+            whatsappBtn.classList.toggle('show', shouldShow);
         }
     });
 
@@ -32,6 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    modals.forEach(modal => {
+        const closeButton = modal.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => modal.classList.remove('active'));
+        }
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                 modal.classList.remove('active');
+            }
+        });
+    });
+
     // --- LÓGICA DE LA PÁGINA DE INICIO ---
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
@@ -40,28 +49,31 @@ document.addEventListener('DOMContentLoaded', function() {
             { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.' },
             { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
         ];
-        services.forEach(service => {
-            const item = document.createElement('div');
-            item.className = 'service-item';
-            item.innerHTML = `<i class="fas ${service.icon}"></i><h3>${service.title}</h3><p>${service.text}</p>`;
-            servicesContainer.appendChild(item);
-        });
+        servicesContainer.innerHTML = services.map(service => `
+            <div class="service-item">
+                <i class="fas ${service.icon}"></i>
+                <h3>${service.title}</h3>
+                <p>${service.text}</p>
+            </div>
+        `).join('');
     }
 
     const faqContainer = document.querySelector('.faq-container');
     if (faqContainer) {
         const faqs = [
-            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos del formulario y adjunta tus imágenes. ¡Nosotros nos encargamos del resto!' },
-            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta o alquiler se realiza a través de nuestros servicios.' },
-            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo fácilmente o contactándonos.' },
-            { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Es una de nuestras especialidades. Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
+            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes. ¡Nosotros nos encargamos del resto!' },
+            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta se realiza a través de nuestros servicios.' },
+            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo o contactándonos.' },
+            { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
         ];
-        faqs.forEach(faq => {
-            const item = document.createElement('div');
-            item.className = 'faq-item';
-            item.innerHTML = `<h3>${faq.question}</h3><p>${faq.answer}</p>`;
+        faqContainer.innerHTML = faqs.map(faq => `
+            <div class="faq-item">
+                <h3>${faq.question}</h3>
+                <p>${faq.answer}</p>
+            </div>
+        `).join('');
+        document.querySelectorAll('.faq-item').forEach(item => {
             item.addEventListener('click', () => item.classList.toggle('open'));
-            faqContainer.appendChild(item);
         });
     }
     
@@ -69,12 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, imagen: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=800' },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, imagen: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800' },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800' },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, imagen: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=800' }
+            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=800', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
+            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
+            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
+            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=800', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
         ];
 
+        const modal = document.getElementById('anuncioModal');
         const filtroTipo = document.getElementById('filtro-tipo');
         const filtroHabitaciones = document.getElementById('filtro-habitaciones');
         const filtroPrecio = document.getElementById('filtro-precio');
@@ -94,8 +107,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
-                        <p class="anuncio-card-details">${anuncio.habitaciones} hab.</p>
+                        <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
                     </div>`;
+                
+                // --- EVENTO DE CLIC PARA ABRIR EL MODAL ---
+                card.addEventListener('click', () => {
+                    if (modal) {
+                        modal.querySelector('#modal-img').src = anuncio.imagen;
+                        modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                        modal.querySelector('#modal-precio').textContent = `${anuncio.precio.toLocaleString('es-ES')} €`;
+                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²`;
+                        modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                        modal.classList.add('active');
+                    }
+                });
                 anunciosContainer.appendChild(card);
             });
         };
@@ -116,19 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
             renderAnuncios(anunciosFiltrados);
         };
-
-        filtroTipo.addEventListener('change', aplicarFiltros);
-        filtroHabitaciones.addEventListener('input', aplicarFiltros);
-        filtroPrecio.addEventListener('input', aplicarFiltros);
-
-        resetFiltrosBtn.addEventListener('click', () => {
-            filtroTipo.value = 'todos';
-            filtroHabitaciones.value = '';
-            filtroPrecio.value = '';
-            aplicarFiltros();
-        });
         
-        // Carga inicial
+        if(filtroTipo) filtroTipo.addEventListener('change', aplicarFiltros);
+        if(filtroHabitaciones) filtroHabitaciones.addEventListener('input', aplicarFiltros);
+        if(filtroPrecio) filtroPrecio.addEventListener('input', aplicarFiltros);
+
+        if(resetFiltrosBtn) {
+            resetFiltrosBtn.addEventListener('click', () => {
+                filtroTipo.value = 'todos';
+                filtroHabitaciones.value = '';
+                filtroPrecio.value = '';
+                aplicarFiltros();
+            });
+        }
+        
+        // Carga inicial de anuncios
         renderAnuncios(anunciosData);
     }
     
