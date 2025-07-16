@@ -114,14 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
+    // --- LÓGICA PARA VER ANUNCIOS (FILTROS + MODAL) ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, imagen: 'Images/Anuncio1-1.jpg' },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, imagen: 'Images/Anuncio2-1.jpg' },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, imagen: 'Images/Anuncio3-1.jpg' },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, imagen: 'Images/Anuncio4-1.jpg' }
+            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, descripcion: 'Espectacular piso reformado en el corazón de Gerona...', imagenes: ['Images/Anuncio1-1.jpg', 'Images/Anuncio1-2.jpg'] },
+            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, descripcion: 'Magnífica casa unifamiliar en urbanización tranquila...', imagenes: ['Images/Anuncio2-1.jpg', 'Images/Anuncio2-2.jpg'] },
+            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, descripcion: 'Luminoso ático con vistas despejadas y acabados de lujo...', imagenes: ['Images/Anuncio3-1.jpg', 'Images/Anuncio3-2.jpg'] },
+            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, descripcion: 'Moderna casa de obra nueva con la máxima eficiencia energética...', imagenes: ['Images/Anuncio4-1.jpg'] }
         ];
 
         const filtroTipo = document.getElementById('filtro-tipo');
@@ -140,13 +140,26 @@ document.addEventListener('DOMContentLoaded', function() {
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
+                // Añadimos un data-id para identificar el anuncio al hacer clic
+                card.dataset.id = anuncio.id;
                 card.innerHTML = `
-                    <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
+                    <img src="${anuncio.imagenes[0]}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab. | ${anuncio.tipo}</p>
                     </div>`;
+                
+                // **AÑADIMOS EL EVENTO CLICK PARA ABRIR EL MODAL**
+                card.addEventListener('click', () => {
+                    const anuncioId = parseInt(card.dataset.id);
+                    const anuncioSeleccionado = anunciosData.find(a => a.id === anuncioId);
+                    if (anuncioSeleccionado) {
+                        // Aquí iría la lógica para abrir el modal con los detalles
+                        // Por ahora, un simple alert para confirmar que funciona:
+                        alert(`Has hecho clic en: ${anuncioSeleccionado.titulo}`);
+                    }
+                });
                 anunciosContainer.appendChild(card);
             });
         };
@@ -185,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleFiltrosBtn.innerHTML = isVisible ? '<i class="fas fa-filter"></i> Mostrar Filtros' : '<i class="fas fa-times"></i> Ocultar Filtros';
         });
         
-        // Carga inicial de todos los anuncios
         renderAnuncios(anunciosData);
     }
 });
