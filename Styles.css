@@ -1,3 +1,4 @@
+/* --- RESET Y VARIABLES GLOBALES --- */
 :root {
     --primary-color: #121212;
     --secondary-color: #1E1E1E;
@@ -13,6 +14,7 @@ body {
     color: var(--font-color-primary);
     overflow-x: hidden;
 }
+/* --- TIPOGRAFÍA --- */
 h1, h2, h3, h4, .btn, button { font-family: 'Poppins', sans-serif; font-weight: 700; }
 h1 { font-size: clamp(2.2rem, 7vw, 3rem); color: white; }
 h2 {
@@ -25,6 +27,8 @@ h2 {
     display: inline-block;
 }
 p { color: var(--font-color-secondary); line-height: 1.7; }
+
+/* --- NAVEGACIÓN Y HEADER --- */
 .menu-toggle {
     position: fixed; top: 20px; left: 20px;
     font-size: 1.8rem; color: var(--accent-color);
@@ -52,10 +56,31 @@ p { color: var(--font-color-secondary); line-height: 1.7; }
     font-size: 1.2rem; transition: background-color 0.2s;
 }
 .sidebar ul li a:hover { background-color: var(--secondary-color); color: var(--accent-color); }
+
+/* --- HERO SECTION Y CARRUSEL --- */
 .hero-section {
     height: 90vh; min-height: 400px;
     position: relative;
     display: flex; align-items: center; justify-content: center; text-align: center;
+    overflow: hidden; /* Oculta lo que se salga del contenedor */
+}
+.carousel-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+}
+.carousel-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+.carousel-slide.active {
+    opacity: 1;
 }
 .hero-section::after {
     content: ''; position: absolute; top:0; left: 0; width: 100%; height: 100%;
@@ -63,8 +88,57 @@ p { color: var(--font-color-secondary); line-height: 1.7; }
 }
 .hero-content { position: relative; z-index: 2; padding: 20px; }
 .hero-content p { color: white; font-size: 1.2rem; }
+
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    z-index: 2;
+    padding: 0 20px;
+}
+.carousel-arrow {
+    background: rgba(0,0,0,0.4);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.carousel-arrow:hover {
+    background: rgba(0,0,0,0.7);
+}
+.carousel-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+}
+.carousel-dot {
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.carousel-dot.active {
+    background: white;
+}
+
+/* --- SECCIONES --- */
 section { padding: 60px 5%; text-align: center; }
 .page-hero { padding: 100px 5% 40px; }
+
+/* --- COMPONENTES (SERVICIOS, FAQ) --- */
 .services-container, .faq-container {
     max-width: 1000px; margin: 0 auto; text-align: left;
     display: grid; gap: 20px;
@@ -79,6 +153,8 @@ section { padding: 60px 5%; text-align: center; }
 .faq-item.open h3::after { content: '-'; }
 .faq-item p { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;}
 .faq-item.open p { display: block; }
+
+/* --- FORMULARIOS --- */
 .form-container { padding-top: 80px; }
 form { display: flex; flex-direction: column; gap: 20px; max-width: 700px; margin: 0 auto; }
 .form-group { display: flex; flex-direction: column; text-align: left; gap: 8px; }
@@ -88,6 +164,7 @@ input, textarea, select {
     background-color: var(--secondary-color); border: 1px solid #444;
     border-radius: 5px; color: var(--font-color-primary); font-size: 1rem;
 }
+/* --- BOTONES --- */
 button, .btn {
     padding: 12px 25px; background-color: var(--accent-color);
     color: var(--primary-color); border: none; border-radius: 5px; cursor: pointer;
@@ -95,6 +172,8 @@ button, .btn {
     transition: transform 0.2s;
 }
 button:hover, .btn:hover { transform: scale(1.05); }
+
+/* --- ANUNCIOS Y MODAL --- */
 .anuncios-container {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px; padding-top: 0;
@@ -106,6 +185,8 @@ button:hover, .btn:hover { transform: scale(1.05); }
 .anuncio-card h3 { color: white; }
 .anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
 .anuncio-card-details { color: var(--font-color-secondary); }
+
+/* --- FOOTER Y BOTONES FLOTANTES --- */
 footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
 footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button, .scroll-to-top {
@@ -122,6 +203,8 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
 .whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
 .scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
+
+/* --- MODAL (GENÉRICO Y DE NOTICIAS) --- */
 .modal {
     display: none; position: fixed; z-index: 103;
     left: 0; top: 0; width: 100%; height: 100%;
@@ -142,6 +225,8 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 .modal-img { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; margin-bottom: 15px; }
 .modal-content h3 { color: var(--accent-color); margin-bottom: 10px; }
+
+/* --- FILTROS --- */
 .filtros-section { 
     padding-top: 0; 
     padding-bottom: 40px; 
@@ -167,6 +252,8 @@ footer a { color: var(--accent-color); text-decoration: none;}
     background-color: #555; 
     color: white; 
 }
+
+/* --- ESTILOS PARA EL MODAL DE ANUNCIOS --- */
 .modal-gallery { margin-bottom: 20px; }
 .modal-thumbnails {
     display: flex;

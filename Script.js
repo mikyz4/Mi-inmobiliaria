@@ -25,6 +25,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- LÓGICA PÁGINA DE INICIO ---
     if (document.body.id === 'home-page') {
+        // --- LÓGICA DEL CARRUSEL ---
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dotsContainer = document.querySelector('.carousel-dots');
+        let currentSlide = 0;
+        let slideInterval;
+
+        if (slides.length > 0) {
+            slides.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('carousel-dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    goToSlide(i);
+                    resetInterval();
+                });
+                dotsContainer.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.carousel-dot');
+
+            const goToSlide = (n) => {
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+                currentSlide = (n + slides.length) % slides.length;
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+            };
+
+            const nextSlide = () => goToSlide(currentSlide + 1);
+            const prevSlide = () => goToSlide(currentSlide - 1);
+
+            const resetInterval = () => {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+            };
+
+            document.getElementById('next-slide').addEventListener('click', () => {
+                nextSlide();
+                resetInterval();
+            });
+            document.getElementById('prev-slide').addEventListener('click', () => {
+                prevSlide();
+                resetInterval();
+            });
+
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // --- RESTO DE LA LÓGICA DE LA PÁGINA DE INICIO ---
         const services = [
             { icon: 'fa-search-dollar', title: 'Valoración de Inmuebles', text: 'Obtén una valoración precisa y de mercado para tu propiedad.' },
             { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad.' },
