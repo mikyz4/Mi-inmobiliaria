@@ -1,112 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Selettas - Asesoría Inmobiliaria</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas - Inmobiliaria en Gerona</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
 
-  <button class="menu-toggle" aria-label="Abrir menú">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <nav class="sidebar" id="sidebar">
-    <button class="close-btn" aria-label="Cerrar menú">&times;</button>
-    <a href="#hero">Inicio</a>
-    <a href="#sobre-nosotros">Sobre Nosotros</a>
-    <a href="#servicios">Servicios</a>
-    <a href="#testimonios">Testimonios</a>
-    <a href="#novedades">Novedades</a>
-    <a href="#faq">Preguntas Frecuentes</a>
-    <a href="#contacto">Contáctanos</a>
-    <a href="anuncio.html">Subir Anuncio</a>
-    <a href="ver-anuncios.html">Ver Anuncios</a>
-  </nav>
-
-  <header id="hero" class="hero-section">
-    <div class="carousel-container">
-      <img src="Images/Carrusel1.jpg" alt="Interior moderno" class="carousel-image active">
-      <img src="Images/Carrusel-2.jpg" alt="Casa con piscina" class="carousel-image">
-      <img src="Images/Carrusel-3.png" alt="Oficina de bienes raíces" class="carousel-image">
-      <div class="carousel-caption">
-        <h1>Selettas</h1>
-        <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
-      </div>
-      <button class="carousel-arrow left" aria-label="Diapositiva anterior"><i class="fas fa-chevron-left"></i></button>
-      <button class="carousel-arrow right" aria-label="Siguiente diapositiva"><i class="fas fa-chevron-right"></i></button>
-      <div class="carousel-dots"></div>
-    </div>
-  </header>
-
-  <main>
-    <section id="sobre-nosotros">
-      <h2 class="section-title"><i class="fas fa-info-circle"></i> Sobre Nosotros</h2>
-      <p>En Selettas, somos una empresa dedicada exclusivamente al asesoramiento inmobiliario. Ayudamos a nuestros clientes en todo el proceso de compra o venta de propiedades.</p>
-      <p>Nuestra misión es conectar a las personas con sus hogares ideales, ofreciendo un servicio transparente, ético y personalizado en Gerona.</p>
-    </section>
-
-    <section id="servicios">
-      <h2 class="section-title"><i class="fas fa-cogs"></i> Nuestros Servicios</h2>
-      <div class="services-grid">
-        <div class="service-item"><i class="fas fa-home service-icon"></i><h3>Compra y Venta</h3><p>Asesoramiento en la adquisición o venta de viviendas, pisos y terrenos.</p></div>
-        <div class="service-item"><i class="fas fa-chart-line service-icon"></i><h3>Análisis de Mercado</h3><p>Estudio detallado para asegurar el mejor precio y oportunidad.</p></div>
-        <div class="service-item"><i class="fas fa-balance-scale service-icon"></i><h3>Asesoramiento Legal</h3><p>Acompañamiento legal y documental para una transacción segura.</p></div>
-        <div class="service-item"><i class="fas fa-piggy-bank service-icon"></i><h3>Inversiones</h3><p>Asesoría experta para maximizar el retorno de tus inversiones.</p></div>
-      </div>
-    </section>
-
-    <section id="testimonios" class="testimonials-section">
-      <h2 class="section-title"><i class="fas fa-comments"></i> Lo que dicen nuestros clientes</h2>
-      <div class="testimonial-carousel" id="testimonial-carousel"></div>
-      <div class="testimonial-dots" id="testimonial-dots"></div>
-    </section>
-
-    <section id="novedades" class="news-section">
-      <h2 class="section-title"><i class="fas fa-newspaper"></i> Novedades y Blog</h2>
-      <div class="news-grid" id="newsGrid">
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
         </div>
-    </section>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="#hero">Inicio</a></li>
+                <li><a href="#services">Servicios</a></li>
+                <li><a href="anuncio.html">Subir Anuncio</a></li>
+                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="#about">Quiénes Somos</a></li>
+                <li><a href="#testimonials">Testimonios</a></li>
+                <li><a href="#news">Novedades</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <section id="faq" class="faq">
-      <h2 class="section-title"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</h2>
-      <div class="faq-item"><h4>¿Cómo subo un anuncio?</h4><p>Desde el menú lateral, accede a "Subir Anuncio" y rellena el formulario. ¡Es muy sencillo!</p></div>
-      <div class="faq-item"><h4>¿Cuánto cuesta publicar?</h4><p>Actualmente, todos los servicios básicos son **completamente gratuitos**.</p></div>
-      <div class="faq-item"><h4>¿Cuánto dura el anuncio?</h4><p>Un anuncio estándar permanece visible por **30 días**. Podrás renovarlo fácilmente.</p></div>
-      <div class="faq-item"><h4>¿Asesoran a primerizos?</h4><p>¡Sí! Nos especializamos en guiar a compradores primerizos en cada paso del proceso.</p></div>
-    </section>
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/Carrusel1.jpg" alt="Vista de Gerona" class="carousel-image active">
+                <img src="Images/Carrusel-2.jpg" alt="Interior de una casa moderna" class="carousel-image">
+                <img src="Images/Carrusel-3.png" alt="Edificios históricos" class="carousel-image">
+            </div>
+            <div class="hero-content">
+                <h1>Encuentra tu hogar ideal en Gerona</h1>
+                <p>Tu sueño inmobiliario, nuestra pasión.</p>
+                <a href="#contact" class="btn">Contactar</a>
+            </div>
+            <button class="carousel-arrow left" aria-label="Anterior">&#10094;</button>
+            <button class="carousel-arrow right" aria-label="Siguiente">&#10095;</button>
+            <div class="carousel-dots"></div>
+        </section>
 
-    <section id="contacto">
-      <h2 class="section-title"><i class="fas fa-envelope"></i> Contáctanos</h2>
-      <form id="contactForm" class="contact-form" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
-        <input type="text" name="name" placeholder="Tu nombre" required /><input type="email" name="email" placeholder="Tu email" required /><textarea name="message" rows="4" placeholder="Tu mensaje" required></textarea><button type="submit">Enviar mensaje</button>
-      </form>
-    </section>
-  </main>
-  
-  <div class="social-links">
-    <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-    <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-    <a href="https://tiktok.com" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-  </div>
+        <section id="services">
+            <h2>Nuestros Servicios</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="fas fa-home"></i>
+                    <h3>Compra-Venta</h3>
+                    <p>Asesoramiento integral para comprar o vender tu propiedad al mejor precio.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-sign"></i>
+                    <h3>Alquileres</h3>
+                    <p>Gestionamos el alquiler de tu inmueble con inquilinos de confianza.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Valoraciones</h3>
+                    <p>Realizamos valoraciones de mercado precisas para tu propiedad.</p>
+                </div>
+            </div>
+        </section>
 
-  <a class="whatsapp-button" href="https://wa.me/34632125872" target="_blank" title="Escríbenos por WhatsApp"><i class="fab fa-whatsapp"></i></a>
-  <button id="scrollToTopBtn" class="scroll-to-top-btn" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
+        <section id="about">
+            <h2>Sobre Nosotros</h2>
+            <div class="about-content">
+                <img src="Images/Logo.png" alt="Logo Selettas" class="about-logo">
+                <p>Somos una inmobiliaria con base en Gerona, apasionados por conectar personas con sus hogares ideales. Nuestro equipo combina experiencia local con un enfoque moderno y personalizado para ofrecer un servicio transparente y eficaz.</p>
+            </div>
+        </section>
+        
+        <section id="testimonials">
+             <h2>Testimonios</h2>
+             <div class="testimonial-carousel-container">
+                 <div id="testimonial-carousel">
+                    </div>
+             </div>
+        </section>
 
-  <footer><p>&copy; 2025 Selettas S.L. | Todos los derechos reservados</p></footer>
+        <section id="news">
+            <h2>Últimas Novedades</h2>
+            <div id="newsGrid" class="news-grid">
+                </div>
+        </section>
 
-  <div id="newsModal" class="modal">
-    <div class="modal-content">
-      <button class="close-button" aria-label="Cerrar modal">&times;</button>
-      <h2 id="newsModalTitle"></h2>
-      <img id="newsModalImage" src="" alt="Imagen de la novedad" class="modal-news-image">
-      <p id="newsModalContent"></p>
+        <section id="contact">
+            <h2>Contacto</h2>
+            <form id="contactForm" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" rows="5" placeholder="Tu mensaje" required></textarea>
+                <button type="submit">Enviar Mensaje</button>
+            </form>
+        </section>
+
+    </main>
+
+    <button id="scrollToTopBtn" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
+
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="newsModalImage" src="" alt="Imagen de la noticia">
+            <h2 id="newsModalTitle"></h2>
+            <p id="newsModalContent"></p>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <footer>
+        <p>&copy; 2025 Selettas S.L. | Todos los derechos reservados | <a href="legal.html" style="color: var(--accent-color);">Aviso Legal y Privacidad</a></p>
+    </footer>
+
+    <div id="cookie-banner" class="hidden">
+        <p>Utilizamos cookies propias y de terceros para mejorar tu experiencia en nuestro sitio web. Al continuar navegando, aceptas su uso. Puedes obtener más información en nuestra <a href="legal.html#politica-privacidad">Política de Privacidad</a>.</p>
+        <button id="accept-cookies-btn">Entendido</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>

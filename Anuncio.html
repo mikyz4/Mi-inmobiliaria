@@ -1,141 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Subir Anuncio - Selettas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    main {
-      padding: 3rem 2rem;
-      max-width: 700px;
-      margin: 80px auto 40px;
-      background-color: rgba(18, 18, 18, 0.85);
-      border-radius: 12px;
-      color: var(--font-color);
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-    }
-    main h1 {
-      margin-top: 0;
-      color: var(--accent-color);
-      font-weight: 700;
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    input[type="text"],
-    input[type="email"],
-    textarea,
-    input[type="file"] {
-      padding: 0.8rem;
-      border: none;
-      border-radius: 6px;
-      background: #1e1e1e;
-      color: white;
-      font-size: 1rem;
-      resize: vertical;
-    }
-    input[type="file"] {
-      background: #333; /* Un color ligeramente diferente para el botón de archivo */
-    }
-    form label {
-      color: var(--font-color);
-      font-size: 0.95rem;
-      margin-bottom: -0.5rem;
-    }
-    form button {
-      padding: 0.8rem;
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: background 0.3s;
-    }
-    form button:hover {
-      background: #1ebe4f;
-    }
-    form button:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-    .error-message {
-      color: #ff6b6b;
-      font-size: 0.9rem;
-      margin-top: -0.8rem;
-      margin-bottom: 0.5rem;
-      min-height: 1.2rem;
-    }
-    @media (max-width: 768px) {
-      main {
-        margin: 80px 1rem 40px;
-        padding: 2rem 1rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Anuncio - Selettas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="anuncio.html">Subir Anuncio</a></li>
+                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
+            </ul>
+        </nav>
+    </header>
 
-  <button class="menu-toggle" aria-label="Abrir menú">
-    <i class="fas fa-bars"></i>
-  </button>
+    <main>
+        <section class="form-container">
+            <h1>Publica tu Anuncio</h1>
+            <p>Rellena el formulario para que podamos gestionar tu propiedad.</p>
+            <form id="anuncioForm">
+                <div class="form-group">
+                    <label for="titulo">Título del Anuncio</label>
+                    <input type="text" id="titulo" name="titulo" required>
+                    <div id="tituloError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                    <div id="direccionError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email de Contacto</label>
+                    <input type="email" id="email" name="email" required>
+                    <div id="emailError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
+                    <div id="descripcionError" class="error-message"></div>
+                </div>
 
-  <nav class="sidebar" id="sidebar">
-    <button class="close-btn" aria-label="Cerrar menú">&times;</button>
-    <a href="index.html">Inicio</a>
-    <a href="anuncio.html">Subir Anuncio</a>
-    <a href="ver-anuncios.html">Ver Anuncios</a>
-  </nav>
-
-  <main>
-    <h1><i class="fas fa-upload"></i> Subir Anuncio</h1>
+                <h3>Subir Imágenes (hasta 4)</h3>
+                <div class="form-group">
+                    <label for="imagen1">Imagen Principal (Obligatoria)</label>
+                    <input type="file" id="imagen1" name="imagen1" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label for="imagen2">Imagen 2</label>
+                    <input type="file" id="imagen2" name="imagen2" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="imagen3">Imagen 3</label>
+                    <input type="file" id="imagen3" name="imagen3" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="imagen4">Imagen 4</label>
+                    <input type="file" id="imagen4" name="imagen4" accept="image/*">
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" id="submitBtn">Enviar Anuncio</button>
+                    <p id="uploadStatus"></p>
+                </div>
+            </form>
+        </section>
+    </main>
     
-    <form id="anuncioForm" novalidate>
-      <label for="titulo">Título</label>
-      <input type="text" name="titulo" id="titulo" placeholder="Título del anuncio" required />
-      <div id="tituloError" class="error-message"></div>
+    <footer>
+        <p>&copy; 2025 Selettas S.L. | Todos los derechos reservados | <a href="legal.html" style="color: var(--accent-color);">Aviso Legal y Privacidad</a></p>
+    </footer>
 
-      <label for="direccion">Dirección</label>
-      <input type="text" name="direccion" id="direccion" placeholder="Dirección" required />
-      <div id="direccionError" class="error-message"></div>
-
-      <label for="email">Email de Contacto</label>
-      <input type="email" name="email" id="email" placeholder="Tu email de contacto" required />
-      <div id="emailError" class="error-message"></div>
-
-      <label for="descripcion">Descripción</label>
-      <textarea name="descripcion" id="descripcion" rows="5" placeholder="Descripción completa de la propiedad" required></textarea>
-      <div id="descripcionError" class="error-message"></div>
-      
-      <label for="imagen1">Imagen Principal:</label>
-      <input type="file" name="imagen1_file" id="imagen1" accept="image/*" required>
-      
-      <label for="imagen2">Imagen Adicional 1 (opcional):</label>
-      <input type="file" name="imagen2_file" id="imagen2" accept="image/*">
-
-      <label for="imagen3">Imagen Adicional 2 (opcional):</label>
-      <input type="file" name="imagen3_file" id="imagen3" accept="image/*">
-
-      <label for="imagen4">Imagen Adicional 3 (opcional):</label>
-      <input type="file" name="imagen4_file" id="imagen4" accept="image/*">
-
-      <div id="uploadStatus" style="color: var(--accent-color); font-weight: bold; text-align: center; margin-top: 1rem;"></div>
-
-      <button type="submit" id="submitBtn">Enviar anuncio</button>
-    </form>
-    
-  </main>
-
-  <script src="script.js"></script>
-  
+    <script src="script.js"></script>
 </body>
 </html>
