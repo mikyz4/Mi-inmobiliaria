@@ -1,184 +1,137 @@
 /* --- RESET Y VARIABLES GLOBALES --- */
 :root {
-    --primary-color: #121212; /* Un negro un poco más suave */
-    --secondary-color: #1E1E1E; /* Un gris oscuro para las tarjetas */
-    --accent-color: #2CFF8E; /* El VERDE original de tu diseño */
+    --primary-color: #121212;
+    --secondary-color: #1E1E1E;
+    --accent-color: #2CFF8E;
     --font-color-primary: #FFFFFF;
-    --font-color-secondary: #B3B3B3; /* Un gris más claro para subtítulos */
+    --font-color-secondary: #B3B3B3;
 }
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
     font-family: 'Open Sans', sans-serif;
     background-color: var(--primary-color);
     color: var(--font-color-primary);
-    overflow-x: hidden; /* ¡Prohíbe el scroll horizontal! */
+    overflow-x: hidden;
 }
-
 /* --- TIPOGRAFÍA --- */
-h1, h2, h3, h4, .btn, button {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-}
-
-h1 {
-    font-size: clamp(2.2rem, 7vw, 3rem);
-    color: white;
-}
-
+h1, h2, h3, h4, .btn, button { font-family: 'Poppins', sans-serif; font-weight: 700; }
+h1 { font-size: clamp(2.2rem, 7vw, 3rem); color: white; }
 h2 {
     font-size: clamp(1.8rem, 6vw, 2.5rem);
     color: var(--accent-color);
-    margin-bottom: 30px;
     text-align: center;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--accent-color);
+    display: inline-block;
 }
+p { color: var(--font-color-secondary); line-height: 1.7; }
 
-p {
-    color: var(--font-color-secondary);
-    line-height: 1.7;
-}
-
-/* --- NAVEGACIÓN (MENÚ LATERAL) --- */
+/* --- NAVEGACIÓN Y HEADER --- */
 .menu-toggle {
     position: fixed; top: 20px; left: 20px;
     font-size: 1.8rem; color: var(--accent-color);
     cursor: pointer; z-index: 102;
     background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 5px;
 }
+.sidebar {
+    position: fixed; top: 0; left: -280px;
+    width: 250px; height: 100%;
+    background-color: #181818;
+    padding-top: 60px;
+    transition: left 0.3s ease-in-out;
+    z-index: 101;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.5);
+}
+.sidebar.open { left: 0; }
+.sidebar .close-btn {
+    position: absolute; top: 15px; right: 25px;
+    font-size: 2.5rem; color: var(--font-color-secondary); cursor: pointer;
+}
+.sidebar ul { list-style: none; }
+.sidebar ul li a {
+    display: block; padding: 15px 20px;
+    color: var(--font-color-primary); text-decoration: none;
+    font-size: 1.2rem; transition: background-color 0.2s;
+}
+.sidebar ul li a:hover { background-color: var(--secondary-color); color: var(--accent-color); }
 
 /* --- HERO SECTION --- */
 .hero-section {
-    height: 90vh;
+    height: 90vh; min-height: 400px;
     position: relative;
-    display: flex;
-    align-items: center; justify-content: center;
-    text-align: center;
+    display: flex; align-items: center; justify-content: center; text-align: center;
 }
-.hero-content {
-    position: relative; z-index: 3;
-    background: rgba(0,0,0,0.6);
-    padding: 20px; border-radius: 10px;
+.hero-section::after {
+    content: ''; position: absolute; top:0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1;
 }
-.hero-content p { color: white; }
+.hero-content { position: relative; z-index: 2; padding: 20px; }
+.hero-content p { color: white; font-size: 1.2rem; }
 
-/* --- SECCIONES GENERALES --- */
-section { padding: 60px 5%; }
-section:nth-of-type(even) { background-color: var(--secondary-color); }
+/* --- SECCIONES --- */
+section { padding: 60px 5%; text-align: center; }
+.page-hero { padding: 100px 5% 40px; }
 
-/* --- FORMULARIOS (Subir Anuncio y Filtros) --- */
-.form-container, .filtros-section {
-    max-width: 800px;
-    margin: 0 auto;
-    padding-top: 80px;
+/* --- COMPONENTES --- */
+.services-container, .faq-container {
+    max-width: 1000px; margin: 0 auto; text-align: left;
+    display: grid; gap: 20px;
 }
-
-form, #filtros-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.service-item, .faq-item {
+    background-color: var(--secondary-color); padding: 25px; border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
 }
+.service-item i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
+.faq-item h3 { cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
+.faq-item h3::after { content: '+'; font-size: 1.5rem; color: var(--accent-color); }
+.faq-item.open h3::after { content: '-'; }
+.faq-item p { display: none; margin-top: 15px; }
+.faq-item.open p { display: block; }
 
-.form-group, .filtro {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    gap: 8px;
-}
-
-label {
-    font-weight: 600;
-    color: var(--font-color-secondary);
-}
-
-input[type="text"],
-input[type="email"],
-input[type="number"],
-textarea,
-select {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--secondary-color);
-    border: 1px solid #444;
-    border-radius: 5px;
-    color: var(--font-color-primary);
-    font-size: 1rem;
-}
-
-input::placeholder {
-    color: #666;
+/* --- FORMULARIOS --- */
+form { display: flex; flex-direction: column; gap: 20px; max-width: 700px; margin: 0 auto; }
+.form-group { display: flex; flex-direction: column; text-align: left; gap: 8px; }
+label { font-weight: 600; color: var(--font-color-secondary); }
+input, textarea, select {
+    width: 100%; padding: 12px;
+    background-color: var(--secondary-color); border: 1px solid #444;
+    border-radius: 5px; color: var(--font-color-primary); font-size: 1rem;
 }
 
 /* --- BOTONES --- */
 button, .btn {
-    padding: 12px 25px;
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    text-decoration: none;
-    transition: transform 0.2s, background-color 0.2s;
-    text-align: center;
+    padding: 12px 25px; background-color: var(--accent-color);
+    color: var(--primary-color); border: none; border-radius: 5px; cursor: pointer;
+    font-size: 1rem; font-weight: bold; text-decoration: none;
+    transition: transform 0.2s;
 }
+button:hover, .btn:hover { transform: scale(1.05); }
 
-button:hover, .btn:hover {
-    transform: scale(1.05);
-}
-
-#reset-filtros {
-    background-color: #555;
-    color: white;
-}
-
-/* --- ANUNCIOS (Ver Anuncios) --- */
+/* --- ANUNCIOS --- */
 .anuncios-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    padding-top: 30px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px; padding-top: 30px;
 }
-.anuncio-card {
-    background-color: var(--secondary-color);
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    text-align: left;
-}
-.anuncio-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-.anuncio-card-content {
-    padding: 15px;
-}
-.anuncio-card-price {
-    color: var(--accent-color);
-    font-size: 1.3rem;
-    font-weight: bold;
-    margin: 5px 0;
-}
+.anuncio-card { background-color: var(--secondary-color); border-radius: 8px; overflow: hidden; }
+.anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
+.anuncio-card-content { padding: 15px; text-align: left; }
+.anuncio-card h3 { color: white; }
+.anuncio-card-price { color: var(--accent-color); font-size: 1.3rem; margin: 5px 0; }
+.anuncio-card-details { color: var(--font-color-secondary); }
 
-/* --- FOOTER --- */
-footer {
-    background-color: #000;
-    text-align: center;
-    padding: 25px;
-    margin-top: 40px;
-}
-footer p { color: #888; }
+/* --- FOOTER Y BOTONES FLOTANTES --- */
+footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
 footer a { color: var(--accent-color); text-decoration: none;}
-
-/* --- BANNER COOKIES --- */
-#cookie-banner { display:none; } /* Oculto por ahora para no molestar */
+.whatsapp-button, .scroll-to-top {
+    position: fixed; right: 20px; z-index: 100;
+    width: 50px; height: 50px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 1.5rem; text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+.whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
+.whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
+.scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; }

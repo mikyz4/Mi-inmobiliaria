@@ -16,7 +16,16 @@
         <div class="menu-toggle">
             <i class="fas fa-bars"></i>
         </div>
-        </header>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="anuncio.html">Publicar Anuncio</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <main>
         <section id="hero" class="hero-section" style="background: url('Images/Carrusel1.jpg') no-repeat center center/cover;">
@@ -29,18 +38,37 @@
 
         <section id="services">
             <h2>Nuestros Servicios</h2>
-            </section>
+            <div class="services-container">
+                <div class="service-item">
+                    <i class="fas fa-search-dollar"></i>
+                    <h3>Valoración de Inmuebles</h3>
+                    <p>Obtén una valoración precisa y de mercado para tu propiedad.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-camera"></i>
+                    <h3>Fotografía Profesional</h3>
+                    <p>Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-file-signature"></i>
+                    <h3>Gestión de Contratos</h3>
+                    <p>Nos encargamos de todo el papeleo para una transacción segura y sin sorpresas.</p>
+                </div>
+            </div>
+        </section>
         
         <section id="faq">
              <h2>Preguntas Frecuentes</h2>
-             </section>
+             <div class="faq-container">
+                </div>
+        </section>
 
         <section id="contact">
             <h2>Contáctanos</h2>
-            <form>
-                <input type="text" placeholder="Nombre">
-                <input type="email" placeholder="Email">
-                <textarea placeholder="Tu mensaje" rows="5"></textarea>
+            <form action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="Tu mensaje" rows="5" required></textarea>
                 <button type="submit">Enviar</button>
             </form>
         </section>
@@ -50,8 +78,9 @@
         <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>
 
-    <a href="#" class="whatsapp-button" style="position:fixed; bottom:80px; right:20px; font-size: 2rem; color: #25D366;"><i class="fab fa-whatsapp"></i></a>
-    <a href="#" class="scroll-to-top" style="position:fixed; bottom:20px; right:20px; font-size: 2rem; color: var(--accent-color);"><i class="fas fa-arrow-up"></i></a>
+    <a href="https://wa.me/34000000000" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
+    <script src="script.js"></script>
 </body>
 </html>
