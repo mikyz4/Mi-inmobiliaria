@@ -3,55 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Anuncio - Selettas</title>
-    
+    <title>Publica tu Anuncio - Selettas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <header>
         <div class="menu-toggle">
             <i class="fas fa-bars"></i>
         </div>
-        <nav class="sidebar">
-            <span class="close-btn">&times;</span>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="anuncio.html">Subir Anuncio</a></li>
-                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
-            </ul>
-        </nav>
     </header>
 
     <main>
         <section class="form-container">
-            <h1>Publica tu Anuncio</h1>
+            <h2>Publica tu Anuncio</h2>
             <p>Rellena el formulario para que podamos gestionar tu propiedad.</p>
+            
             <form id="anuncioForm">
                 <div class="form-group">
                     <label for="titulo">Título del Anuncio</label>
                     <input type="text" id="titulo" name="titulo" required>
-                    <div id="tituloError" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="direccion">Dirección</label>
                     <input type="text" id="direccion" name="direccion" required>
-                    <div id="direccionError" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="email">Email de Contacto</label>
                     <input type="email" id="email" name="email" required>
-                    <div id="emailError" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="descripcion">Descripción</label>
                     <textarea id="descripcion" name="descripcion" rows="6" required></textarea>
-                    <div id="descripcionError" class="error-message"></div>
                 </div>
 
                 <h3>Subir Imágenes (hasta 4)</h3>
@@ -59,31 +46,15 @@
                     <label for="imagen1">Imagen Principal (Obligatoria)</label>
                     <input type="file" id="imagen1" name="imagen1" accept="image/*" required>
                 </div>
-                <div class="form-group">
-                    <label for="imagen2">Imagen 2</label>
-                    <input type="file" id="imagen2" name="imagen2" accept="image/*">
-                </div>
-                <div class="form-group">
-                    <label for="imagen3">Imagen 3</label>
-                    <input type="file" id="imagen3" name="imagen3" accept="image/*">
-                </div>
-                <div class="form-group">
-                    <label for="imagen4">Imagen 4</label>
-                    <input type="file" id="imagen4" name="imagen4" accept="image/*">
-                </div>
                 
-                <div class="form-group">
-                    <button type="submit" id="submitBtn">Enviar Anuncio</button>
-                    <p id="uploadStatus"></p>
-                </div>
+                <button type="submit" id="submitBtn">Enviar Anuncio</button>
             </form>
         </section>
     </main>
     
     <footer>
-        <p>&copy; 2025 Selettas S.L. | Todos los derechos reservados | <a href="legal.html" style="color: var(--accent-color);">Aviso Legal y Privacidad</a></p>
+        <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>
 
-    <script src="script.js"></script>
 </body>
 </html>

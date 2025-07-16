@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selettas - Inmobiliaria en Gerona</title>
+    <title>Selettas - Asesoría Inmobiliaria</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,113 +16,42 @@
         <div class="menu-toggle">
             <i class="fas fa-bars"></i>
         </div>
-        <nav class="sidebar">
-            <span class="close-btn">&times;</span>
-            <ul>
-                <li><a href="#hero">Inicio</a></li>
-                <li><a href="#services">Servicios</a></li>
-                <li><a href="anuncio.html">Subir Anuncio</a></li>
-                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
-                <li><a href="#about">Quiénes Somos</a></li>
-                <li><a href="#testimonials">Testimonios</a></li>
-                <li><a href="#news">Novedades</a></li>
-                <li><a href="#contact">Contacto</a></li>
-            </ul>
-        </nav>
-    </header>
+        </header>
 
     <main>
-        <section id="hero" class="hero-section">
-            <div class="carousel-container">
-                <img src="Images/Carrusel1.jpg" alt="Vista de Gerona" class="carousel-image active">
-                <img src="Images/Carrusel-2.jpg" alt="Interior de una casa moderna" class="carousel-image">
-                <img src="Images/Carrusel-3.png" alt="Edificios históricos" class="carousel-image">
-            </div>
+        <section id="hero" class="hero-section" style="background: url('Images/Carrusel1.jpg') no-repeat center center/cover;">
             <div class="hero-content">
-                <h1>Encuentra tu hogar ideal en Gerona</h1>
-                <p>Tu sueño inmobiliario, nuestra pasión.</p>
+                <h1><span style="color: var(--accent-color);">Selettas</span></h1>
+                <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
                 <a href="#contact" class="btn">Contactar</a>
             </div>
-            <button class="carousel-arrow left" aria-label="Anterior">&#10094;</button>
-            <button class="carousel-arrow right" aria-label="Siguiente">&#10095;</button>
-            <div class="carousel-dots"></div>
         </section>
 
         <section id="services">
             <h2>Nuestros Servicios</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <i class="fas fa-home"></i>
-                    <h3>Compra-Venta</h3>
-                    <p>Asesoramiento integral para comprar o vender tu propiedad al mejor precio.</p>
-                </div>
-                <div class="service-card">
-                    <i class="fas fa-sign"></i>
-                    <h3>Alquileres</h3>
-                    <p>Gestionamos el alquiler de tu inmueble con inquilinos de confianza.</p>
-                </div>
-                <div class="service-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>Valoraciones</h3>
-                    <p>Realizamos valoraciones de mercado precisas para tu propiedad.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="about">
-            <h2>Sobre Nosotros</h2>
-            <div class="about-content">
-                <img src="Images/Logo.png" alt="Logo Selettas" class="about-logo">
-                <p>Somos una inmobiliaria con base en Gerona, apasionados por conectar personas con sus hogares ideales. Nuestro equipo combina experiencia local con un enfoque moderno y personalizado para ofrecer un servicio transparente y eficaz.</p>
-            </div>
-        </section>
+            </section>
         
-        <section id="testimonials">
-             <h2>Testimonios</h2>
-             <div class="testimonial-carousel-container">
-                 <div id="testimonial-carousel">
-                    </div>
-             </div>
-        </section>
-
-        <section id="news">
-            <h2>Últimas Novedades</h2>
-            <div id="newsGrid" class="news-grid">
-                </div>
-        </section>
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             </section>
 
         <section id="contact">
-            <h2>Contacto</h2>
-            <form id="contactForm" action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
-                <input type="text" name="name" placeholder="Nombre" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <textarea name="message" rows="5" placeholder="Tu mensaje" required></textarea>
-                <button type="submit">Enviar Mensaje</button>
+            <h2>Contáctanos</h2>
+            <form>
+                <input type="text" placeholder="Nombre">
+                <input type="email" placeholder="Email">
+                <textarea placeholder="Tu mensaje" rows="5"></textarea>
+                <button type="submit">Enviar</button>
             </form>
         </section>
-
     </main>
-
-    <button id="scrollToTopBtn" title="Volver arriba"><i class="fas fa-arrow-up"></i></button>
-
-    <div id="newsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <img id="newsModalImage" src="" alt="Imagen de la noticia">
-            <h2 id="newsModalTitle"></h2>
-            <p id="newsModalContent"></p>
-        </div>
-    </div>
-
+    
     <footer>
-        <p>&copy; 2025 Selettas S.L. | Todos los derechos reservados | <a href="legal.html" style="color: var(--accent-color);">Aviso Legal y Privacidad</a></p>
+        <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>
 
-    <div id="cookie-banner" class="hidden">
-        <p>Utilizamos cookies para mejorar tu experiencia. Al continuar, aceptas su uso. <a href="legal.html#politica-privacidad">Saber más</a>.</p>
-        <button id="accept-cookies-btn">Entendido</button>
-    </div>
+    <a href="#" class="whatsapp-button" style="position:fixed; bottom:80px; right:20px; font-size: 2rem; color: #25D366;"><i class="fab fa-whatsapp"></i></a>
+    <a href="#" class="scroll-to-top" style="position:fixed; bottom:20px; right:20px; font-size: 2rem; color: var(--accent-color);"><i class="fas fa-arrow-up"></i></a>
 
-    <script src="script.js"></script>
 </body>
 </html>

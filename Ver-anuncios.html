@@ -4,111 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver Anuncios - Selettas</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <header>
         <div class="menu-toggle">
             <i class="fas fa-bars"></i>
         </div>
-        <nav class="sidebar">
-            <span class="close-btn">&times;</span>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="anuncio.html">Subir Anuncio</a></li>
-                <li><a href="ver-anuncios.html">Ver Anuncios</a></li>
-            </ul>
-        </nav>
     </header>
 
     <main>
-        <section class="page-hero">
-            <h1>Propiedades Disponibles</h1>
-            <p>Encuentra el inmueble que estás buscando en Gerona</p>
+        <section class="page-hero" style="padding: 80px 5% 40px 5%; text-align:center;">
+            <h2>Anuncios Disponibles</h2>
+            <p>Explora las propiedades publicadas recientemente</p>
         </section>
 
-        <section class="filtros-section">
+        <section class="filtros-section" style="padding-top:0;">
             <button id="toggle-filtros"><i class="fas fa-filter"></i> Mostrar Filtros</button>
-            <div id="filtros-wrapper">
+            <div id="filtros-wrapper" style="display: none;">
                 <div class="filtro">
                     <label for="filtro-tipo">Tipo de Propiedad</label>
                     <select id="filtro-tipo">
                         <option value="todos">Todos</option>
-                        <option value="Piso">Piso</option>
-                        <option value="Casa">Casa</option>
-                        <option value="Ático">Ático</option>
-                        <option value="Terreno">Terreno</option>
                     </select>
                 </div>
                 <div class="filtro">
                     <label for="filtro-habitaciones-min">Habitaciones (mín)</label>
-                    <input type="number" id="filtro-habitaciones-min" min="0" placeholder="0">
-                </div>
-                 <div class="filtro">
-                    <label for="filtro-habitaciones-max">Habitaciones (máx)</label>
-                    <input type="number" id="filtro-habitaciones-max" min="0" placeholder="5+">
-                </div>
-                <div class="filtro">
-                    <label for="filtro-banos-min">Baños (mín)</label>
-                    <input type="number" id="filtro-banos-min" min="0" placeholder="0">
-                </div>
-                 <div class="filtro">
-                    <label for="filtro-banos-max">Baños (máx)</label>
-                    <input type="number" id="filtro-banos-max" min="0" placeholder="3+">
+                    <input type="number" id="filtro-habitaciones-min" placeholder="0">
                 </div>
                 <div class="filtro">
                     <label for="filtro-precio">Precio Máximo (€)</label>
-                    <input type="number" id="filtro-precio" step="10000" placeholder="Sin límite">
-                </div>
-                <div class="filtro">
-                    <label for="ordenar-por">Ordenar por</label>
-                    <select id="ordenar-por">
-                        <option value="defecto">Defecto</option>
-                        <option value="precio-asc">Precio (Menor a Mayor)</option>
-                        <option value="precio-desc">Precio (Mayor a Menor)</option>
-                    </select>
+                    <input type="number" id="filtro-precio" placeholder="Sin límite">
                 </div>
                 <button id="reset-filtros">Limpiar Filtros</button>
             </div>
         </section>
 
-        <section id="anunciosContainer" class="anuncios-container">
-            </section>
-    </main>
-
-    <div id="anuncioModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div class="gallery-container">
-                <img id="mainImage" src="" alt="Imagen principal del anuncio">
-                <div id="thumbnailContainer" class="thumbnail-container"></div>
-                 <div class="gallery-nav">
-                    <button id="prevBtn"><i class="fas fa-chevron-left"></i></button>
-                    <button id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        <section id="anunciosContainer" class="anuncios-container" style="padding-top:0;">
+            <div class="anuncio-card">
+                <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=1974" alt="Casa de ejemplo">
+                <div class="anuncio-card-content">
+                    <h3>Piso céntrico...</h3>
+                    <p class="anuncio-card-price">250.000 €</p>
+                    <p>3 hab | 2 baños | 90 m²</p>
                 </div>
             </div>
-            <h2 id="modalTitle"></h2>
-            <p><strong>Tipo:</strong> <span id="modalTipo"></span></p>
-            <p><strong>Ubicación:</strong> <span id="modalUbicacion"></span></p>
-            <p><strong>Precio:</strong> <span id="modalPrecio"></span></p>
-            <p><strong>Detalles:</strong> <span id="modalHabitaciones"></span> hab | <span id="modalBanos"></span> baños | <span id="modalSuperficie"></span> m²</p>
-            <p><strong>Descripción:</strong></p>
-            <p id="modalDescripcion"></p>
-            <p><strong>Contacto:</strong> <span id="modalContacto"></span></p>
-        </div>
-    </div>
+            </section>
+    </main>
     
     <footer>
-        <p>&copy; 2025 Selettas S.L. | Todos los derechos reservados | <a href="legal.html" style="color: var(--accent-color);">Aviso Legal y Privacidad</a></p>
+        <p>&copy; 2025 Selettas | <a href="legal.html">Aviso Legal</a></p>
     </footer>
 
-    <script src="script.js"></script>
 </body>
 </html>
