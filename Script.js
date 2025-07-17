@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    // --- URL DE LA API (DEFINIDA UNA SOLA VEZ) ---
+    const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
+
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -111,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
 
-        const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
+        // YA NO SE DEFINE LA URL AQUÍ
 
         let todosLosAnuncios = []; 
 
@@ -139,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²</p>
-                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || anuncio.direccion || 'Ubicación no especificada'}</p>
+                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
                 card.addEventListener('click', () => {
@@ -172,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
             }
             if (ubicacion) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => (a.ubicacion || a.direccion || '').toLowerCase().includes(ubicacion));
+                anunciosFiltrados = anunciosFiltrados.filter(a => (a.direccion || '').toLowerCase().includes(ubicacion));
             }
             if (banos > 0) {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
@@ -187,13 +190,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const cargarAnunciosDesdeAPI = () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
-            fetch(apiUrl)
+            fetch(apiUrl) // <-- Usa la variable global
                 .then(response => {
                     if (!response.ok) { throw new Error('Error en la respuesta de la API'); }
                     return response.json();
                 })
                 .then(data => {
-                    todosLosAnuncios = data;
+                    todosLosAnuncios = data.sort((a, b) => b.id - a.id);
                     renderAnuncios(todosLosAnuncios);
                 })
                 .catch(error => {
@@ -280,30 +283,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const formData = new FormData(anuncioForm);
             
-            const nuevoAnuncio = {
-                titulo: formData.get('titulo'),
-                direccion: formData.get('direccion'),
-                email: formData.get('email'),
-                descripcion: formData.get('descripcion'),
-                precio: parseInt(formData.get('precio')),
-                habitaciones: parseInt(formData.get('habitaciones')),
-                banos: parseInt(formData.get('banos')),
-                superficie: parseInt(formData.get('superficie')),
-                imagen: 'https://via.placeholder.com/400x250.png?text=Anuncio+Nuevo'
-            };
+            // YA NO SE DEFINE LA URL AQUÍ
 
-            const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
-
-            fetch(apiUrl, {
+            fetch(apiUrl, { // <-- Usa la variable global
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(nuevoAnuncio),
+                body: formData,
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Error al enviar el anuncio');
+                    return response.text().then(text => { throw new Error(text || 'Error en el servidor') });
                 }
                 return response.json();
             })
@@ -313,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch((error) => {
                 console.error('Error al enviar el anuncio:', error);
-                alert('Hubo un error al enviar tu anuncio. Por favor, inténtalo de nuevo.');
+                alert('Hubo un error al enviar tu anuncio: ' + error.message);
                 submitButton.textContent = 'Enviar Anuncio';
                 submitButton.disabled = false;
             });
