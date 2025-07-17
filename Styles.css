@@ -62,13 +62,41 @@ p { color: var(--font-color-secondary); line-height: 1.7; }
     height: 90vh; min-height: 400px;
     position: relative;
     display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 0; /* Añadido para el carrusel */
 }
 .hero-section::after {
     content: ''; position: absolute; top:0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); z-index: 1;
 }
-.hero-content { position: relative; z-index: 2; padding: 20px; }
-.hero-content p { color: white; font-size: 1.2rem; }
+
+/* ESTA ES LA REGLA QUE HEMOS CORREGIDO */
+.hero-content { 
+    position: relative; 
+    z-index: 2; 
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Este 'gap' crea el espacio entre el texto y el botón */
+}
+
+.hero-content p { color: white; font-size: 1.2rem; margin: 0; /* Quitamos márgenes extra */ }
+
+/* --- CARRUSEL --- */
+.carousel-container {
+    width: 100%; height: 100%;
+    position: absolute; top: 0; left: 0;
+}
+.carousel-image {
+    width: 100%; height: 100%;
+    object-fit: cover; position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 0;
+}
+.carousel-image.active { opacity: 1; }
+
 
 /* --- SECCIONES --- */
 section { padding: 60px 5%; text-align: center; }
@@ -194,33 +222,3 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
 .whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
 .scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
-
-/* --- ESTILOS ADICIONALES PARA EL CARRUSEL --- */
-.hero-section {
-    padding: 0;
-}
-.carousel-container {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-.carousel-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
-    z-index: 0;
-}
-.carousel-image.active {
-    opacity: 1;
-}
-/* Espacio extra para el botón de la cabecera */
-.hero-content .btn {
-    margin-top: 40px;
-}
