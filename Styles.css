@@ -222,5 +222,5 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 /* Espacio extra para el botón de la cabecera */
 .hero-content .btn {
-    margin-top: 20px;
+    margin-top: 40px;
 }
