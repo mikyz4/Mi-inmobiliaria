@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS (MODIFICADO) ---
+    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
 
@@ -133,11 +133,10 @@ document.addEventListener('DOMContentLoaded', function() {
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
-                // LÍNEA DE DEPURACIÓN AÑADIDA EN EL H3
                 card.innerHTML = `
                     <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
-                        <h3>${anuncio.titulo} --- URL: ${anuncio.imagen}</h3>
+                        <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || 'Ubicación no especificada'}</p>
