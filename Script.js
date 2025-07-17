@@ -137,17 +137,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
-                        <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
-                        <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
-                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || 'Ubicación no especificada'}</p>
+                        <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
+                        <p class="anuncio-card-details">${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²</p>
+                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
                 card.addEventListener('click', () => {
                     if (modal) {
                         modal.querySelector('#modal-img').src = anuncio.imagen;
                         modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
-                        modal.querySelector('#modal-precio').textContent = `${anuncio.precio.toLocaleString('es-ES')} €`;
-                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²`;
+                        modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
                         modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
                         modal.classList.add('active');
                     }
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
             }
             if (ubicacion) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => (a.ubicacion || '').toLowerCase().includes(ubicacion));
+                anunciosFiltrados = anunciosFiltrados.filter(a => (a.ubicacion || a.direccion || '').toLowerCase().includes(ubicacion));
             }
             if (banos > 0) {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
             }
             
-            anunciosFiltrados = anunciosFiltrados.filter(a => a.precio <= precio);
+            anunciosFiltrados = anunciosFiltrados.filter(a => (a.precio || 0) <= precio);
             renderAnuncios(anunciosFiltrados);
         };
         
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- LÓGICA PARA EL BANNER DE COOKIES (AÑADIDO) ---
+    // --- LÓGICA PARA EL BANNER DE COOKIES ---
     const cookieBanner = document.getElementById('cookie-banner');
     if (cookieBanner) {
         const acceptCookiesBtn = document.getElementById('accept-cookies');
@@ -265,6 +265,57 @@ document.addEventListener('DOMContentLoaded', function() {
         acceptCookiesBtn.addEventListener('click', () => {
             localStorage.setItem('cookies_accepted', 'true');
             cookieBanner.style.display = 'none';
+        });
+    }
+
+    // --- LÓGICA PARA ENVIAR EL FORMULARIO DE NUEVO ANUNCIO ---
+    const anuncioForm = document.getElementById('anuncioForm');
+    if (anuncioForm) {
+        anuncioForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const submitButton = anuncioForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Enviando...';
+            submitButton.disabled = true;
+
+            const formData = new FormData(anuncioForm);
+            const nuevoAnuncio = {
+                titulo: formData.get('titulo'),
+                direccion: formData.get('direccion'),
+                email: formData.get('email'),
+                descripcion: formData.get('descripcion'),
+                imagen: 'https://via.placeholder.com/400x250.png?text=Anuncio+Nuevo',
+                precio: 0,
+                habitaciones: 0,
+                banos: 0,
+                superficie: 0
+            };
+
+            const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(nuevoAnuncio),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al enviar el anuncio');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Anuncio enviado con éxito:', data);
+                window.location.href = 'Gracias.html';
+            })
+            .catch((error) => {
+                console.error('Error al enviar el anuncio:', error);
+                alert('Hubo un error al enviar tu anuncio. Por favor, inténtalo de nuevo.');
+                submitButton.textContent = 'Enviar Anuncio';
+                submitButton.disabled = false;
+            });
         });
     }
 });
