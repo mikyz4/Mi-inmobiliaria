@@ -107,20 +107,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
+    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS (BLOQUE ACTUALIZADO) ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'Images/Anuncio1-1.jpg', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'Images/Anuncio2-1.jpg', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'Images/Anuncio3-1.jpg', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'Images/Anuncio4-1.jpg', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
+            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', ubicacion: 'Gerona Centro', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'Images/Anuncio1-1.jpg', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
+            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', ubicacion: 'Palau, Gerona', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'Images/Anuncio2-1.jpg', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
+            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', ubicacion: 'Vila-roja', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'Images/Anuncio3-1.jpg', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
+            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', ubicacion: 'Montjuïc, Gerona', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'Images/Anuncio4-1.jpg', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
         ];
 
         const modal = document.getElementById('anuncioModal');
         const filtroTipo = document.getElementById('filtro-tipo');
         const filtroHabitaciones = document.getElementById('filtro-habitaciones');
         const filtroPrecio = document.getElementById('filtro-precio');
+        const filtroUbicacion = document.getElementById('filtro-ubicacion');
+        const filtroBanos = document.getElementById('filtro-banos');
+        const filtroSuperficie = document.getElementById('filtro-superficie');
         const resetFiltrosBtn = document.getElementById('reset-filtros');
 
         const renderAnuncios = (anuncios) => {
@@ -138,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
+                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion}</p>
                     </div>`;
                 
                 card.addEventListener('click', () => {
@@ -159,6 +163,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const tipo = filtroTipo.value;
             const habitaciones = parseInt(filtroHabitaciones.value) || 0;
             const precio = parseInt(filtroPrecio.value) || 999999999;
+            const ubicacion = filtroUbicacion.value.toLowerCase();
+            const banos = parseInt(filtroBanos.value) || 0;
+            const superficie = parseInt(filtroSuperficie.value) || 0;
 
             if (tipo !== 'todos') {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
@@ -166,6 +173,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (habitaciones > 0) {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
             }
+            if (ubicacion) {
+                anunciosFiltrados = anunciosFiltrados.filter(a => a.ubicacion.toLowerCase().includes(ubicacion));
+            }
+            if (banos > 0) {
+                anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
+            }
+            if (superficie > 0) {
+                anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
+            }
+            
             anunciosFiltrados = anunciosFiltrados.filter(a => a.precio <= precio);
 
             renderAnuncios(anunciosFiltrados);
@@ -174,12 +191,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if(filtroTipo) filtroTipo.addEventListener('change', aplicarFiltros);
         if(filtroHabitaciones) filtroHabitaciones.addEventListener('input', aplicarFiltros);
         if(filtroPrecio) filtroPrecio.addEventListener('input', aplicarFiltros);
+        if(filtroUbicacion) filtroUbicacion.addEventListener('input', aplicarFiltros);
+        if(filtroBanos) filtroBanos.addEventListener('input', aplicarFiltros);
+        if(filtroSuperficie) filtroSuperficie.addEventListener('input', aplicarFiltros);
 
         if(resetFiltrosBtn) {
             resetFiltrosBtn.addEventListener('click', () => {
                 filtroTipo.value = 'todos';
                 filtroHabitaciones.value = '';
                 filtroPrecio.value = '';
+                filtroUbicacion.value = '';
+                filtroBanos.value = '';
+                filtroSuperficie.value = '';
                 aplicarFiltros();
             });
         }

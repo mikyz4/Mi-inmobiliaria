@@ -53,6 +53,20 @@
                     <label for="filtro-precio">Precio Máximo (€)</label>
                     <input type="number" id="filtro-precio" placeholder="Sin límite" step="10000">
                 </div>
+                
+                <div class="filtro">
+                    <label for="filtro-ubicacion">Ubicación</label>
+                    <input type="text" id="filtro-ubicacion" placeholder="Ej: Gerona Centro">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-banos">Baños (mín)</label>
+                    <input type="number" id="filtro-banos" placeholder="Cualquiera" min="0">
+                </div>
+                <div class="filtro">
+                    <label for="filtro-superficie">Superficie (mín m²)</label>
+                    <input type="number" id="filtro-superficie" placeholder="Cualquiera" min="0">
+                </div>
+
                 <button id="reset-filtros" class="btn-secondary">Limpiar Filtros</button>
             </div>
         </section>
