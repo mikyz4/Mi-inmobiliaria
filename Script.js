@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
+    // (Esta parte no ha cambiado)
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
     const closeBtn = document.querySelector('.close-btn');
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- LÓGICA DE LA PÁGINA DE INICIO ---
+    // (Esta parte no ha cambiado)
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         const services = [
@@ -107,15 +109,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
+    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS (MODIFICADO) ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
-        const anunciosData = [
-            { id: 1, titulo: 'Piso céntrico con gran terraza', tipo: 'Piso', ubicacion: 'Gerona Centro', precio: 250000, habitaciones: 3, banos: 2, superficie: 90, imagen: 'Images/Anuncio1-1.jpg', descripcion: 'Fantástico piso en el centro de la ciudad, con una terraza de 30m² perfecta para disfrutar del aire libre. Totalmente reformado y listo para entrar a vivir.' },
-            { id: 2, titulo: 'Casa con jardín y piscina', tipo: 'Casa', ubicacion: 'Palau, Gerona', precio: 450000, habitaciones: 4, banos: 3, superficie: 180, imagen: 'Images/Anuncio2-1.jpg', descripcion: 'Chalet independiente en zona residencial tranquila. Dispone de un amplio jardín, piscina privada y garaje para dos coches. Ideal para familias.' },
-            { id: 3, titulo: 'Ático con vistas panorámicas', tipo: 'Ático', ubicacion: 'Vila-roja', precio: 320000, habitaciones: 2, banos: 2, superficie: 110, imagen: 'Images/Anuncio3-1.jpg', descripcion: 'Luminoso ático con impresionantes vistas a toda la ciudad. Cuenta con acabados de lujo y una gran terraza solárium.' },
-            { id: 4, titulo: 'Casa de obra nueva', tipo: 'Casa', ubicacion: 'Montjuïc, Gerona', precio: 510000, habitaciones: 5, banos: 3, superficie: 220, imagen: 'Images/Anuncio4-1.jpg', descripcion: 'Moderna casa de obra nueva con alta eficiencia energética. Espacios abiertos y diseño minimalista. Entrega inmediata.' }
-        ];
+
+        // 1. URL de la API que creamos en Replit
+        const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
+
+        // 2. Variable para guardar los anuncios que vengan del servidor
+        let todosLosAnuncios = []; 
 
         const modal = document.getElementById('anuncioModal');
         const filtroTipo = document.getElementById('filtro-tipo');
@@ -141,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
-                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion}</p>
+                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
                 card.addEventListener('click', () => {
@@ -159,7 +161,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const aplicarFiltros = () => {
-            let anunciosFiltrados = [...anunciosData];
+            // 3. Ahora filtramos desde la variable `todosLosAnuncios`
+            let anunciosFiltrados = [...todosLosAnuncios];
             const tipo = filtroTipo.value;
             const habitaciones = parseInt(filtroHabitaciones.value) || 0;
             const precio = parseInt(filtroPrecio.value) || 999999999;
@@ -174,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
             }
             if (ubicacion) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.ubicacion.toLowerCase().includes(ubicacion));
+                anunciosFiltrados = anunciosFiltrados.filter(a => (a.ubicacion || '').toLowerCase().includes(ubicacion));
             }
             if (banos > 0) {
                 anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
@@ -184,10 +187,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             anunciosFiltrados = anunciosFiltrados.filter(a => a.precio <= precio);
-
             renderAnuncios(anunciosFiltrados);
         };
         
+        // 4. NUEVA FUNCIÓN para llamar a la API
+        const cargarAnunciosDesdeAPI = () => {
+            anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) { throw new Error('Error en la respuesta de la API'); }
+                    return response.json();
+                })
+                .then(data => {
+                    todosLosAnuncios = data;
+                    renderAnuncios(todosLosAnuncios);
+                })
+                .catch(error => {
+                    console.error('Error al cargar anuncios desde la API:', error);
+                    anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
+                });
+        };
+
         if(filtroTipo) filtroTipo.addEventListener('change', aplicarFiltros);
         if(filtroHabitaciones) filtroHabitaciones.addEventListener('input', aplicarFiltros);
         if(filtroPrecio) filtroPrecio.addEventListener('input', aplicarFiltros);
@@ -207,10 +227,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        renderAnuncios(anunciosData);
+        // 5. Al cargar la página, llamamos a la nueva función
+        cargarAnunciosDesdeAPI();
     }
     
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
+    // (Esta parte no ha cambiado)
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
     if (toggleFiltrosBtn && filtrosWrapper) {
@@ -221,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- LÓGICA PARA EL CARRUSEL DE LA PÁGINA DE INICIO ---
+    // (Esta parte no ha cambiado)
     const heroSection = document.getElementById('hero');
     if (heroSection) {
         const carouselImages = document.querySelectorAll('.carousel-image');
@@ -235,21 +258,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(carouselImages[currentImageIndex]) {
                     carouselImages[currentImageIndex].classList.add('active');
                 }
-            }, 5000); // Cambia de imagen cada 5 segundos
+            }, 5000);
         }
     }
 
     // --- LÓGICA PARA EL BANNER DE COOKIES (AÑADIDO) ---
+    // (Esta parte no ha cambiado)
     const cookieBanner = document.getElementById('cookie-banner');
     if (cookieBanner) {
         const acceptCookiesBtn = document.getElementById('accept-cookies');
 
-        // Si no hay una cookie guardada, muestra el banner
         if (!localStorage.getItem('cookies_accepted')) {
             cookieBanner.style.display = 'flex';
         }
 
-        // Cuando el usuario hace clic en Aceptar
         acceptCookiesBtn.addEventListener('click', () => {
             localStorage.setItem('cookies_accepted', 'true');
             cookieBanner.style.display = 'none';
