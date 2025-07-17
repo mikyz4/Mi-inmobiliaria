@@ -196,19 +196,4 @@ document.addEventListener('DOMContentLoaded', function() {
             filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
         });
     }
-
-    // --- LÓGICA PARA EL CARRUSEL DE LA PÁGINA DE INICIO (AÑADIDO) ---
-    const heroSection = document.getElementById('hero');
-    if (heroSection) {
-        const carouselImages = document.querySelectorAll('.carousel-image');
-        let currentImageIndex = 0;
-
-        if (carouselImages.length > 1) {
-            setInterval(() => {
-                carouselImages[currentImageIndex].classList.remove('active');
-                currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
-                carouselImages[currentImageIndex].classList.add('active');
-            }, 5000); // Cambia de imagen cada 5 segundos
-        }
-    }
 });
