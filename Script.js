@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
-    // (Esta parte no ha cambiado)
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
     const closeBtn = document.querySelector('.close-btn');
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- LÓGICA DE LA PÁGINA DE INICIO ---
-    // (Esta parte no ha cambiado)
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         const services = [
@@ -113,10 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
 
-        // 1. URL de la API que creamos en Replit
         const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
 
-        // 2. Variable para guardar los anuncios que vengan del servidor
         let todosLosAnuncios = []; 
 
         const modal = document.getElementById('anuncioModal');
@@ -137,10 +133,11 @@ document.addEventListener('DOMContentLoaded', function() {
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
+                // LÍNEA DE DEPURACIÓN AÑADIDA EN EL H3
                 card.innerHTML = `
                     <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
-                        <h3>${anuncio.titulo}</h3>
+                        <h3>${anuncio.titulo} --- URL: ${anuncio.imagen}</h3>
                         <p class="anuncio-card-price">${anuncio.precio.toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones} hab | ${anuncio.banos} baños | ${anuncio.superficie} m²</p>
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.ubicacion || 'Ubicación no especificada'}</p>
@@ -161,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const aplicarFiltros = () => {
-            // 3. Ahora filtramos desde la variable `todosLosAnuncios`
             let anunciosFiltrados = [...todosLosAnuncios];
             const tipo = filtroTipo.value;
             const habitaciones = parseInt(filtroHabitaciones.value) || 0;
@@ -190,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
             renderAnuncios(anunciosFiltrados);
         };
         
-        // 4. NUEVA FUNCIÓN para llamar a la API
         const cargarAnunciosDesdeAPI = () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
             fetch(apiUrl)
@@ -227,12 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // 5. Al cargar la página, llamamos a la nueva función
         cargarAnunciosDesdeAPI();
     }
     
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
-    // (Esta parte no ha cambiado)
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
     if (toggleFiltrosBtn && filtrosWrapper) {
@@ -243,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- LÓGICA PARA EL CARRUSEL DE LA PÁGINA DE INICIO ---
-    // (Esta parte no ha cambiado)
     const heroSection = document.getElementById('hero');
     if (heroSection) {
         const carouselImages = document.querySelectorAll('.carousel-image');
@@ -263,7 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- LÓGICA PARA EL BANNER DE COOKIES (AÑADIDO) ---
-    // (Esta parte no ha cambiado)
     const cookieBanner = document.getElementById('cookie-banner');
     if (cookieBanner) {
         const acceptCookiesBtn = document.getElementById('accept-cookies');
