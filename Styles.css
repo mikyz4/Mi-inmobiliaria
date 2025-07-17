@@ -220,3 +220,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .carousel-image.active {
     opacity: 1;
 }
+/* Espacio extra para el botón de la cabecera */
+.hero-content .btn {
+    margin-top: 20px;
+}
