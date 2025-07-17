@@ -1,108 +1,98 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas - Asesoría Inmobiliaria</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+</head>
+<body>
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="Index.html">Inicio</a></li>
+                <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="Anuncio.html">Publicar Anuncio</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
 
-// --- Middlewares ---
-app.use(cors());
-app.use(express.json()); // Necesario para peticiones que no son de archivos
-app.use(express.urlencoded({ extended: true })); // Para procesar datos de formularios
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/Carrusel1.jpg" alt="Vistas de Gerona" class="carousel-image active">
+                <img src="Images/Carrusel2.jpg" alt="Interior de una casa moderna" class="carousel-image">
+                <img src="Images/Carrusel3.jpg" alt="Familia recibiendo llaves" class="carousel-image">
 
-// Hacemos la carpeta 'uploads' pública.
-// Cualquier archivo en esa carpeta será accesible desde la URL del servidor.
-// Ejemplo: https://mi-replit.replit.dev/uploads/nombre-del-archivo.jpg
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+                <div class="hero-content">
+                    <h1><span style="color: var(--accent-color);">Selettas</span></h1>
+                    <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
+                    <a href="#contact" class="btn">Contactar</a>
+                </div>
+            </div>
+        </section>
 
-// --- Configuración de Multer (el gestor de subida de archivos) ---
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Aquí le decimos a Multer que guarde los archivos en la carpeta 'uploads' que creaste.
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    // Creamos un nombre de archivo único para evitar que se sobreescriban.
-    // Será algo como: 'attachment_1-1678886400000-123456789.jpg'
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+        <section id="services">
+            <h2>Nuestros Servicios</h2>
+            <div class="services-container">
+                </div>
+        </section>
+        
+        <section id="news">
+            <h2>Últimas Novedades</h2>
+            <div id="news-container" class="anuncios-container">
+                </div>
+        </section>
 
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB por archivo
-    fileFilter: function (req, file, cb) {
-        // Aceptar solo imágenes
-        if (!file.mimetype.startsWith('image/')) {
-            return cb(new Error('Solo se permiten archivos de imagen.'), false);
-        }
-        cb(null, true);
-    }
-});
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             <div class="faq-container">
+                </div>
+        </section>
 
-// --- Base de datos en memoria (para el ejemplo) ---
-let anuncios = [];
-let nextId = 1;
-
-// --- Rutas de la API ---
-
-// Ruta para OBTENER todos los anuncios
-app.get('/api/anuncios', (req, res) => {
-  res.json(anuncios);
-});
-
-// Ruta para CREAR un nuevo anuncio
-// 1. 'upload.single('attachment_1')' es el middleware de Multer.
-//    Procesa UN archivo que venga del campo del formulario con name="attachment_1".
-// 2. Si todo va bien, los datos de texto estarán en 'req.body' y el archivo en 'req.file'.
-app.post('/api/anuncios', upload.single('attachment_1'), (req, res) => {
+        <section id="contact">
+            <h2>Contáctanos</h2>
+            <form action="https://formsubmit.co/miky.tv098@gmail.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="Tu mensaje" rows="5" required></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
+    </main>
     
-    // Si 'fileFilter' de multer da un error, aquí lo manejamos
-    if (!req.file) {
-        return res.status(400).send('Error: No se ha subido la imagen principal o el archivo no es una imagen.');
-    }
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img">
+            <h3 id="news-modal-titulo"></h3>
+            <p id="news-modal-descripcion"></p>
+        </div>
+    </div>
 
-    try {
-        console.log('Datos de texto recibidos:', req.body);
-        console.log('Datos del archivo recibidos:', req.file);
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
 
-        // Los datos del formulario de texto están en req.body
-        const { titulo, direccion, email, descripcion, precio, habitaciones, banos, superficie } = req.body;
+    <div id="cookie-banner">
+        <p>Utilizamos cookies para asegurar que damos la mejor experiencia al usuario en nuestra web. Si continúas utilizando este sitio asumiremos que estás de acuerdo. <a href="Legal.html">Leer más</a></p>
+        <button id="accept-cookies" class="btn">Aceptar</button>
+    </div>
 
-        // Construimos la URL pública COMPLETA de la imagen que se acaba de subir
-        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    <a href="https://wa.me/34632125872" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
-        // Creamos el nuevo objeto de anuncio
-        const nuevoAnuncio = {
-            id: nextId++,
-            titulo,
-            direccion,
-            email,
-            descripcion,
-            precio: parseFloat(precio) || 0,
-            habitaciones: parseInt(habitaciones) || 0,
-            banos: parseInt(banos) || 0,
-            superficie: parseInt(superficie) || 0,
-            imagen: imageUrl, // ¡Guardamos la URL real de la imagen!
-        };
-        
-        // Añadimos el anuncio al principio del array para que aparezca el primero
-        anuncios.unshift(nuevoAnuncio);
-        
-        console.log('Anuncio creado y guardado:', nuevoAnuncio);
-
-        // Enviamos una respuesta exitosa con el anuncio creado
-        res.status(201).json(nuevoAnuncio);
-
-    } catch (error) {
-        console.error("Error procesando el anuncio:", error);
-        res.status(500).send("Error interno del servidor al procesar el anuncio.");
-    }
-});
-
-// --- Iniciar el servidor ---
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
+    <script src="Script.js"></script>
+</body>
+</html>

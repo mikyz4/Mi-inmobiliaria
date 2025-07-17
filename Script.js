@@ -114,8 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
 
-        // YA NO SE DEFINE LA URL AQUÍ
-
         let todosLosAnuncios = []; 
 
         const modal = document.getElementById('anuncioModal');
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const cargarAnunciosDesdeAPI = () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
-            fetch(apiUrl) // <-- Usa la variable global
+            fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) { throw new Error('Error en la respuesta de la API'); }
                     return response.json();
@@ -283,9 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const formData = new FormData(anuncioForm);
             
-            // YA NO SE DEFINE LA URL AQUÍ
-
-            fetch(apiUrl, { // <-- Usa la variable global
+            fetch(apiUrl, {
                 method: 'POST',
                 body: formData,
             })
