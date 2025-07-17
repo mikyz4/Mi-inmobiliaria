@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS (BLOQUE ACTUALIZADO) ---
+    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         const anunciosData = [
@@ -237,5 +237,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 5000); // Cambia de imagen cada 5 segundos
         }
+    }
+
+    // --- LÓGICA PARA EL BANNER DE COOKIES (AÑADIDO) ---
+    const cookieBanner = document.getElementById('cookie-banner');
+    if (cookieBanner) {
+        const acceptCookiesBtn = document.getElementById('accept-cookies');
+
+        // Si no hay una cookie guardada, muestra el banner
+        if (!localStorage.getItem('cookies_accepted')) {
+            cookieBanner.style.display = 'flex';
+        }
+
+        // Cuando el usuario hace clic en Aceptar
+        acceptCookiesBtn.addEventListener('click', () => {
+            localStorage.setItem('cookies_accepted', 'true');
+            cookieBanner.style.display = 'none';
+        });
     }
 });
