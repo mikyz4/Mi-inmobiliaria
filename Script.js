@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- CONEXIÓN CON SUPABASE ---
+    // --- CONEXIÓN CON SUPABASE (VERSIÓN CORREGIDA) ---
     const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // La variable global se llama 'supabase' y creamos un cliente a partir de ella
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
@@ -179,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cargarAnunciosDesdeSupabase = async () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('anuncios')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -268,7 +269,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="Terreno">Terreno</option>
                 </select>
             `;
-            anuncioForm.querySelector('#descripcion').parentElement.after(formGroup);
+            // Insertamos el campo 'tipo' después de la descripción
+            const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
+            if(descripcionGroup) descripcionGroup.after(formGroup);
         }
 
         anuncioForm.addEventListener('submit', async function(event) {
@@ -293,12 +296,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const file = fileInputs[i]?.files[0];
                     if (file) {
                         const fileName = `${Date.now()}-${file.name}`;
-                        const { error: uploadError } = await supabase.storage
+                        const { error: uploadError } = await supabaseClient.storage
                             .from('imagenes-anuncios') // Nombre corregido con guion
                             .upload(fileName, file);
                         if (uploadError) throw uploadError;
 
-                        const { data: publicUrlData } = supabase.storage
+                        const { data: publicUrlData } = supabaseClient.storage
                             .from('imagenes-anuncios')
                             .getPublicUrl(fileName);
                         
@@ -323,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     imagenes_adicionales_urls: imagenesAdicionalesUrls
                 };
 
-                const { error: insertError } = await supabase.from('anuncios').insert([nuevoAnuncio]);
+                const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
                 if (insertError) throw insertError;
 
                 window.location.href = 'Gracias.html';
