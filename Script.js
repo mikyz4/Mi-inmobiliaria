@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- URL DE LA API (DEFINIDA UNA SOLA VEZ) ---
-    const apiUrl = 'https://b3e75e34-bbdc-4f97-a34f-56b934e026a7-00-1ivwxos54f12f.kirk.replit.dev/api/anuncios';
+    // --- CONEXIÓN CON SUPABASE ---
+    const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
@@ -94,9 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const faqContainer = document.querySelector('.faq-container');
     if (faqContainer) {
         const faqs = [
-            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes. ¡Nosotros nos encargamos del resto!' },
+            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes. ¡Tu anuncio aparecerá al instante!' },
             { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta se realiza a través de nuestros servicios.' },
-            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo o contactándonos.' },
+            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo contactándonos.' },
             { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
         ];
         faqContainer.innerHTML = faqs.map(faq => `
@@ -105,17 +107,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>${faq.answer}</p>
             </div>
         `).join('');
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.addEventListener('click', () => item.classList.toggle('open'));
+        document.querySelectorAll('.faq-item h3').forEach(item => {
+            item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
         });
     }
     
     // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
-
         let todosLosAnuncios = []; 
-
         const modal = document.getElementById('anuncioModal');
         const filtroTipo = document.getElementById('filtro-tipo');
         const filtroHabitaciones = document.getElementById('filtro-habitaciones');
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
                 card.innerHTML = `
-                    <img src="${anuncio.imagen}" alt="${anuncio.titulo}" loading="lazy">
+                    <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
                         <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 card.addEventListener('click', () => {
                     if (modal) {
-                        modal.querySelector('#modal-img').src = anuncio.imagen;
+                        modal.querySelector('#modal-img').src = anuncio.imagen_principal_url;
                         modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
                         modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
                         modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
@@ -166,63 +166,52 @@ document.addEventListener('DOMContentLoaded', function() {
             const banos = parseInt(filtroBanos.value) || 0;
             const superficie = parseInt(filtroSuperficie.value) || 0;
 
-            if (tipo !== 'todos') {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
-            }
-            if (habitaciones > 0) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
-            }
-            if (ubicacion) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => (a.direccion || '').toLowerCase().includes(ubicacion));
-            }
-            if (banos > 0) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
-            }
-            if (superficie > 0) {
-                anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
-            }
+            if (tipo !== 'todos') anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
+            if (habitaciones > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
+            if (ubicacion) anunciosFiltrados = anunciosFiltrados.filter(a => (a.direccion || '').toLowerCase().includes(ubicacion));
+            if (banos > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
+            if (superficie > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
             
             anunciosFiltrados = anunciosFiltrados.filter(a => (a.precio || 0) <= precio);
             renderAnuncios(anunciosFiltrados);
         };
         
-        const cargarAnunciosDesdeAPI = () => {
+        const cargarAnunciosDesdeSupabase = async () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) { throw new Error('Error en la respuesta de la API'); }
-                    return response.json();
-                })
-                .then(data => {
-                    todosLosAnuncios = data.sort((a, b) => b.id - a.id);
-                    renderAnuncios(todosLosAnuncios);
-                })
-                .catch(error => {
-                    console.error('Error al cargar anuncios desde la API:', error);
-                    anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
-                });
+            try {
+                const { data, error } = await supabase
+                    .from('anuncios')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                todosLosAnuncios = data;
+                renderAnuncios(todosLosAnuncios);
+
+            } catch (error) {
+                console.error('Error al cargar anuncios desde Supabase:', error);
+                anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
+            }
         };
 
-        if(filtroTipo) filtroTipo.addEventListener('change', aplicarFiltros);
-        if(filtroHabitaciones) filtroHabitaciones.addEventListener('input', aplicarFiltros);
-        if(filtroPrecio) filtroPrecio.addEventListener('input', aplicarFiltros);
-        if(filtroUbicacion) filtroUbicacion.addEventListener('input', aplicarFiltros);
-        if(filtroBanos) filtroBanos.addEventListener('input', aplicarFiltros);
-        if(filtroSuperficie) filtroSuperficie.addEventListener('input', aplicarFiltros);
+        [filtroTipo, filtroHabitaciones, filtroPrecio, filtroUbicacion, filtroBanos, filtroSuperficie].forEach(filtro => {
+            if (filtro) filtro.addEventListener('input', aplicarFiltros);
+        });
 
         if(resetFiltrosBtn) {
             resetFiltrosBtn.addEventListener('click', () => {
-                filtroTipo.value = 'todos';
-                filtroHabitaciones.value = '';
-                filtroPrecio.value = '';
-                filtroUbicacion.value = '';
-                filtroBanos.value = '';
-                filtroSuperficie.value = '';
+                if (filtroTipo) filtroTipo.value = 'todos';
+                if (filtroHabitaciones) filtroHabitaciones.value = '';
+                if (filtroPrecio) filtroPrecio.value = '';
+                if (filtroUbicacion) filtroUbicacion.value = '';
+                if (filtroBanos) filtroBanos.value = '';
+                if (filtroSuperficie) filtroSuperficie.value = '';
                 aplicarFiltros();
             });
         }
         
-        cargarAnunciosDesdeAPI();
+        cargarAnunciosDesdeSupabase();
     }
     
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
@@ -232,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleFiltrosBtn.addEventListener('click', () => {
             const isVisible = filtrosWrapper.style.display === 'grid';
             filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
+            toggleFiltrosBtn.innerHTML = isVisible ? '<i class="fas fa-filter"></i> Mostrar Filtros' : '<i class="fas fa-times"></i> Ocultar Filtros';
         });
     }
 
@@ -240,16 +230,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (heroSection) {
         const carouselImages = document.querySelectorAll('.carousel-image');
         let currentImageIndex = 0;
-
         if (carouselImages.length > 1) {
             setInterval(() => {
-                if(carouselImages[currentImageIndex]) {
-                    carouselImages[currentImageIndex].classList.remove('active');
-                }
+                if(carouselImages[currentImageIndex]) carouselImages[currentImageIndex].classList.remove('active');
                 currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
-                if(carouselImages[currentImageIndex]) {
-                    carouselImages[currentImageIndex].classList.add('active');
-                }
+                if(carouselImages[currentImageIndex]) carouselImages[currentImageIndex].classList.add('active');
             }, 5000);
         }
     }
@@ -258,11 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cookieBanner = document.getElementById('cookie-banner');
     if (cookieBanner) {
         const acceptCookiesBtn = document.getElementById('accept-cookies');
-
-        if (!localStorage.getItem('cookies_accepted')) {
-            cookieBanner.style.display = 'flex';
-        }
-
+        if (!localStorage.getItem('cookies_accepted')) cookieBanner.style.display = 'flex';
         acceptCookiesBtn.addEventListener('click', () => {
             localStorage.setItem('cookies_accepted', 'true');
             cookieBanner.style.display = 'none';
@@ -272,35 +253,87 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LÓGICA PARA ENVIAR EL FORMULARIO DE NUEVO ANUNCIO ---
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
-        anuncioForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Añadimos el campo 'tipo' si no existe en el HTML
+        if (!anuncioForm.querySelector('#tipo')) {
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            formGroup.innerHTML = `
+                <label for="tipo">Tipo de Propiedad</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="" disabled selected>Selecciona un tipo</option>
+                    <option value="Piso">Piso</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Ático">Ático</option>
+                    <option value="Local">Local</option>
+                    <option value="Terreno">Terreno</option>
+                </select>
+            `;
+            anuncioForm.querySelector('#descripcion').parentElement.after(formGroup);
+        }
 
+        anuncioForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
             const submitButton = anuncioForm.querySelector('button[type="submit"]');
             submitButton.textContent = 'Enviando...';
             submitButton.disabled = true;
 
-            const formData = new FormData(anuncioForm);
-            
-            fetch(apiUrl, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text || 'Error en el servidor') });
+            try {
+                const formData = new FormData(anuncioForm);
+                const fileInputs = [
+                    anuncioForm.querySelector('#imagen1'),
+                    anuncioForm.querySelector('#imagen2'),
+                    anuncioForm.querySelector('#imagen3'),
+                    anuncioForm.querySelector('#imagen4')
+                ];
+
+                let imagenPrincipalUrl = '';
+                const imagenesAdicionalesUrls = [];
+
+                for (let i = 0; i < fileInputs.length; i++) {
+                    const file = fileInputs[i]?.files[0];
+                    if (file) {
+                        const fileName = `${Date.now()}-${file.name}`;
+                        const { error: uploadError } = await supabase.storage
+                            .from('imagenes-anuncios') // Nombre corregido con guion
+                            .upload(fileName, file);
+                        if (uploadError) throw uploadError;
+
+                        const { data: publicUrlData } = supabase.storage
+                            .from('imagenes-anuncios')
+                            .getPublicUrl(fileName);
+                        
+                        if (i === 0) imagenPrincipalUrl = publicUrlData.publicUrl;
+                        else imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
+                    }
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Anuncio enviado con éxito:', data);
+                
+                if (!imagenPrincipalUrl) throw new Error('La imagen principal es obligatoria.');
+
+                const nuevoAnuncio = {
+                    titulo: formData.get('titulo'),
+                    direccion: formData.get('direccion'),
+                    email_contacto: formData.get('email'),
+                    descripcion: formData.get('descripcion'),
+                    tipo: formData.get('tipo'),
+                    precio: parseFloat(formData.get('precio')),
+                    habitaciones: parseInt(formData.get('habitaciones')),
+                    banos: parseInt(formData.get('banos')),
+                    superficie: parseInt(formData.get('superficie')),
+                    imagen_principal_url: imagenPrincipalUrl,
+                    imagenes_adicionales_urls: imagenesAdicionalesUrls
+                };
+
+                const { error: insertError } = await supabase.from('anuncios').insert([nuevoAnuncio]);
+                if (insertError) throw insertError;
+
                 window.location.href = 'Gracias.html';
-            })
-            .catch((error) => {
+
+            } catch (error) {
                 console.error('Error al enviar el anuncio:', error);
                 alert('Hubo un error al enviar tu anuncio: ' + error.message);
                 submitButton.textContent = 'Enviar Anuncio';
                 submitButton.disabled = false;
-            });
+            }
         });
     }
 });
