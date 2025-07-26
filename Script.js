@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
     const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
+    // Esta es la clave pública (anon key), es seguro tenerla aquí. ¡NUNCA pongas la clave "service_role"!
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
-    // (Tu código original para el menú y los modales se mantiene igual)
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
     const closeBtn = document.querySelector('.close-btn');
@@ -21,16 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
         closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
     }
     window.addEventListener('scroll', () => {
-        if (scrollTopBtn && whatsappBtn) {
-            const shouldShow = window.scrollY > 200;
-            scrollTopBtn.classList.toggle('show', shouldShow);
-            whatsappBtn.classList.toggle('show', shouldShow);
-        }
+        const shouldShow = window.scrollY > 200;
+        if (scrollTopBtn) scrollTopBtn.classList.toggle('show', shouldShow);
+        if (whatsappBtn) whatsappBtn.classList.toggle('show', shouldShow);
     });
     if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
     modals.forEach(modal => {
         const closeButton = modal.querySelector('.close-button');
@@ -44,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- NUEVO: LÓGICA DE AUTENTICACIÓN Y SESIÓN ---
+    // --- LÓGICA DE AUTENTICACIÓN Y SESIÓN ---
     const signUpForm = document.getElementById('signUpForm');
     if (signUpForm) {
         signUpForm.addEventListener('submit', async (e) => {
@@ -52,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = signUpForm.querySelector('#email').value;
             const password = signUpForm.querySelector('#password').value;
             const { error } = await supabaseClient.auth.signUp({ email, password });
-
             if (error) {
                 alert('Error al registrar: ' + error.message);
             } else {
@@ -69,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = loginForm.querySelector('#email').value;
             const password = loginForm.querySelector('#password').value;
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
             if (error) {
                 alert('Error al iniciar sesión: ' + error.message);
             } else {
@@ -94,8 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
             logoutLi.innerHTML = '<a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a>';
             navLinks.appendChild(logoutLi);
 
-            const logoutBtn = document.getElementById('logoutBtn');
-            logoutBtn.addEventListener('click', async (e) => {
+            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
                 window.location.reload();
@@ -104,19 +97,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const loginLi = document.createElement('li');
             loginLi.className = 'auth-link';
             loginLi.innerHTML = '<a href="login.html">Iniciar Sesión</a>';
-
             const registroLi = document.createElement('li');
             registroLi.className = 'auth-link';
             registroLi.innerHTML = '<a href="registro.html">Registrarse</a>';
-
             navLinks.appendChild(loginLi);
             navLinks.appendChild(registroLi);
         }
     }
-
     checkUserStatus();
 
-    // --- NUEVO: PROTEGER PÁGINA DE PUBLICAR ANUNCIO ---
+    // --- PROTEGER PÁGINA DE PUBLICAR ANUNCIO ---
     (async () => {
         if (window.location.pathname.endsWith('Anuncio.html')) {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -128,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
     
     // --- LÓGICA DE LA PÁGINA DE INICIO ---
-    // (Tu código original de servicios, noticias y FAQ se mantiene igual)
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         const services = [
@@ -137,12 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
             { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
         ];
         servicesContainer.innerHTML = services.map(service => `
-            <div class="service-item">
-                <i class="fas ${service.icon}"></i>
-                <h3>${service.title}</h3>
-                <p>${service.text}</p>
-            </div>
-        `).join('');
+            <div class="service-item"><i class="fas ${service.icon}"></i><h3>${service.title}</h3><p>${service.text}</p></div>`).join('');
     }
     const newsContainer = document.getElementById('news-container');
     if(newsContainer) {
@@ -152,16 +136,10 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: 3, titulo: 'Guía para Compradores', imagen: 'Images/Noticia3.jpg', descripcion: 'Desde la financiación hasta la firma, todo lo que necesitas saber para tu primera compra.'}
         ];
         const newsModal = document.getElementById('newsModal');
-
         newsData.forEach(news => {
             const card = document.createElement('div');
             card.className = 'anuncio-card';
-            card.innerHTML = `
-                <img src="${news.imagen}" alt="${news.titulo}" loading="lazy">
-                <div class="anuncio-card-content">
-                    <h3>${news.titulo}</h3>
-                </div>
-            `;
+            card.innerHTML = `<img src="${news.imagen}" alt="${news.titulo}" loading="lazy"><div class="anuncio-card-content"><h3>${news.titulo}</h3></div>`;
             card.addEventListener('click', () => {
                 if(newsModal) {
                     newsModal.querySelector('#news-modal-img').src = news.imagen;
@@ -176,29 +154,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const faqContainer = document.querySelector('.faq-container');
     if (faqContainer) {
         const faqs = [
-            { question: '¿Cómo subo un anuncio?', answer: 'Ve a la sección "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes. ¡Tu anuncio aparecerá al instante!' },
-            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito. Solo cobramos una comisión si la venta se realiza a través de nuestros servicios.' },
-            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios permanecen activos durante 90 días. Pasado ese tiempo, puedes renovarlo contactándonos.' },
-            { question: '¿Asesoran a compradores primerizos?', answer: '¡Por supuesto! Te acompañamos en todo el proceso, desde la búsqueda de financiación hasta la firma.' }
+            { question: '¿Cómo subo un anuncio?', answer: 'Inicia sesión, ve a "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes.' },
+            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito.' },
+            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios no tienen fecha de caducidad por ahora.' },
         ];
-        faqContainer.innerHTML = faqs.map(faq => `
-            <div class="faq-item">
-                <h3>${faq.question}</h3>
-                <p>${faq.answer}</p>
-            </div>
-        `).join('');
+        faqContainer.innerHTML = faqs.map(faq => `<div class="faq-item"><h3>${faq.question}</h3><p>${faq.answer}</p></div>`).join('');
         document.querySelectorAll('.faq-item h3').forEach(item => {
             item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
         });
     }
 
     // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
-    // (Tu código original de filtros y renderizado de anuncios se mantiene igual)
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
         const modal = document.getElementById('anuncioModal');
-        // ... (resto de tus variables de filtros)
         const filtroTipo = document.getElementById('filtro-tipo');
         const filtroHabitaciones = document.getElementById('filtro-habitaciones');
         const filtroPrecio = document.getElementById('filtro-precio');
@@ -261,10 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cargarAnunciosDesdeSupabase = async () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
             try {
-                const { data, error } = await supabaseClient
-                    .from('anuncios')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('anuncios').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 todosLosAnuncios = data;
                 renderAnuncios(todosLosAnuncios);
@@ -279,7 +246,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         if(resetFiltrosBtn) {
             resetFiltrosBtn.addEventListener('click', () => {
-                //... tu código de reset
+                // CORREGIDO: Resetea todos los campos del formulario de filtros
+                filtroTipo.value = 'todos';
+                filtroHabitaciones.value = '';
+                filtroPrecio.value = '';
+                filtroUbicacion.value = '';
+                filtroBanos.value = '';
+                filtroSuperficie.value = '';
                 aplicarFiltros();
             });
         }
@@ -287,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
-    // (Tu código original se mantiene)
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
     if (toggleFiltrosBtn && filtrosWrapper) {
@@ -299,26 +271,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- LÓGICA PARA EL CARRUSEL DE LA PÁGINA DE INICIO ---
-    // (Tu código original se mantiene)
     const heroSection = document.getElementById('hero');
     if (heroSection) {
-        // ... tu código del carrusel
+        let currentImage = 0;
+        const images = heroSection.querySelectorAll('.carousel-image');
+        setInterval(() => {
+            images[currentImage].classList.remove('active');
+            currentImage = (currentImage + 1) % images.length;
+            images[currentImage].classList.add('active');
+        }, 5000);
     }
 
     // --- LÓGICA PARA EL BANNER DE COOKIES ---
-    // (Tu código original se mantiene)
     const cookieBanner = document.getElementById('cookie-banner');
-    if (cookieBanner) {
-        // ... tu código de cookies
+    const acceptCookiesBtn = document.getElementById('accept-cookies');
+    if (cookieBanner && !localStorage.getItem('cookiesAccepted')) {
+        cookieBanner.style.display = 'flex';
+    }
+    if (acceptCookiesBtn) {
+        acceptCookiesBtn.addEventListener('click', () => {
+            cookieBanner.style.display = 'none';
+            localStorage.setItem('cookiesAccepted', 'true');
+        });
     }
 
     // --- LÓGICA PARA ENVIAR EL FORMULARIO DE NUEVO ANUNCIO ---
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
-        // (Tu código para añadir el campo 'tipo' se mantiene igual)
+        // CORREGIDO: Añade el campo "Tipo de Propiedad" al formulario si no existe
         if (!anuncioForm.querySelector('#tipo')) {
             const formGroup = document.createElement('div');
-            // ... tu código para añadir el campo tipo
+            formGroup.className = 'form-group';
+            formGroup.innerHTML = `
+                <label for="tipo">Tipo de Propiedad</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecciona un tipo</option>
+                    <option value="Piso">Piso</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Ático">Ático</option>
+                </select>`;
             const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
             if(descripcionGroup) descripcionGroup.after(formGroup);
         }
@@ -330,36 +321,38 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
 
             try {
-                // --- MODIFICADO: OBTENER USUARIO LOGUEADO ---
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) throw new Error('Debes estar logueado para crear un anuncio.');
 
                 const formData = new FormData(anuncioForm);
-                // ... (tu código de subida de imágenes se mantiene igual)
                 let imagenPrincipalUrl = '';
                 const imagenesAdicionalesUrls = [];
-                const fileInputs = [anuncioForm.querySelector('#imagen1'), /* ... */];
+                // CORREGIDO: Se crea un array con todos los inputs de imágenes
+                const fileInputs = [
+                    anuncioForm.querySelector('#imagen1'), 
+                    anuncioForm.querySelector('#imagen2'), 
+                    anuncioForm.querySelector('#imagen3'), 
+                    anuncioForm.querySelector('#imagen4')
+                ];
 
                 for (let i = 0; i < fileInputs.length; i++) {
                     const file = fileInputs[i]?.files[0];
                     if (file) {
-                        const fileName = `${user.id}/${Date.now()}-${file.name}`; // Organiza por ID de usuario
-                        const { error: uploadError } = await supabaseClient.storage
-                            .from('imagenes-anuncios')
-                            .upload(fileName, file);
+                        const fileName = `${user.id}/${Date.now()}-${file.name}`;
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-anuncios').upload(fileName, file);
                         if (uploadError) throw uploadError;
 
-                        const { data: publicUrlData } = supabaseClient.storage
-                            .from('imagenes-anuncios')
-                            .getPublicUrl(fileName);
+                        const { data: publicUrlData } = supabaseClient.storage.from('imagenes-anuncios').getPublicUrl(fileName);
                         
-                        if (i === 0) imagenPrincipalUrl = publicUrlData.publicUrl;
-                        else imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
+                        if (i === 0) {
+                            imagenPrincipalUrl = publicUrlData.publicUrl;
+                        } else {
+                            imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
+                        }
                     }
                 }
                 if (!imagenPrincipalUrl) throw new Error('La imagen principal es obligatoria.');
 
-                // --- MODIFICADO: AÑADIR USER_ID AL OBJETO ---
                 const nuevoAnuncio = {
                     titulo: formData.get('titulo'),
                     direccion: formData.get('direccion'),
@@ -372,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     superficie: parseInt(formData.get('superficie')),
                     imagen_principal_url: imagenPrincipalUrl,
                     imagenes_adicionales_urls: imagenesAdicionalesUrls,
-                    user_id: user.id // <-- ¡AÑADIDO!
+                    user_id: user.id
                 };
 
                 const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
