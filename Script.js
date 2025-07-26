@@ -5,6 +5,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // --- SISTEMA DE NOTIFICACIONES ---
+    const notificationBanner = document.getElementById('notification-banner');
+    function showNotification(message, type = 'success', duration = 4000) {
+        if (!notificationBanner) return;
+
+        notificationBanner.textContent = message;
+        notificationBanner.className = 'notification-hidden'; // Resetea clases
+        // Forzamos un reflow para reiniciar la animación si se llama rápidamente
+        void notificationBanner.offsetWidth; 
+        
+        notificationBanner.classList.add('show');
+        notificationBanner.classList.add(type === 'success' ? 'notification-success' : 'notification-error');
+
+        setTimeout(() => {
+            notificationBanner.classList.remove('show');
+        }, duration);
+    }
+
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -49,11 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
             
             if (error) {
-                alert('Error al registrar: ' + error.message);
+                showNotification('Error al registrar: ' + error.message, 'error');
             } else {
-                // Con la confirmación por email desactivada, Supabase inicia sesión automáticamente.
-                alert('¡Registro exitoso! Serás redirigido a la página principal.');
-                window.location.href = 'Index.html'; // Lo llevamos directo al inicio ya logueado
+                showNotification('¡Registro exitoso! Serás redirigido a la página principal.', 'success');
+                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
             }
         });
     }
@@ -66,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = loginForm.querySelector('#password').value;
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
-                alert('Error al iniciar sesión: ' + error.message);
+                showNotification('Error al iniciar sesión: ' + error.message, 'error');
             } else {
                 window.location.href = 'Index.html';
             }
@@ -81,26 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!navLinksContainer) return;
         
         navLinksContainer.innerHTML = '';
-
         navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
         `;
-
         if (user) {
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-
+            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single();
             if (profile && profile.role === 'admin') {
-                navLinksContainer.innerHTML += `
-                    <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
-                `;
+                navLinksContainer.innerHTML += `<li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>`;
             }
-
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
@@ -128,21 +135,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
-                alert('Debes iniciar sesión para acceder a esta página.');
-                window.location.href = 'login.html';
+                showNotification('Debes iniciar sesión para acceder a esta página.', 'error', 2000);
+                setTimeout(() => { window.location.href = 'login.html'; }, 2000);
             }
         }
         if (currentPage === 'admin.html') {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
-                alert('Acceso denegado.');
-                window.location.href = 'Index.html';
+                showNotification('Acceso denegado.', 'error', 2000);
+                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
                 return;
             }
             const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
             if (!profile || profile.role !== 'admin') {
-                alert('No tienes permisos de administrador para acceder a esta página.');
-                window.location.href = 'Index.html';
+                showNotification('No tienes permisos de administrador.', 'error', 2000);
+                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
             }
         }
     })();
@@ -295,7 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderAnuncios(todosLosAnuncios);
             } catch (error) {
                 console.error('Error al cargar anuncios desde Supabase:', error);
-                anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
+                showNotification('No se pudieron cargar los anuncios. Inténtalo más tarde.', 'error');
+                anunciosContainer.innerHTML = '';
             }
         };
 
@@ -402,7 +410,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } catch (error) {
                 console.error('Error al cargar mis anuncios:', error);
-                misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar tus propiedades.</p>';
+                showNotification('Hubo un error al cargar tus propiedades.', 'error');
+                misAnunciosContainer.innerHTML = '';
             }
         };
 
@@ -413,16 +422,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) throw error;
+                        showNotification('Anuncio borrado con éxito.', 'success');
                         cargarMisAnuncios();
                     } catch (error) {
-                        alert('Error al borrar el anuncio: ' + error.message);
+                        showNotification('Error al borrar el anuncio: ' + error.message, 'error');
                     }
                 }
             }
             if (e.target.classList.contains('btn-edit')) {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
                 if (error) {
-                    alert('Error al cargar los datos del anuncio: ' + error.message);
+                    showNotification('Error al cargar los datos del anuncio: ' + error.message, 'error');
                     return;
                 }
                 document.getElementById('edit-anuncio-id').value = data.id;
@@ -456,18 +466,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 try {
-                    const { error } = await supabaseClient
-                        .from('anuncios')
-                        .update(updatedData)
-                        .eq('id', anuncioId);
-
+                    const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
                     if (error) throw error;
-
                     editModal.classList.remove('active');
+                    showNotification('Anuncio actualizado con éxito.', 'success');
                     cargarMisAnuncios();
-
                 } catch (error) {
-                    alert('Error al guardar los cambios: ' + error.message);
+                    showNotification('Error al guardar los cambios: ' + error.message, 'error');
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
                     submitButton.disabled = false;
@@ -487,20 +492,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const cargarTodosLosAnuncios = async () => {
             adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando todos los anuncios...</p>';
-            
             try {
-                const { data, error } = await supabaseClient
-                    .from('anuncios')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
+                const { data, error } = await supabaseClient.from('anuncios').select('*, profiles(email)').order('created_at', { ascending: false });
                 if (error) throw error;
-
                 if (data.length === 0) {
                     adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay ningún anuncio en la plataforma.</p>';
                     return;
                 }
-
                 adminAnunciosContainer.innerHTML = '';
                 data.forEach(anuncio => {
                     const card = document.createElement('div');
@@ -510,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="anuncio-card-content">
                             <h3>${anuncio.titulo}</h3>
                             <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                            <p class="anuncio-card-details">Publicado por: ${anuncio.email_contacto || 'No especificado'}</p>
+                            <p class="anuncio-card-details">Publicado por: ${anuncio.profiles ? anuncio.profiles.email : 'Usuario no disponible'}</p>
                             <div class="gestion-buttons">
                                 <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
                                 <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
@@ -562,10 +560,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     adminAnunciosContainer.appendChild(card);
                 });
-
             } catch (error) {
                 console.error('Error al cargar todos los anuncios:', error);
-                adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar los anuncios.</p>';
+                showNotification('Hubo un error al cargar los anuncios.', 'error');
+                adminAnunciosContainer.innerHTML = '';
             }
         };
 
@@ -576,16 +574,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) throw error;
+                        showNotification('Anuncio borrado por el administrador.', 'success');
                         cargarTodosLosAnuncios();
                     } catch (error) {
-                        alert('Error al borrar el anuncio: ' + error.message);
+                        showNotification('Error al borrar el anuncio: ' + error.message, 'error');
                     }
                 }
             }
             if (e.target.classList.contains('btn-edit')) {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
                 if (error) {
-                    alert('Error al cargar los datos del anuncio: ' + error.message);
+                    showNotification('Error al cargar los datos del anuncio: ' + error.message, 'error');
                     return;
                 }
                 document.getElementById('edit-anuncio-id').value = data.id;
@@ -620,12 +619,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
                     if (error) throw error;
                     editModal.classList.remove('active');
-                    // Dependiendo de la página, recargamos una u otra lista
+                    showNotification('Anuncio actualizado por el administrador.', 'success');
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
                     }
                 } catch (error) {
-                    alert('Error al guardar los cambios: ' + error.message);
+                    showNotification('Error al guardar los cambios: ' + error.message, 'error');
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
                     submitButton.disabled = false;
@@ -745,12 +744,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
                 if (insertError) throw insertError;
-
-                window.location.href = 'Gracias.html';
+                
+                showNotification('¡Anuncio enviado con éxito! Será revisado pronto.', 'success');
+                setTimeout(() => { window.location.href = 'Gracias.html'; }, 2000);
 
             } catch (error) {
                 console.error('Error al enviar el anuncio:', error);
-                alert('Hubo un error al enviar tu anuncio: ' + error.message);
+                showNotification('Hubo un error al enviar tu anuncio: ' + error.message, 'error');
                 submitButton.textContent = 'Enviar Anuncio';
                 submitButton.disabled = false;
             }

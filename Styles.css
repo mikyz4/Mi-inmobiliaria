@@ -251,12 +251,10 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .gallery {
     margin-bottom: 20px;
 }
-
 .gallery-main {
     position: relative;
     margin-bottom: 10px;
 }
-
 .gallery-main img {
     width: 100%;
     display: block;
@@ -264,7 +262,6 @@ footer a { color: var(--accent-color); text-decoration: none;}
     object-fit: cover;
     border-radius: 5px;
 }
-
 .gallery-nav {
     position: absolute;
     top: 50%;
@@ -278,28 +275,23 @@ footer a { color: var(--accent-color); text-decoration: none;}
     transition: background-color 0.2s;
     -webkit-tap-highlight-color: transparent;
 }
-
 .gallery-nav:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
-
 .gallery-nav.prev {
     left: 0;
     border-radius: 0 3px 3px 0;
 }
-
 .gallery-nav.next {
     right: 0;
     border-radius: 3px 0 0 3px;
 }
-
 .thumbnail-list {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
 }
-
 .thumbnail-list img {
     width: 80px;
     height: 60px;
@@ -309,11 +301,42 @@ footer a { color: var(--accent-color); text-decoration: none;}
     border-radius: 4px;
     transition: border-color 0.2s;
 }
-
 .thumbnail-list img:hover {
     border-color: #777;
 }
-
 .thumbnail-list img.active {
     border-color: var(--accent-color);
+}
+
+/* --- ESTILOS PARA LA BARRA DE NOTIFICACIONES --- */
+#notification-banner {
+    position: fixed;
+    top: -100px; /* Empieza oculta arriba */
+    left: 0;
+    width: 100%;
+    padding: 16px;
+    text-align: center;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    z-index: 2000;
+    transform: translateY(0);
+    transition: transform 0.4s ease-in-out;
+    border-bottom: 3px solid;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+#notification-banner.show {
+    transform: translateY(100px); /* Se desliza hacia abajo */
+}
+
+.notification-success {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border-color: #078c4e;
+}
+
+.notification-error {
+    background-color: var(--delete-color);
+    color: var(--primary-color);
+    border-color: #a13d3d;
 }
