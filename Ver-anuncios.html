@@ -77,14 +77,22 @@
     <div id="anuncioModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <img id="modal-img" src="" alt="Imagen del anuncio" class="modal-img">
+            
+            <div class="gallery">
+                <div class="gallery-main">
+                    <img id="modal-img" src="" alt="Imagen principal del anuncio">
+                    <button class="gallery-nav prev">&#10094;</button>
+                    <button class="gallery-nav next">&#10095;</button>
+                </div>
+                <div id="thumbnail-container" class="thumbnail-list">
+                    </div>
+            </div>
             <h3 id="modal-titulo"></h3>
             <p id="modal-precio" class="anuncio-card-price"></p>
             <p id="modal-detalles" class="anuncio-card-details"></p>
             <p id="modal-descripcion"></p>
         </div>
     </div>
-
     <footer>
         <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
     </footer>
@@ -95,7 +103,6 @@
     </div>
    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="Script.js"></script>
 </body>
 </html>

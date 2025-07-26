@@ -229,3 +229,68 @@ footer a { color: var(--accent-color); text-decoration: none;}
     }
     #cookie-banner p { text-align: left; }
 }
+
+/* === CÓDIGO AÑADIDO === */
+/* --- ESTILOS PARA LA NUEVA GALERÍA DEL MODAL --- */
+.gallery {
+    margin-bottom: 20px;
+}
+
+.gallery-main {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    -webkit-tap-highlight-color: transparent; /* Evita el resaltado azul en móviles */
+}
+
+.gallery-nav:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.gallery-nav.prev {
+    left: 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.gallery-nav.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.thumbnail-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center; /* Centra las miniaturas */
+}
+
+.thumbnail-list img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.thumbnail-list img:hover {
+    border-color: #777;
+}
+
+.thumbnail-list img.active {
+    border-color: var(--accent-color);
+}
+/* === FIN DEL CÓDIGO AÑADIDO === */

@@ -195,16 +195,66 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
+                // === CÓDIGO MODIFICADO ===
                 card.addEventListener('click', () => {
                     if (modal) {
-                        modal.querySelector('#modal-img').src = anuncio.imagen_principal_url;
+                        // 1. Juntar todas las imágenes en un solo array, filtrando las que no existan.
+                        const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                        let imagenActual = 0;
+
+                        // 2. Si no hay imágenes, no hacemos nada.
+                        if (imagenes.length === 0) return;
+
+                        // 3. Referencias a los elementos de la galería
+                        const mainImage = modal.querySelector('#modal-img');
+                        const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                        const prevBtn = modal.querySelector('.gallery-nav.prev');
+                        const nextBtn = modal.querySelector('.gallery-nav.next');
+
+                        // 4. Función para mostrar una imagen
+                        const mostrarImagen = (index) => {
+                            if (index < 0 || index >= imagenes.length) return;
+                            mainImage.src = imagenes[index];
+                            imagenActual = index;
+                            // Marcar la miniatura activa
+                            thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                                img.classList.toggle('active', i === index);
+                            });
+                        };
+
+                        // 5. Llenar el resto de la información del modal
                         modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
                         modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
                         modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
                         modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+
+                        // 6. Crear las miniaturas
+                        thumbnailContainer.innerHTML = ''; // Limpiar miniaturas antiguas
+                        imagenes.forEach((url, index) => {
+                            const thumb = document.createElement('img');
+                            thumb.src = url;
+                            thumb.alt = `Miniatura ${index + 1}`;
+                            thumb.addEventListener('click', () => mostrarImagen(index));
+                            thumbnailContainer.appendChild(thumb);
+                        });
+
+                        // 7. Lógica de los botones de navegación
+                        prevBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
+                        nextBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
+                        
+                        // 8. Mostrar la primera imagen y abrir el modal
+                        mostrarImagen(0);
                         modal.classList.add('active');
                     }
                 });
+                // === FIN DEL CÓDIGO MODIFICADO ===
+
                 anunciosContainer.appendChild(card);
             });
         };
@@ -246,7 +296,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         if(resetFiltrosBtn) {
             resetFiltrosBtn.addEventListener('click', () => {
-                // CORREGIDO: Resetea todos los campos del formulario de filtros
                 filtroTipo.value = 'todos';
                 filtroHabitaciones.value = '';
                 filtroPrecio.value = '';
@@ -298,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LÓGICA PARA ENVIAR EL FORMULARIO DE NUEVO ANUNCIO ---
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
-        // CORREGIDO: Añade el campo "Tipo de Propiedad" al formulario si no existe
         if (!anuncioForm.querySelector('#tipo')) {
             const formGroup = document.createElement('div');
             formGroup.className = 'form-group';
@@ -327,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData(anuncioForm);
                 let imagenPrincipalUrl = '';
                 const imagenesAdicionalesUrls = [];
-                // CORREGIDO: Se crea un array con todos los inputs de imágenes
                 const fileInputs = [
                     anuncioForm.querySelector('#imagen1'), 
                     anuncioForm.querySelector('#imagen2'), 
