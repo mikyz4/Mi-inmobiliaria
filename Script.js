@@ -87,6 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         if (user) {
+            // Si el usuario está logueado, buscamos su rol en la tabla 'profiles'
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            // Si es admin, añadimos el enlace al panel de admin
+            if (profile && profile.role === 'admin') {
+                navLinksContainer.innerHTML += `
+                    <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
+                `;
+            }
+
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
@@ -109,14 +123,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
         const currentPage = window.location.pathname.split('/').pop();
         
+        // Páginas que requieren solo estar logueado
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Debes iniciar sesión para acceder a esta página.');
                 window.location.href = 'login.html';
+            }
+        }
+
+        // Página que requiere ser ADMIN
+        if (currentPage === 'admin.html') {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                alert('Acceso denegado.');
+                window.location.href = 'Index.html';
+                return;
+            }
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+            if (error || !profile || profile.role !== 'admin') {
+                alert('No tienes permisos de administrador para acceder a esta página.');
+                window.location.href = 'Index.html';
             }
         }
     })();
@@ -438,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (error) throw error;
 
                     editModal.classList.remove('active');
-                    cargarMisAnuncios(); // Recargar la lista para ver los cambios
+                    cargarMisAnuncios();
 
                 } catch (error) {
                     alert('Error al guardar los cambios: ' + error.message);
@@ -451,6 +486,60 @@ document.addEventListener('DOMContentLoaded', function() {
         
         cargarMisAnuncios();
     }
+
+    // === INICIO: NUEVA LÓGICA PARA LA PÁGINA DE ADMINISTRADOR ===
+    const adminAnunciosContainer = document.getElementById('adminAnunciosContainer');
+    if (adminAnunciosContainer) {
+        
+        const cargarTodosLosAnuncios = async () => {
+            adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando todos los anuncios...</p>';
+            
+            try {
+                // Pedimos a Supabase TODOS los anuncios, sin filtro .eq()
+                const { data, error } = await supabaseClient
+                    .from('anuncios')
+                    .select('*') // Podríamos seleccionar email del perfil: '*, profiles(email)'
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay ningún anuncio en la plataforma.</p>';
+                    return;
+                }
+
+                adminAnunciosContainer.innerHTML = '';
+                data.forEach(anuncio => {
+                    const card = document.createElement('div');
+                    card.className = 'anuncio-card gestion-card';
+                    card.innerHTML = `
+                        <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
+                        <div class="anuncio-card-content">
+                            <h3>${anuncio.titulo}</h3>
+                            <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
+                            <p class="anuncio-card-details">Publicado por: ${anuncio.email_contacto || 'No especificado'}</p>
+                            <div class="gestion-buttons">
+                                <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
+                                <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
+                            </div>
+                        </div>`;
+                    adminAnunciosContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar todos los anuncios:', error);
+                adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar los anuncios.</p>';
+            }
+        };
+
+        // La lógica para editar y borrar en el panel de admin sería muy similar
+        // a la de "mis-anuncios", así que podemos reutilizarla en el futuro.
+        // Por ahora, solo cargamos los datos.
+
+        cargarTodosLosAnuncios();
+    }
+    // === FIN: NUEVA LÓGICA ===
+
 
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
