@@ -230,7 +230,6 @@ footer a { color: var(--accent-color); text-decoration: none;}
     #cookie-banner p { text-align: left; }
 }
 
-/* === CÓDIGO AÑADIDO === */
 /* --- ESTILOS PARA LA NUEVA GALERÍA DEL MODAL --- */
 .gallery {
     margin-bottom: 20px;
@@ -240,6 +239,17 @@ footer a { color: var(--accent-color); text-decoration: none;}
     position: relative;
     margin-bottom: 10px;
 }
+
+/* === INICIO DEL CÓDIGO MODIFICADO === */
+/* Este es el bloque de código que he añadido para solucionar el problema */
+.gallery-main img {
+    width: 100%;
+    display: block;
+    max-height: 45vh; /* Límite de altura: 45% de la altura de la pantalla */
+    object-fit: cover;
+    border-radius: 5px;
+}
+/* === FIN DEL CÓDIGO MODIFICADO === */
 
 .gallery-nav {
     position: absolute;
@@ -293,4 +303,3 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .thumbnail-list img.active {
     border-color: var(--accent-color);
 }
-/* === FIN DEL CÓDIGO AÑADIDO === */
