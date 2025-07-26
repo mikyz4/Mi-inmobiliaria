@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
     const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
-    // Esta es la clave pública (anon key), es seguro tenerla aquí. ¡NUNCA pongas la clave "service_role"!
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- LÓGICA DE AUTENTICACIÓN Y SESIÓN ---
+    // --- LÓGICA DE AUTENTICACIÓN Y MENÚ DINÁMICO ---
     const signUpForm = document.getElementById('signUpForm');
     if (signUpForm) {
         signUpForm.addEventListener('submit', async (e) => {
@@ -75,43 +74,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkUserStatus = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         const user = session?.user;
-        const navLinks = document.querySelector('.sidebar ul');
+        const navLinksContainer = document.querySelector('.sidebar ul');
 
-        if (!navLinks) return;
+        if (!navLinksContainer) return;
+        
+        // Limpiamos el menú para reconstruirlo
+        navLinksContainer.innerHTML = '';
 
-        const oldAuthLinks = navLinks.querySelectorAll('.auth-link');
-        oldAuthLinks.forEach(link => link.remove());
+        // Enlaces base que siempre aparecen
+        navLinksContainer.innerHTML += `
+            <li><a href="Index.html">Inicio</a></li>
+            <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+            <li><a href="Anuncio.html">Publicar Anuncio</a></li>
+        `;
 
         if (user) {
-            const logoutLi = document.createElement('li');
-            logoutLi.className = 'auth-link';
-            logoutLi.innerHTML = '<a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a>';
-            navLinks.appendChild(logoutLi);
-
+            // Si el usuario ha iniciado sesión, añadimos "Mis Anuncios" y "Cerrar Sesión"
+            navLinksContainer.innerHTML += `
+                <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
+                <li><a href="#contact">Contacto</a></li>
+                <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
+            `;
             document.getElementById('logoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
-                window.location.reload();
+                window.location.href = 'Index.html'; // Redirigir al inicio tras cerrar sesión
             });
         } else {
-            const loginLi = document.createElement('li');
-            loginLi.className = 'auth-link';
-            loginLi.innerHTML = '<a href="login.html">Iniciar Sesión</a>';
-            const registroLi = document.createElement('li');
-            registroLi.className = 'auth-link';
-            registroLi.innerHTML = '<a href="registro.html">Registrarse</a>';
-            navLinks.appendChild(loginLi);
-            navLinks.appendChild(registroLi);
+            // Si no, añadimos "Contacto", "Iniciar Sesión" y "Registrarse"
+            navLinksContainer.innerHTML += `
+                <li><a href="#contact">Contacto</a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
+                <li><a href="registro.html">Registrarse</a></li>
+            `;
         }
     }
     checkUserStatus();
 
-    // --- PROTEGER PÁGINA DE PUBLICAR ANUNCIO ---
+    // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
-        if (window.location.pathname.endsWith('Anuncio.html')) {
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
-                alert('Debes iniciar sesión para publicar un anuncio.');
+                alert('Debes iniciar sesión para acceder a esta página.');
                 window.location.href = 'login.html';
             }
         }
@@ -125,8 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.' },
             { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
         ];
-        servicesContainer.innerHTML = services.map(service => `
-            <div class="service-item"><i class="fas ${service.icon}"></i><h3>${service.title}</h3><p>${service.text}</p></div>`).join('');
+        servicesContainer.innerHTML = services.map(service => `<div class="service-item"><i class="fas ${service.icon}"></i><h3>${service.title}</h3><p>${service.text}</p></div>`).join('');
     }
     const newsContainer = document.getElementById('news-container');
     if(newsContainer) {
@@ -164,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA PARA VER ANUNCIOS Y FILTROS ---
+    // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
@@ -195,41 +202,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
-                // === CÓDIGO MODIFICADO ===
                 card.addEventListener('click', () => {
                     if (modal) {
-                        // 1. Juntar todas las imágenes en un solo array, filtrando las que no existan.
                         const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
                         let imagenActual = 0;
-
-                        // 2. Si no hay imágenes, no hacemos nada.
                         if (imagenes.length === 0) return;
-
-                        // 3. Referencias a los elementos de la galería
                         const mainImage = modal.querySelector('#modal-img');
                         const thumbnailContainer = modal.querySelector('#thumbnail-container');
                         const prevBtn = modal.querySelector('.gallery-nav.prev');
                         const nextBtn = modal.querySelector('.gallery-nav.next');
-
-                        // 4. Función para mostrar una imagen
                         const mostrarImagen = (index) => {
                             if (index < 0 || index >= imagenes.length) return;
                             mainImage.src = imagenes[index];
                             imagenActual = index;
-                            // Marcar la miniatura activa
                             thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
                                 img.classList.toggle('active', i === index);
                             });
                         };
-
-                        // 5. Llenar el resto de la información del modal
                         modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
                         modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
                         modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
                         modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
-
-                        // 6. Crear las miniaturas
-                        thumbnailContainer.innerHTML = ''; // Limpiar miniaturas antiguas
+                        thumbnailContainer.innerHTML = '';
                         imagenes.forEach((url, index) => {
                             const thumb = document.createElement('img');
                             thumb.src = url;
@@ -237,8 +231,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             thumb.addEventListener('click', () => mostrarImagen(index));
                             thumbnailContainer.appendChild(thumb);
                         });
-
-                        // 7. Lógica de los botones de navegación
                         prevBtn.onclick = () => {
                             const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
                             mostrarImagen(nuevaPosicion);
@@ -247,14 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             const nuevaPosicion = (imagenActual + 1) % imagenes.length;
                             mostrarImagen(nuevaPosicion);
                         };
-                        
-                        // 8. Mostrar la primera imagen y abrir el modal
                         mostrarImagen(0);
                         modal.classList.add('active');
                     }
                 });
-                // === FIN DEL CÓDIGO MODIFICADO ===
-
                 anunciosContainer.appendChild(card);
             });
         };
@@ -267,13 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const ubicacion = filtroUbicacion.value.toLowerCase();
             const banos = parseInt(filtroBanos.value) || 0;
             const superficie = parseInt(filtroSuperficie.value) || 0;
-
             if (tipo !== 'todos') anunciosFiltrados = anunciosFiltrados.filter(a => a.tipo === tipo);
             if (habitaciones > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.habitaciones >= habitaciones);
             if (ubicacion) anunciosFiltrados = anunciosFiltrados.filter(a => (a.direccion || '').toLowerCase().includes(ubicacion));
             if (banos > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
             if (superficie > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
-            
             anunciosFiltrados = anunciosFiltrados.filter(a => (a.precio || 0) <= precio);
             renderAnuncios(anunciosFiltrados);
         };
@@ -308,6 +294,60 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarAnunciosDesdeSupabase();
     }
     
+    // === INICIO: NUEVA LÓGICA PARA LA PÁGINA "MIS ANUNCIOS" ===
+    const misAnunciosContainer = document.getElementById('misAnunciosContainer');
+    if (misAnunciosContainer) {
+        const cargarMisAnuncios = async () => {
+            misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus anuncios...</p>';
+            
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
+            if (!user) {
+                misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudo identificar al usuario.</p>';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('anuncios')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Aún no has publicado ningún anuncio. <a href="Anuncio.html" style="color: var(--accent-color);">¡Publica el primero!</a></p>';
+                    return;
+                }
+
+                misAnunciosContainer.innerHTML = '';
+                data.forEach(anuncio => {
+                    const card = document.createElement('div');
+                    card.className = 'anuncio-card gestion-card';
+                    card.innerHTML = `
+                        <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
+                        <div class="anuncio-card-content">
+                            <h3>${anuncio.titulo}</h3>
+                            <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
+                            <div class="gestion-buttons">
+                                <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
+                                <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
+                            </div>
+                        </div>`;
+                    misAnunciosContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar mis anuncios:', error);
+                misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar tus propiedades.</p>';
+            }
+        };
+
+        cargarMisAnuncios();
+    }
+    // === FIN: NUEVA LÓGICA ===
+
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
