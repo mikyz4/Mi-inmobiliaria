@@ -34,6 +34,64 @@
             </section>
     </main>
     
+    <div id="anuncioModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="gallery">
+                <div class="gallery-main">
+                    <img id="modal-img" src="" alt="Imagen principal del anuncio">
+                    <button class="gallery-nav prev">&#10094;</button>
+                    <button class="gallery-nav next">&#10095;</button>
+                </div>
+                <div id="thumbnail-container" class="thumbnail-list"></div>
+            </div>
+            <h3 id="modal-titulo"></h3>
+            <p id="modal-precio" class="anuncio-card-price"></p>
+            <p id="modal-detalles" class="anuncio-card-details"></p>
+            <p id="modal-descripcion"></p>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Editando Anuncio</h3>
+            <form id="editAnuncioForm">
+                <input type="hidden" id="edit-anuncio-id">
+                <div class="form-group">
+                    <label for="edit-titulo">Título del Anuncio</label>
+                    <input type="text" id="edit-titulo" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-direccion">Dirección</label>
+                    <input type="text" id="edit-direccion" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-descripcion">Descripción</label>
+                    <textarea id="edit-descripcion" rows="5" required></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-precio">Precio (€)</label>
+                    <input type="number" id="edit-precio" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-habitaciones">Habitaciones</label>
+                    <input type="number" id="edit-habitaciones" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-banos">Baños</label>
+                    <input type="number" id="edit-banos" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-superficie">Superficie (m²)</label>
+                    <input type="number" id="edit-superficie" required>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--font-color-secondary); text-align: center;">(La edición de imágenes no está disponible por ahora)</p>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+    
     <footer>
         <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
     </footer>

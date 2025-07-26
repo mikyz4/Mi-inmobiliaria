@@ -487,18 +487,20 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarMisAnuncios();
     }
 
-    // === INICIO: NUEVA LÓGICA PARA LA PÁGINA DE ADMINISTRADOR ===
+    // --- LÓGICA PARA LA PÁGINA DE ADMINISTRADOR ---
     const adminAnunciosContainer = document.getElementById('adminAnunciosContainer');
     if (adminAnunciosContainer) {
+        const modal = document.getElementById('anuncioModal');
+        const editModal = document.getElementById('editModal');
+        const editAnuncioForm = document.getElementById('editAnuncioForm');
         
         const cargarTodosLosAnuncios = async () => {
             adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando todos los anuncios...</p>';
             
             try {
-                // Pedimos a Supabase TODOS los anuncios, sin filtro .eq()
                 const { data, error } = await supabaseClient
                     .from('anuncios')
-                    .select('*') // Podríamos seleccionar email del perfil: '*, profiles(email)'
+                    .select('*')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -523,6 +525,50 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
                             </div>
                         </div>`;
+
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.gestion-buttons')) return;
+                        if (modal) {
+                            const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                            let imagenActual = 0;
+                            if (imagenes.length === 0) return;
+                            const mainImage = modal.querySelector('#modal-img');
+                            const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                            const prevBtn = modal.querySelector('.gallery-nav.prev');
+                            const nextBtn = modal.querySelector('.gallery-nav.next');
+                            const mostrarImagen = (index) => {
+                                if (index < 0 || index >= imagenes.length) return;
+                                mainImage.src = imagenes[index];
+                                imagenActual = index;
+                                thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                                    img.classList.toggle('active', i === index);
+                                });
+                            };
+                            modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                            modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                            modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
+                            modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                            thumbnailContainer.innerHTML = '';
+                            imagenes.forEach((url, index) => {
+                                const thumb = document.createElement('img');
+                                thumb.src = url;
+                                thumb.alt = `Miniatura ${index + 1}`;
+                                thumb.addEventListener('click', () => mostrarImagen(index));
+                                thumbnailContainer.appendChild(thumb);
+                            });
+                            prevBtn.onclick = () => {
+                                const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                                mostrarImagen(nuevaPosicion);
+                            };
+                            nextBtn.onclick = () => {
+                                const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                                mostrarImagen(nuevaPosicion);
+                            };
+                            mostrarImagen(0);
+                            modal.classList.add('active');
+                        }
+                    });
+                    
                     adminAnunciosContainer.appendChild(card);
                 });
 
@@ -532,14 +578,74 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
-        // La lógica para editar y borrar en el panel de admin sería muy similar
-        // a la de "mis-anuncios", así que podemos reutilizarla en el futuro.
-        // Por ahora, solo cargamos los datos.
+        adminAnunciosContainer.addEventListener('click', async (e) => {
+            const anuncioId = e.target.dataset.id;
+            if (e.target.classList.contains('btn-delete')) {
+                if (confirm('ADMIN: ¿Seguro que quieres borrar este anuncio? Esta acción es irreversible.')) {
+                    try {
+                        const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
+                        if (error) throw error;
+                        cargarTodosLosAnuncios();
+                    } catch (error) {
+                        alert('Error al borrar el anuncio: ' + error.message);
+                    }
+                }
+            }
+            if (e.target.classList.contains('btn-edit')) {
+                const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
+                if (error) {
+                    alert('Error al cargar los datos del anuncio: ' + error.message);
+                    return;
+                }
+                document.getElementById('edit-anuncio-id').value = data.id;
+                document.getElementById('edit-titulo').value = data.titulo;
+                document.getElementById('edit-direccion').value = data.direccion;
+                document.getElementById('edit-descripcion').value = data.descripcion;
+                document.getElementById('edit-precio').value = data.precio;
+                document.getElementById('edit-habitaciones').value = data.habitaciones;
+                document.getElementById('edit-banos').value = data.banos;
+                document.getElementById('edit-superficie').value = data.superficie;
+                editModal.classList.add('active');
+            }
+        });
 
+        if (editAnuncioForm) {
+            editAnuncioForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const anuncioId = document.getElementById('edit-anuncio-id').value;
+                const submitButton = editAnuncioForm.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Guardando...';
+                submitButton.disabled = true;
+                const updatedData = {
+                    titulo: document.getElementById('edit-titulo').value,
+                    direccion: document.getElementById('edit-direccion').value,
+                    descripcion: document.getElementById('edit-descripcion').value,
+                    precio: parseFloat(document.getElementById('edit-precio').value),
+                    habitaciones: parseInt(document.getElementById('edit-habitaciones').value),
+                    banos: parseInt(document.getElementById('edit-banos').value),
+                    superficie: parseInt(document.getElementById('edit-superficie').value),
+                };
+                try {
+                    const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
+                    if (error) throw error;
+                    editModal.classList.remove('active');
+                    // Dependiendo de la página, recargamos una u otra lista
+                    if (document.getElementById('adminAnunciosContainer')) {
+                        cargarTodosLosAnuncios();
+                    } else if (document.getElementById('misAnunciosContainer')) {
+                        cargarMisAnuncios();
+                    }
+                } catch (error) {
+                    alert('Error al guardar los cambios: ' + error.message);
+                } finally {
+                    submitButton.textContent = 'Guardar Cambios';
+                    submitButton.disabled = false;
+                }
+            });
+        }
+        
         cargarTodosLosAnuncios();
     }
-    // === FIN: NUEVA LÓGICA ===
-
 
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
