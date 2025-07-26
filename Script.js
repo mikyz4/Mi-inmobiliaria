@@ -293,6 +293,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LÓGICA PARA LA PÁGINA "MIS ANUNCIOS" ---
     const misAnunciosContainer = document.getElementById('misAnunciosContainer');
     if (misAnunciosContainer) {
+        const modal = document.getElementById('anuncioModal');
+        
         const cargarMisAnuncios = async () => {
             misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus anuncios...</p>';
             const { data: { user } } = await supabaseClient.auth.getUser();
@@ -325,6 +327,51 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
                             </div>
                         </div>`;
+                    
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.gestion-buttons')) {
+                            return;
+                        }
+                        if (modal) {
+                            const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                            let imagenActual = 0;
+                            if (imagenes.length === 0) return;
+                            const mainImage = modal.querySelector('#modal-img');
+                            const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                            const prevBtn = modal.querySelector('.gallery-nav.prev');
+                            const nextBtn = modal.querySelector('.gallery-nav.next');
+                            const mostrarImagen = (index) => {
+                                if (index < 0 || index >= imagenes.length) return;
+                                mainImage.src = imagenes[index];
+                                imagenActual = index;
+                                thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                                    img.classList.toggle('active', i === index);
+                                });
+                            };
+                            modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                            modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                            modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
+                            modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                            thumbnailContainer.innerHTML = '';
+                            imagenes.forEach((url, index) => {
+                                const thumb = document.createElement('img');
+                                thumb.src = url;
+                                thumb.alt = `Miniatura ${index + 1}`;
+                                thumb.addEventListener('click', () => mostrarImagen(index));
+                                thumbnailContainer.appendChild(thumb);
+                            });
+                            prevBtn.onclick = () => {
+                                const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                                mostrarImagen(nuevaPosicion);
+                            };
+                            nextBtn.onclick = () => {
+                                const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                                mostrarImagen(nuevaPosicion);
+                            };
+                            mostrarImagen(0);
+                            modal.classList.add('active');
+                        }
+                    });
                     misAnunciosContainer.appendChild(card);
                 });
             } catch (error) {
@@ -338,10 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target.classList.contains('btn-delete')) {
                 if (confirm('¿Estás seguro de que quieres borrar este anuncio de forma permanente?')) {
                     try {
-                        const { error } = await supabaseClient
-                            .from('anuncios')
-                            .delete()
-                            .eq('id', anuncioId);
+                        const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) throw error;
                         cargarMisAnuncios();
                     } catch (error) {
