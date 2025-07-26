@@ -4,9 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Selettas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="Styles.css">
 </head>
 <body>
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="Index.html">Inicio</a></li>
+                <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="Anuncio.html">Publicar Anuncio</a></li>
+            </ul>
+        </nav>
+    </header>
+
     <main>
         <section class="form-container">
             <h2>Iniciar Sesión</h2>
@@ -20,10 +36,12 @@
                     <input type="password" id="password" required>
                 </div>
                 <button type="submit">Entrar</button>
-                <p>¿No tienes cuenta? <a href="registro.html" style="color: var(--accent-color);">Regístrate</a></p>
+                <p style="text-align: center; margin-top: 1rem;">¿No tienes cuenta? <a href="registro.html" style="color: var(--accent-color);">Regístrate</a></p>
             </form>
         </section>
     </main>
-    
-    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
 </html>

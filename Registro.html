@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Selettas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="Styles.css">
-    </head>
+</head>
 <body>
-    <header>...</header>
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="Index.html">Inicio</a></li>
+                <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+                <li><a href="Anuncio.html">Publicar Anuncio</a></li>
+            </ul>
+        </nav>
+    </header>
 
     <main>
         <section class="form-container">
@@ -23,12 +37,11 @@
                     <p style="font-size: 0.8rem; color: #888;">(Mínimo 6 caracteres)</p>
                 </div>
                 <button type="submit">Registrarse</button>
-                <p>¿Ya tienes cuenta? <a href="login.html" style="color: var(--accent-color);">Inicia sesión</a></p>
+                <p style="text-align: center; margin-top: 1rem;">¿Ya tienes cuenta? <a href="login.html" style="color: var(--accent-color);">Inicia sesión</a></p>
             </form>
         </section>
     </main>
     
-    <footer>...</footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="Script.js"></script>
 </body>
