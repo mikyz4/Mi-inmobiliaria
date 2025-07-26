@@ -46,12 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const email = signUpForm.querySelector('#email').value;
             const password = signUpForm.querySelector('#password').value;
-            const { error } = await supabaseClient.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            
             if (error) {
                 alert('Error al registrar: ' + error.message);
             } else {
-                alert('¡Registro exitoso! Revisa tu email para confirmar la cuenta.');
-                window.location.href = 'login.html';
+                // Con la confirmación por email desactivada, Supabase inicia sesión automáticamente.
+                alert('¡Registro exitoso! Serás redirigido a la página principal.');
+                window.location.href = 'Index.html'; // Lo llevamos directo al inicio ya logueado
             }
         });
     }
@@ -87,14 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         if (user) {
-            // Si el usuario está logueado, buscamos su rol en la tabla 'profiles'
             const { data: profile, error } = await supabaseClient
                 .from('profiles')
                 .select('role')
                 .eq('id', user.id)
                 .single();
 
-            // Si es admin, añadimos el enlace al panel de admin
             if (profile && profile.role === 'admin') {
                 navLinksContainer.innerHTML += `
                     <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
@@ -124,8 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        
-        // Páginas que requieren solo estar logueado
         const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -134,8 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'login.html';
             }
         }
-
-        // Página que requiere ser ADMIN
         if (currentPage === 'admin.html') {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -143,13 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'Index.html';
                 return;
             }
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('role')
-                .eq('id', session.user.id)
-                .single();
-
-            if (error || !profile || profile.role !== 'admin') {
+            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+            if (!profile || profile.role !== 'admin') {
                 alert('No tienes permisos de administrador para acceder a esta página.');
                 window.location.href = 'Index.html';
             }
@@ -632,8 +623,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Dependiendo de la página, recargamos una u otra lista
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
-                    } else if (document.getElementById('misAnunciosContainer')) {
-                        cargarMisAnuncios();
                     }
                 } catch (error) {
                     alert('Error al guardar los cambios: ' + error.message);
