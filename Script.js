@@ -294,6 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const misAnunciosContainer = document.getElementById('misAnunciosContainer');
     if (misAnunciosContainer) {
         const modal = document.getElementById('anuncioModal');
+        const editModal = document.getElementById('editModal');
+        const editAnuncioForm = document.getElementById('editAnuncioForm');
         
         const cargarMisAnuncios = async () => {
             misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus anuncios...</p>';
@@ -329,9 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>`;
                     
                     card.addEventListener('click', (e) => {
-                        if (e.target.closest('.gestion-buttons')) {
-                            return;
-                        }
+                        if (e.target.closest('.gestion-buttons')) return;
                         if (modal) {
                             const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
                             let imagenActual = 0;
@@ -394,9 +394,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             if (e.target.classList.contains('btn-edit')) {
-                alert('La función de editar aún no está implementada. ¡Será nuestro próximo paso!');
+                const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
+                if (error) {
+                    alert('Error al cargar los datos del anuncio: ' + error.message);
+                    return;
+                }
+                document.getElementById('edit-anuncio-id').value = data.id;
+                document.getElementById('edit-titulo').value = data.titulo;
+                document.getElementById('edit-direccion').value = data.direccion;
+                document.getElementById('edit-descripcion').value = data.descripcion;
+                document.getElementById('edit-precio').value = data.precio;
+                document.getElementById('edit-habitaciones').value = data.habitaciones;
+                document.getElementById('edit-banos').value = data.banos;
+                document.getElementById('edit-superficie').value = data.superficie;
+                editModal.classList.add('active');
             }
         });
+
+        if (editAnuncioForm) {
+            editAnuncioForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const anuncioId = document.getElementById('edit-anuncio-id').value;
+                const submitButton = editAnuncioForm.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Guardando...';
+                submitButton.disabled = true;
+
+                const updatedData = {
+                    titulo: document.getElementById('edit-titulo').value,
+                    direccion: document.getElementById('edit-direccion').value,
+                    descripcion: document.getElementById('edit-descripcion').value,
+                    precio: parseFloat(document.getElementById('edit-precio').value),
+                    habitaciones: parseInt(document.getElementById('edit-habitaciones').value),
+                    banos: parseInt(document.getElementById('edit-banos').value),
+                    superficie: parseInt(document.getElementById('edit-superficie').value),
+                };
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('anuncios')
+                        .update(updatedData)
+                        .eq('id', anuncioId);
+
+                    if (error) throw error;
+
+                    editModal.classList.remove('active');
+                    cargarMisAnuncios(); // Recargar la lista para ver los cambios
+
+                } catch (error) {
+                    alert('Error al guardar los cambios: ' + error.message);
+                } finally {
+                    submitButton.textContent = 'Guardar Cambios';
+                    submitButton.disabled = false;
+                }
+            });
+        }
         
         cargarMisAnuncios();
     }

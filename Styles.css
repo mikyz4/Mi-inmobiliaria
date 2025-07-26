@@ -5,6 +5,7 @@
     --accent-color: #2CFF8E;
     --font-color-primary: #FFFFFF;
     --font-color-secondary: #B3B3B3;
+    --delete-color: #ff8a80; /* Color para el botón de borrar */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -167,6 +168,22 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
     margin-top: 8px; display: flex; align-items: center; gap: 5px;
 }
 
+.gestion-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.gestion-buttons button {
+    flex-grow: 1;
+    font-size: 0.9rem;
+}
+
+.btn-delete {
+    background-color: var(--delete-color);
+    color: var(--primary-color);
+}
+
 /* --- MODAL (VENTANA EMERGENTE) --- */
 .modal {
     position: fixed; top: 0; left: 0;
@@ -196,7 +213,7 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 footer { background-color: #000; text-align: center; padding: 25px; margin-top: 40px; }
 footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button, .scroll-to-top {
-    position: fixed; right: 20px; z-index: 999; /* Z-index menor que el modal */
+    position: fixed; right: 20px; z-index: 999;
     width: 50px; height: 50px; border-radius: 50%;
     display: none; place-items: center; font-size: 1.5rem; text-decoration: none;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
@@ -214,7 +231,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     bottom: 0; left: 0; width: 100%;
     background-color: var(--secondary-color);
     padding: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
-    z-index: 1100; /* Z-index más alto para que esté por encima de todo */
+    z-index: 1100;
     display: none;
     flex-direction: column; align-items: center;
     text-align: center; gap: 15px;
@@ -240,16 +257,13 @@ footer a { color: var(--accent-color); text-decoration: none;}
     margin-bottom: 10px;
 }
 
-/* === INICIO DEL CÓDIGO MODIFICADO === */
-/* Este es el bloque de código que he añadido para solucionar el problema */
 .gallery-main img {
     width: 100%;
     display: block;
-    max-height: 45vh; /* Límite de altura: 45% de la altura de la pantalla */
+    max-height: 45vh;
     object-fit: cover;
     border-radius: 5px;
 }
-/* === FIN DEL CÓDIGO MODIFICADO === */
 
 .gallery-nav {
     position: absolute;
@@ -262,7 +276,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.2s;
-    -webkit-tap-highlight-color: transparent; /* Evita el resaltado azul en móviles */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .gallery-nav:hover {
@@ -283,7 +297,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    justify-content: center; /* Centra las miniaturas */
+    justify-content: center;
 }
 
 .thumbnail-list img {
