@@ -78,10 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!navLinksContainer) return;
         
-        // Limpiamos el menú para reconstruirlo
         navLinksContainer.innerHTML = '';
 
-        // Enlaces base que siempre aparecen
         navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
@@ -89,21 +87,19 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         if (user) {
-            // Si el usuario ha iniciado sesión, añadimos "Mis Anuncios" y "Cerrar Sesión"
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
-                <li><a href="#contact">Contacto</a></li>
+                <li><a href="Index.html#contact">Contacto</a></li>
                 <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
             `;
             document.getElementById('logoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
-                window.location.href = 'Index.html'; // Redirigir al inicio tras cerrar sesión
+                window.location.href = 'Index.html';
             });
         } else {
-            // Si no, añadimos "Contacto", "Iniciar Sesión" y "Registrarse"
             navLinksContainer.innerHTML += `
-                <li><a href="#contact">Contacto</a></li>
+                <li><a href="Index.html#contact">Contacto</a></li>
                 <li><a href="login.html">Iniciar Sesión</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
             `;
@@ -294,33 +290,27 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarAnunciosDesdeSupabase();
     }
     
-    // === INICIO: NUEVA LÓGICA PARA LA PÁGINA "MIS ANUNCIOS" ===
+    // --- LÓGICA PARA LA PÁGINA "MIS ANUNCIOS" ---
     const misAnunciosContainer = document.getElementById('misAnunciosContainer');
     if (misAnunciosContainer) {
         const cargarMisAnuncios = async () => {
             misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus anuncios...</p>';
-            
             const { data: { user } } = await supabaseClient.auth.getUser();
-
             if (!user) {
                 misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudo identificar al usuario.</p>';
                 return;
             }
-
             try {
                 const { data, error } = await supabaseClient
                     .from('anuncios')
                     .select('*')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
-
                 if (error) throw error;
-
                 if (data.length === 0) {
                     misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Aún no has publicado ningún anuncio. <a href="Anuncio.html" style="color: var(--accent-color);">¡Publica el primero!</a></p>';
                     return;
                 }
-
                 misAnunciosContainer.innerHTML = '';
                 data.forEach(anuncio => {
                     const card = document.createElement('div');
@@ -337,16 +327,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>`;
                     misAnunciosContainer.appendChild(card);
                 });
-
             } catch (error) {
                 console.error('Error al cargar mis anuncios:', error);
                 misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar tus propiedades.</p>';
             }
         };
 
+        misAnunciosContainer.addEventListener('click', async (e) => {
+            const anuncioId = e.target.dataset.id;
+            if (e.target.classList.contains('btn-delete')) {
+                if (confirm('¿Estás seguro de que quieres borrar este anuncio de forma permanente?')) {
+                    try {
+                        const { error } = await supabaseClient
+                            .from('anuncios')
+                            .delete()
+                            .eq('id', anuncioId);
+                        if (error) throw error;
+                        cargarMisAnuncios();
+                    } catch (error) {
+                        alert('Error al borrar el anuncio: ' + error.message);
+                    }
+                }
+            }
+            if (e.target.classList.contains('btn-edit')) {
+                alert('La función de editar aún no está implementada. ¡Será nuestro próximo paso!');
+            }
+        });
+        
         cargarMisAnuncios();
     }
-    // === FIN: NUEVA LÓGICA ===
 
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
