@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p class="anuncio-card-details">Publicado por: ${nombreUsuario}</p>
                             <div class="gestion-buttons">
                                 <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
-                                <button class="btn-delete" data-id="${anuncionp m i.id}">Borrar</button>
+                                <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
                             </div>
                         </div>`;
 
