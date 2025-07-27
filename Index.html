@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="Styles.css">
+
+    <link rel="manifest" href="/manifest.json">
+
 </head>
 <body>
     <div id="notification-banner" class="notification-hidden"></div>
@@ -93,5 +96,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="Script.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registrado con éxito:', registration.scope);
+          }).catch(error => {
+            console.log('Fallo en el registro de ServiceWorker:', error);
+          });
+        });
+      }
+    </script>
 </body>
 </html>

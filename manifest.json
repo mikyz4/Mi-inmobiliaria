@@ -1,0 +1,22 @@
+{
+  "name": "Selettas Inmobiliaria",
+  "short_name": "Selettas",
+  "description": "Tu portal inmobiliario de confianza. Encuentra, compra o alquila propiedades.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#00ff99",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Images/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/Images/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
