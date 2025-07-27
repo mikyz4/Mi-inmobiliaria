@@ -1,5 +1,3 @@
-// --- CÓDIGO COMPLETO Y MODIFICADO DE Script.js (versión para depuración) ---
-
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
@@ -15,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!notificationBanner) return;
         notificationBanner.textContent = message;
         notificationBanner.className = 'notification-hidden';
-        void notificationBanner.offsetWidth;
+        void notificationBanner.offsetWidth; 
         notificationBanner.classList.add('show');
         notificationBanner.classList.add(type === 'success' ? 'notification-success' : 'notification-error');
         setTimeout(() => {
@@ -646,15 +644,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     adminAnunciosContainer.appendChild(card);
                 });
             } catch (error) {
-                // ----- ESTA ES LA PARTE MODIFICADA -----
-                // En lugar de un mensaje genérico, ahora mostramos el error real.
-                const errorMessage = `Error Detallado: ${error.message}`;
-                
-                // Usamos tu función de notificación para mostrarlo en el banner
-                showNotification(errorMessage, 'error', 15000); // 15 segundos para que te dé tiempo a leerlo
-                
-                // Y también lo escribimos en la página por si acaso
-                adminAnunciosContainer.innerHTML = `<p style="color: var(--delete-color); padding: 20px; text-align: left; font-family: monospace; word-break: break-all;">${errorMessage}</p>`;
+                console.error('Error al cargar todos los anuncios:', error);
+                showNotification('Hubo un error al cargar los anuncios.', 'error');
+                adminAnunciosContainer.innerHTML = '';
             }
         };
 
@@ -975,4 +967,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } catch (error) {
                 console.error('Error al enviar el anuncio:', error);
-                showNotification('Hubo un error al enviar tu anuncio: ' of-anuncios` en tu SQL Editor para ver si hay algún anuncio problemático. Si encuentras alguno, puedes borrarlo o asignarle un `user_id` válido para solucionar el problema de raíz.
+                showNotification('Hubo un error al enviar tu anuncio: ' + error.message, 'error');
+                submitButton.textContent = 'Enviar Anuncio';
+                submitButton.disabled = false;
+            }
+        });
+    }
+});
