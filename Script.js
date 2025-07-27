@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!notificationBanner) return;
 
         notificationBanner.textContent = message;
-        notificationBanner.className = 'notification-hidden'; // Resetea clases
-        // Forzamos un reflow para reiniciar la animación si se llama rápidamente
+        notificationBanner.className = 'notification-hidden';
         void notificationBanner.offsetWidth; 
         
         notificationBanner.classList.add('show');
@@ -98,16 +97,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!navLinksContainer) return;
         
         navLinksContainer.innerHTML = '';
+
         navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
         `;
+
         if (user) {
-            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single();
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
             if (profile && profile.role === 'admin') {
-                navLinksContainer.innerHTML += `<li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>`;
+                navLinksContainer.innerHTML += `
+                    <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
+                `;
             }
+
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
@@ -745,8 +754,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
                 if (insertError) throw insertError;
                 
-                showNotification('¡Anuncio enviado con éxito! Será revisado pronto.', 'success');
-                setTimeout(() => { window.location.href = 'Gracias.html'; }, 2000);
+                showNotification('¡Anuncio enviado con éxito! Será revisado pronto.', 'success', 3000);
+                setTimeout(() => { window.location.href = 'Gracias.html'; }, 3000);
 
             } catch (error) {
                 console.error('Error al enviar el anuncio:', error);
