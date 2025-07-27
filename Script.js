@@ -756,4 +756,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    // --- LÓGICA PARA EL BOTÓN DE INSTALACIÓN DE LA PWA ---
+let deferredPrompt; // Esta variable guardará el evento de instalación
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Previene que el mini-infobar de Chrome aparezca en móviles
+  e.preventDefault();
+  // Guarda el evento para que pueda ser disparado más tarde.
+  deferredPrompt = e;
+  // Muestra nuestro botón de instalación personalizado
+  if (installBtn) {
+    installBtn.style.display = 'block';
+    console.log('La aplicación se puede instalar. Mostrando botón.');
+  }
+});
+
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    // Oculta el botón, ya que solo se puede usar una vez.
+    installBtn.style.display = 'none';
+    // Muestra el aviso de instalación del navegador.
+    deferredPrompt.prompt();
+    // Espera a que el usuario responda al aviso
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`Respuesta del usuario: ${outcome}`);
+    // Ya no necesitamos la variable, la limpiamos.
+    deferredPrompt = null;
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  // Oculta el botón de instalación si la app ya fue instalada
+  if (installBtn) {
+    installBtn.style.display = 'none';
+  }
+  deferredPrompt = null;
+  console.log('PWA fue instalada');
 });
