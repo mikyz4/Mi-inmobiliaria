@@ -1,38 +1,20 @@
-const CACHE_NAME = 'selettas-v1';
-// Lista de archivos que se guardarán en caché para funcionar offline
-const urlsToCache = [
-  '/',
-  '/Index.html',
-  '/Ver-anuncios.html',
-  '/login.html',
-  '/registro.html',
-  '/admin.html',
-  '/mis-anuncios.html',
-  '/favoritos.html',
-  '/Anuncio.html',
-  '/Styles.css',
-  '/Script.js',
-  '/favicon.png' 
-];
+// sw.js (Versión Segura - Sin Caché)
 
-// Evento de instalación: se abre la caché y se añaden los archivos
+// Este evento se dispara cuando el service worker se instala.
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Cache abierta');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  console.log('Service Worker: Instalado (versión segura)');
+  // Forzamos al nuevo service worker a activarse en cuanto termine la instalación.
+  self.skipWaiting();
 });
 
-// Evento de fetch: responde desde la caché si es posible
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Si el recurso está en la caché, lo devuelve. Si no, lo busca en la red.
-        return response || fetch(event.request);
-      })
-  );
+// Este evento se dispara cuando el service worker se activa.
+self.addEventListener('activate', event => {
+  console.log('Service Worker: Activado (versión segura)');
+  // Toma el control de las páginas abiertas.
+  return self.clients.claim();
 });
+
+// NOTA IMPORTANTE:
+// Deliberadamente no hay un evento 'fetch'.
+// Esto significa que el service worker no interceptará ninguna petición.
+// La web funcionará con normalidad, pidiendo todo a la red como siempre.
