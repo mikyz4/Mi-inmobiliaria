@@ -794,3 +794,5 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
   console.log('PWA fue instalada');
 });
+
+});
