@@ -5,22 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- ESTADO GLOBAL Y SISTEMA DE NOTIFICACIONES ---
-    const notificationBanner = document.getElementById('notification-banner');
-    let userFavorites = new Set(); // Almacena los IDs de los anuncios favoritos del usuario
-
-    function showNotification(message, type = 'success', duration = 4000) {
-        if (!notificationBanner) return;
-        notificationBanner.textContent = message;
-        notificationBanner.className = 'notification-hidden';
-        void notificationBanner.offsetWidth; 
-        notificationBanner.classList.add('show');
-        notificationBanner.classList.add(type === 'success' ? 'notification-success' : 'notification-error');
-        setTimeout(() => {
-            notificationBanner.classList.remove('show');
-        }, duration);
-    }
-
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -55,25 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- GESTIÓN DE FAVORITOS (FUNCIÓN DE CARGA) ---
-    const cargarFavoritos = async (userId) => {
-        if (!userId) {
-            userFavorites.clear();
-            return;
-        }
-        try {
-            const { data, error } = await supabaseClient
-                .from('favoritos')
-                .select('anuncio_id')
-                .eq('user_id', userId);
-            if (error) throw error;
-            userFavorites = new Set(data.map(fav => fav.anuncio_id));
-        } catch (error) {
-            console.error('Error al cargar favoritos:', error);
-        }
-    };
-
-
     // --- LÓGICA DE AUTENTICACIÓN Y MENÚ DINÁMICO ---
     const signUpForm = document.getElementById('signUpForm');
     if (signUpForm) {
@@ -84,10 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
             
             if (error) {
-                showNotification('Error al registrar: ' + error.message, 'error');
+                alert('Error al registrar: ' + error.message);
             } else {
-                showNotification('¡Registro exitoso! Serás redirigido a la página principal.', 'success');
-                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
+                // Con la confirmación por email desactivada, Supabase inicia sesión automáticamente.
+                alert('¡Registro exitoso! Serás redirigido a la página principal.');
+                window.location.href = 'Index.html'; // Lo llevamos directo al inicio ya logueado
             }
         });
     }
@@ -100,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = loginForm.querySelector('#password').value;
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
-                showNotification('Error al iniciar sesión: ' + error.message, 'error');
+                alert('Error al iniciar sesión: ' + error.message);
             } else {
                 window.location.href = 'Index.html';
             }
@@ -114,18 +80,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!navLinksContainer) return;
         
-        if (user) {
-            await cargarFavoritos(user.id);
-        }
-        
-        navLinksContainer.innerHTML = `
+        navLinksContainer.innerHTML = '';
+
+        navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
         `;
 
         if (user) {
-            const { data: profile } = await supabaseClient
+            const { data: profile, error } = await supabaseClient
                 .from('profiles')
                 .select('role')
                 .eq('id', user.id)
@@ -136,17 +100,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
                 `;
             }
-            
+
             navLinksContainer.innerHTML += `
-                <li><a href="mis-anuncios.html">Mis Anuncios</a></li>
-                <li><a href="favoritos.html" style="color: var(--favorite-color);">Mis Favoritos</a></li>
+                <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
                 <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
             `;
             document.getElementById('logoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
-                userFavorites.clear(); 
                 window.location.href = 'Index.html';
             });
         } else {
@@ -162,25 +124,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'favoritos.html']; 
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
-                showNotification('Debes iniciar sesión para acceder a esta página.', 'error', 2000);
-                setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                alert('Debes iniciar sesión para acceder a esta página.');
+                window.location.href = 'login.html';
             }
         }
         if (currentPage === 'admin.html') {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
-                showNotification('Acceso denegado.', 'error', 2000);
-                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
+                alert('Acceso denegado.');
+                window.location.href = 'Index.html';
                 return;
             }
             const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
             if (!profile || profile.role !== 'admin') {
-                showNotification('No tienes permisos de administrador.', 'error', 2000);
-                setTimeout(() => { window.location.href = 'Index.html'; }, 2000);
+                alert('No tienes permisos de administrador para acceder a esta página.');
+                window.location.href = 'Index.html';
             }
         }
     })();
@@ -244,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtroSuperficie = document.getElementById('filtro-superficie');
         const resetFiltrosBtn = document.getElementById('reset-filtros');
 
-        const renderAnuncios = (anuncios, userIsLoggedIn) => {
+        const renderAnuncios = (anuncios) => {
             anunciosContainer.innerHTML = '';
             if (anuncios.length === 0) {
                 anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se encontraron anuncios con estos criterios.</p>';
@@ -253,14 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
-                card.dataset.id = anuncio.id;
-
-                const isFavorited = userFavorites.has(anuncio.id);
-
                 card.innerHTML = `
-                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''} ${userIsLoggedIn ? 'visible' : ''}" data-id="${anuncio.id}">
-                        <i class="fas fa-heart"></i>
-                    </button>
                     <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
@@ -269,11 +224,52 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
+                card.addEventListener('click', () => {
+                    if (modal) {
+                        const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                        let imagenActual = 0;
+                        if (imagenes.length === 0) return;
+                        const mainImage = modal.querySelector('#modal-img');
+                        const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                        const prevBtn = modal.querySelector('.gallery-nav.prev');
+                        const nextBtn = modal.querySelector('.gallery-nav.next');
+                        const mostrarImagen = (index) => {
+                            if (index < 0 || index >= imagenes.length) return;
+                            mainImage.src = imagenes[index];
+                            imagenActual = index;
+                            thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                                img.classList.toggle('active', i === index);
+                            });
+                        };
+                        modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                        modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
+                        modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                        thumbnailContainer.innerHTML = '';
+                        imagenes.forEach((url, index) => {
+                            const thumb = document.createElement('img');
+                            thumb.src = url;
+                            thumb.alt = `Miniatura ${index + 1}`;
+                            thumb.addEventListener('click', () => mostrarImagen(index));
+                            thumbnailContainer.appendChild(thumb);
+                        });
+                        prevBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
+                        nextBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
+                        mostrarImagen(0);
+                        modal.classList.add('active');
+                    }
+                });
                 anunciosContainer.appendChild(card);
             });
         };
 
-        const aplicarFiltros = async () => {
+        const aplicarFiltros = () => {
             let anunciosFiltrados = [...todosLosAnuncios];
             const tipo = filtroTipo.value;
             const habitaciones = parseInt(filtroHabitaciones.value) || 0;
@@ -287,9 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (banos > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
             if (superficie > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
             anunciosFiltrados = anunciosFiltrados.filter(a => (a.precio || 0) <= precio);
-            
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            renderAnuncios(anunciosFiltrados, !!session);
+            renderAnuncios(anunciosFiltrados);
         };
         
         const cargarAnunciosDesdeSupabase = async () => {
@@ -298,95 +292,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 todosLosAnuncios = data;
-                await aplicarFiltros();
+                renderAnuncios(todosLosAnuncios);
             } catch (error) {
                 console.error('Error al cargar anuncios desde Supabase:', error);
-                showNotification('No se pudieron cargar los anuncios. Inténtalo más tarde.', 'error');
-                anunciosContainer.innerHTML = '';
+                anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
             }
         };
-
-        anunciosContainer.addEventListener('click', async (e) => {
-            const favoriteBtn = e.target.closest('.favorite-btn');
-            const card = e.target.closest('.anuncio-card');
-
-            if (favoriteBtn) {
-                e.stopPropagation(); 
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session) {
-                    showNotification('Debes iniciar sesión para guardar favoritos.', 'error');
-                    return;
-                }
-
-                const anuncioId = parseInt(favoriteBtn.dataset.id);
-                const isFavorited = favoriteBtn.classList.contains('favorited');
-                favoriteBtn.disabled = true;
-
-                if (isFavorited) {
-                    const { error } = await supabaseClient.from('favoritos').delete().match({ user_id: session.user.id, anuncio_id: anuncioId });
-                    if (!error) {
-                        favoriteBtn.classList.remove('favorited');
-                        userFavorites.delete(anuncioId);
-                    }
-                } else {
-                    const { error } = await supabaseClient.from('favoritos').insert({ user_id: session.user.id, anuncio_id: anuncioId });
-                    if (!error) {
-                        favoriteBtn.classList.add('favorited');
-                        userFavorites.add(anuncioId);
-                    }
-                }
-                favoriteBtn.disabled = false;
-            
-            } else if (card && modal) {
-                const anuncioId = parseInt(card.dataset.id);
-                const anuncio = todosLosAnuncios.find(a => a.id === anuncioId);
-                if (!anuncio) return;
-                
-                const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
-                let imagenActual = 0;
-                if (imagenes.length === 0) return;
-                
-                const mainImage = modal.querySelector('#modal-img');
-                const thumbnailContainer = modal.querySelector('#thumbnail-container');
-                const prevBtn = modal.querySelector('.gallery-nav.prev');
-                const nextBtn = modal.querySelector('.gallery-nav.next');
-                
-                const mostrarImagen = (index) => {
-                    if (index < 0 || index >= imagenes.length) return;
-                    mainImage.src = imagenes[index];
-                    imagenActual = index;
-                    thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
-                        img.classList.toggle('active', i === index);
-                    });
-                };
-
-                modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
-                modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
-                modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
-                modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
-                thumbnailContainer.innerHTML = '';
-                
-                imagenes.forEach((url, index) => {
-                    const thumb = document.createElement('img');
-                    thumb.src = url;
-                    thumb.alt = `Miniatura ${index + 1}`;
-                    thumb.addEventListener('click', () => mostrarImagen(index));
-                    thumbnailContainer.appendChild(thumb);
-                });
-                
-                prevBtn.onclick = () => {
-                    const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
-                    mostrarImagen(nuevaPosicion);
-                };
-                nextBtn.onclick = () => {
-                    const nuevaPosicion = (imagenActual + 1) % imagenes.length;
-                    mostrarImagen(nuevaPosicion);
-                };
-                
-                mostrarImagen(0);
-                modal.classList.add('active');
-            }
-        });
 
         [filtroTipo, filtroHabitaciones, filtroPrecio, filtroUbicacion, filtroBanos, filtroSuperficie].forEach(filtro => {
             if (filtro) filtro.addEventListener('input', aplicarFiltros);
@@ -491,8 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } catch (error) {
                 console.error('Error al cargar mis anuncios:', error);
-                showNotification('Hubo un error al cargar tus propiedades.', 'error');
-                misAnunciosContainer.innerHTML = '';
+                misAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar tus propiedades.</p>';
             }
         };
 
@@ -503,17 +413,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) throw error;
-                        showNotification('Anuncio borrado con éxito.', 'success');
                         cargarMisAnuncios();
                     } catch (error) {
-                        showNotification('Error al borrar el anuncio: ' + error.message, 'error');
+                        alert('Error al borrar el anuncio: ' + error.message);
                     }
                 }
             }
             if (e.target.classList.contains('btn-edit')) {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
                 if (error) {
-                    showNotification('Error al cargar los datos del anuncio: ' + error.message, 'error');
+                    alert('Error al cargar los datos del anuncio: ' + error.message);
                     return;
                 }
                 document.getElementById('edit-anuncio-id').value = data.id;
@@ -547,13 +456,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 try {
-                    const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
+                    const { error } = await supabaseClient
+                        .from('anuncios')
+                        .update(updatedData)
+                        .eq('id', anuncioId);
+
                     if (error) throw error;
+
                     editModal.classList.remove('active');
-                    showNotification('Anuncio actualizado con éxito.', 'success');
                     cargarMisAnuncios();
+
                 } catch (error) {
-                    showNotification('Error al guardar los cambios: ' + error.message, 'error');
+                    alert('Error al guardar los cambios: ' + error.message);
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
                     submitButton.disabled = false;
@@ -573,31 +487,30 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const cargarTodosLosAnuncios = async () => {
             adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando todos los anuncios...</p>';
+            
             try {
                 const { data, error } = await supabaseClient
                     .from('anuncios')
-                    .select('*, profiles(username)')
+                    .select('*')
                     .order('created_at', { ascending: false });
-                
+
                 if (error) throw error;
-                
+
                 if (data.length === 0) {
                     adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay ningún anuncio en la plataforma.</p>';
                     return;
                 }
+
                 adminAnunciosContainer.innerHTML = '';
                 data.forEach(anuncio => {
                     const card = document.createElement('div');
                     card.className = 'anuncio-card gestion-card';
-                    
-                    const nombreUsuario = anuncio.profiles ? anuncio.profiles.username : 'Usuario no disponible';
-
                     card.innerHTML = `
                         <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
                         <div class="anuncio-card-content">
                             <h3>${anuncio.titulo}</h3>
                             <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                            <p class="anuncio-card-details">Publicado por: ${nombreUsuario}</p>
+                            <p class="anuncio-card-details">Publicado por: ${anuncio.email_contacto || 'No especificado'}</p>
                             <div class="gestion-buttons">
                                 <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
                                 <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
@@ -649,10 +562,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     adminAnunciosContainer.appendChild(card);
                 });
+
             } catch (error) {
                 console.error('Error al cargar todos los anuncios:', error);
-                showNotification('Hubo un error al cargar los anuncios: ' + error.message, 'error');
-                adminAnunciosContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+                adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar los anuncios.</p>';
             }
         };
 
@@ -663,17 +576,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) throw error;
-                        showNotification('Anuncio borrado por el administrador.', 'success');
                         cargarTodosLosAnuncios();
                     } catch (error) {
-                        showNotification('Error al borrar el anuncio: ' + error.message, 'error');
+                        alert('Error al borrar el anuncio: ' + error.message);
                     }
                 }
             }
             if (e.target.classList.contains('btn-edit')) {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
                 if (error) {
-                    showNotification('Error al cargar los datos del anuncio: ' + error.message, 'error');
+                    alert('Error al cargar los datos del anuncio: ' + error.message);
                     return;
                 }
                 document.getElementById('edit-anuncio-id').value = data.id;
@@ -708,12 +620,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
                     if (error) throw error;
                     editModal.classList.remove('active');
-                    showNotification('Anuncio actualizado por el administrador.', 'success');
+                    // Dependiendo de la página, recargamos una u otra lista
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
                     }
                 } catch (error) {
-                    showNotification('Error al guardar los cambios: ' + error.message, 'error');
+                    alert('Error al guardar los cambios: ' + error.message);
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
                     submitButton.disabled = false;
@@ -722,138 +634,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         cargarTodosLosAnuncios();
-    }
-
-    // -- AÑADIDO: Lógica para la nueva página de Favoritos --
-    const favoritosContainer = document.getElementById('favoritosContainer');
-    if (favoritosContainer) {
-        let anunciosFavoritos = []; // Guardar los anuncios cargados para el modal
-
-        const renderFavoritos = (anuncios) => {
-            favoritosContainer.innerHTML = '';
-            if (!anuncios || anuncios.length === 0) {
-                favoritosContainer.innerHTML = '<p style="text-align:center; width:100%;">Aún no has guardado ningún anuncio en favoritos. <a href="Ver-anuncios.html" style="color: var(--accent-color);">¡Explora ahora!</a></p>';
-                return;
-            }
-            anuncios.forEach(anuncio => {
-                const card = document.createElement('div');
-                card.className = 'anuncio-card';
-                card.dataset.id = anuncio.id;
-                
-                card.innerHTML = `
-                    <button class="favorite-btn favorited visible" data-id="${anuncio.id}" title="Quitar de favoritos">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
-                    <div class="anuncio-card-content">
-                        <h3>${anuncio.titulo}</h3>
-                        <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                        <p class="anuncio-card-details">${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²</p>
-                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
-                    </div>`;
-                favoritosContainer.appendChild(card);
-            });
-        };
-
-        const cargarAnunciosFavoritos = async () => {
-            favoritosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus favoritos...</p>';
-            
-            if (userFavorites.size === 0) {
-                renderFavoritos([]);
-                return;
-            }
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('anuncios')
-                    .select('*')
-                    .in('id', Array.from(userFavorites));
-
-                if (error) throw error;
-                anunciosFavoritos = data; // Guardamos los datos para usarlos en el modal
-                renderFavoritos(anunciosFavoritos);
-            } catch (error) {
-                console.error('Error al cargar anuncios favoritos:', error);
-                showNotification('No se pudieron cargar tus favoritos.', 'error');
-            }
-        };
-
-        favoritosContainer.addEventListener('click', async (e) => {
-            const favoriteBtn = e.target.closest('.favorite-btn');
-            const card = e.target.closest('.anuncio-card');
-            const modal = document.getElementById('anuncioModal');
-
-            if (favoriteBtn) {
-                e.stopPropagation();
-                const anuncioId = parseInt(favoriteBtn.dataset.id);
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                if (!session) return;
-
-                if (confirm("¿Quitar este anuncio de tus favoritos?")) {
-                    const { error } = await supabaseClient.from('favoritos').delete().match({ user_id: session.user.id, anuncio_id: anuncioId });
-                    if (!error) {
-                        favoriteBtn.closest('.anuncio-card').style.display = 'none'; // Oculta la tarjeta
-                        userFavorites.delete(anuncioId); 
-                        
-                        const remainingCards = Array.from(favoritosContainer.children).filter(child => child.style.display !== 'none');
-                        if (remainingCards.length === 0) {
-                            renderFavoritos([]);
-                        }
-                    } else {
-                        showNotification('Error al quitar el favorito.', 'error');
-                    }
-                }
-            } else if (card && modal) {
-                 const anuncioId = parseInt(card.dataset.id);
-                 const anuncio = anunciosFavoritos.find(a => a.id === anuncioId);
-                 if (!anuncio) return;
-
-                const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
-                let imagenActual = 0;
-                if (imagenes.length === 0) return;
-                
-                const mainImage = modal.querySelector('#modal-img');
-                const thumbnailContainer = modal.querySelector('#thumbnail-container');
-                const prevBtn = modal.querySelector('.gallery-nav.prev');
-                const nextBtn = modal.querySelector('.gallery-nav.next');
-                
-                const mostrarImagen = (index) => {
-                    if (index < 0 || index >= imagenes.length) return;
-                    mainImage.src = imagenes[index];
-                    imagenActual = index;
-                    thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
-                        img.classList.toggle('active', i === index);
-                    });
-                };
-
-                modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
-                modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
-                modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
-                modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
-                thumbnailContainer.innerHTML = '';
-                
-                imagenes.forEach((url, index) => {
-                    const thumb = document.createElement('img');
-                    thumb.src = url;
-                    thumb.alt = `Miniatura ${index + 1}`;
-                    thumb.addEventListener('click', () => mostrarImagen(index));
-                    thumbnailContainer.appendChild(thumb);
-                });
-                
-                prevBtn.onclick = () => {
-                    mostrarImagen((imagenActual - 1 + imagenes.length) % imagenes.length);
-                };
-                nextBtn.onclick = () => {
-                    mostrarImagen((imagenActual + 1) % imagenes.length);
-                };
-                
-                mostrarImagen(0);
-                modal.classList.add('active');
-            }
-        });
-
-        cargarAnunciosFavoritos();
     }
 
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
@@ -873,7 +653,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentImage = 0;
         const images = heroSection.querySelectorAll('.carousel-image');
         setInterval(() => {
-            if (images.length === 0) return;
             images[currentImage].classList.remove('active');
             currentImage = (currentImage + 1) % images.length;
             images[currentImage].classList.add('active');
@@ -966,13 +745,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
                 if (insertError) throw insertError;
-                
-                showNotification('¡Anuncio enviado con éxito! Será revisado pronto.', 'success', 3000);
-                setTimeout(() => { window.location.href = 'Gracias.html'; }, 3000);
+
+                window.location.href = 'Gracias.html';
 
             } catch (error) {
                 console.error('Error al enviar el anuncio:', error);
-                showNotification('Hubo un error al enviar tu anuncio: ' + error.message, 'error');
+                alert('Hubo un error al enviar tu anuncio: ' + error.message);
                 submitButton.textContent = 'Enviar Anuncio';
                 submitButton.disabled = false;
             }
