@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         if (user) {
-            const { data: profile, error } = await supabaseClient
+            const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('role')
                 .eq('id', user.id)
@@ -136,9 +136,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>
                 `;
             }
-
+            
+            // -- MODIFICADO: Añadido el enlace a "Mis Favoritos" --
             navLinksContainer.innerHTML += `
-                <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
+                <li><a href="mis-anuncios.html">Mis Anuncios</a></li>
+                <li><a href="favoritos.html" style="color: var(--favorite-color);">Mis Favoritos</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
                 <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
             `;
@@ -161,7 +163,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
+        // -- MODIFICADO: Añadida la página de favoritos a las páginas privadas --
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'favoritos.html']; 
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -713,6 +716,139 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         cargarTodosLosAnuncios();
+    }
+
+    // -- AÑADIDO: Lógica para la nueva página de Favoritos --
+    const favoritosContainer = document.getElementById('favoritosContainer');
+    if (favoritosContainer) {
+        let anunciosFavoritos = []; // Guardar los anuncios cargados para el modal
+
+        const renderFavoritos = (anuncios) => {
+            favoritosContainer.innerHTML = '';
+            if (!anuncios || anuncios.length === 0) {
+                favoritosContainer.innerHTML = '<p style="text-align:center; width:100%;">Aún no has guardado ningún anuncio en favoritos. <a href="Ver-anuncios.html" style="color: var(--accent-color);">¡Explora ahora!</a></p>';
+                return;
+            }
+            anuncios.forEach(anuncio => {
+                const card = document.createElement('div');
+                card.className = 'anuncio-card';
+                card.dataset.id = anuncio.id;
+                
+                card.innerHTML = `
+                    <button class="favorite-btn favorited visible" data-id="${anuncio.id}" title="Quitar de favoritos">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
+                    <div class="anuncio-card-content">
+                        <h3>${anuncio.titulo}</h3>
+                        <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
+                        <p class="anuncio-card-details">${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²</p>
+                        <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
+                    </div>`;
+                favoritosContainer.appendChild(card);
+            });
+        };
+
+        const cargarAnunciosFavoritos = async () => {
+            favoritosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando tus favoritos...</p>';
+            
+            if (userFavorites.size === 0) {
+                renderFavoritos([]);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('anuncios')
+                    .select('*')
+                    .in('id', Array.from(userFavorites));
+
+                if (error) throw error;
+                anunciosFavoritos = data; // Guardamos los datos para usarlos en el modal
+                renderFavoritos(anunciosFavoritos);
+            } catch (error) {
+                console.error('Error al cargar anuncios favoritos:', error);
+                showNotification('No se pudieron cargar tus favoritos.', 'error');
+            }
+        };
+
+        favoritosContainer.addEventListener('click', async (e) => {
+            const favoriteBtn = e.target.closest('.favorite-btn');
+            const card = e.target.closest('.anuncio-card');
+            const modal = document.getElementById('anuncioModal');
+
+            if (favoriteBtn) {
+                e.stopPropagation();
+                const anuncioId = parseInt(favoriteBtn.dataset.id);
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (!session) return;
+
+                if (confirm("¿Quitar este anuncio de tus favoritos?")) {
+                    const { error } = await supabaseClient.from('favoritos').delete().match({ user_id: session.user.id, anuncio_id: anuncioId });
+                    if (!error) {
+                        favoriteBtn.closest('.anuncio-card').style.display = 'none'; // Oculta la tarjeta
+                        userFavorites.delete(anuncioId); 
+                        
+                        // Si no quedan más tarjetas, muestra el mensaje
+                        const remainingCards = Array.from(favoritosContainer.children).filter(child => child.style.display !== 'none');
+                        if (remainingCards.length === 0) {
+                            renderFavoritos([]);
+                        }
+                    } else {
+                        showNotification('Error al quitar el favorito.', 'error');
+                    }
+                }
+            } else if (card && modal) {
+                 const anuncioId = parseInt(card.dataset.id);
+                 const anuncio = anunciosFavoritos.find(a => a.id === anuncioId);
+                 if (!anuncio) return;
+
+                const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                let imagenActual = 0;
+                if (imagenes.length === 0) return;
+                
+                const mainImage = modal.querySelector('#modal-img');
+                const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                const prevBtn = modal.querySelector('.gallery-nav.prev');
+                const nextBtn = modal.querySelector('.gallery-nav.next');
+                
+                const mostrarImagen = (index) => {
+                    if (index < 0 || index >= imagenes.length) return;
+                    mainImage.src = imagenes[index];
+                    imagenActual = index;
+                    thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                        img.classList.toggle('active', i === index);
+                    });
+                };
+
+                modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
+                modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                thumbnailContainer.innerHTML = '';
+                
+                imagenes.forEach((url, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = url;
+                    thumb.alt = `Miniatura ${index + 1}`;
+                    thumb.addEventListener('click', () => mostrarImagen(index));
+                    thumbnailContainer.appendChild(thumb);
+                });
+                
+                prevBtn.onclick = () => {
+                    mostrarImagen((imagenActual - 1 + imagenes.length) % imagenes.length);
+                };
+                nextBtn.onclick = () => {
+                    mostrarImagen((imagenActual + 1) % imagenes.length);
+                };
+                
+                mostrarImagen(0);
+                modal.classList.add('active');
+            }
+        });
+
+        cargarAnunciosFavoritos();
     }
 
     // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
