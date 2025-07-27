@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="Styles.css">
-    
-    </head>
+    <link rel="manifest" href="/manifest.json">
+</head>
 <body>
     <div id="notification-banner" class="notification-hidden"></div>
 
@@ -37,6 +37,7 @@
                     <h1><span style="color: var(--accent-color);">Selettas</span></h1>
                     <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
                     <a href="#contact" class="btn">Contactar</a>
+                    <button id="installBtn" class="btn" style="display: none; margin-top: 15px;">Instalar Aplicación</button>
                 </div>
             </div>
         </section>
@@ -92,19 +93,18 @@
     <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="Script.js"></script>
 
-    </body>
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(registration => {
-        console.log('ServiceWorker registrado con éxito:', registration.scope);
-      }).catch(error => {
-        console.log('Fallo en el registro de ServiceWorker:', error);
-      });
-    });
-  }
-</script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registrado con éxito:', registration.scope);
+          }).catch(error => {
+            console.log('Fallo en el registro de ServiceWorker:', error);
+          });
+        });
+      }
+    </script>
+</body>
 </html>
