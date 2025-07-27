@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
     const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI_NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- ESTADO GLOBAL Y SISTEMA DE NOTIFICACIONES ---
@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const scrollTopBtn = document.querySelector('.scroll-to-top');
     const whatsappBtn = document.querySelector('.whatsapp-button');
     const modals = document.querySelectorAll('.modal');
-    const navLinksContainer = document.querySelector('.sidebar ul');
 
     if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeBtn && sidebar) {
         closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
     }
-    
     window.addEventListener('scroll', () => {
         const shouldShow = window.scrollY > 200;
         if (scrollTopBtn) scrollTopBtn.classList.toggle('show', shouldShow);
@@ -80,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkUserStatus = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         const user = session?.user;
+        const navLinksContainer = document.querySelector('.sidebar ul');
 
         if (!navLinksContainer) return;
 
@@ -106,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
+            // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html">Mis Anuncios</a></li>
                 <li><a href="favoritos.html" style="color: var(--accent-color);">Mis Favoritos</a></li>
@@ -124,16 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="login.html">Iniciar Sesión</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
             `;
-        }
-
-        // -- ¡LA CORRECCIÓN AHORA ESTÁ AQUÍ! --
-        // Se ejecuta después de que el menú se haya llenado con los enlaces.
-        if (sidebar) {
-            navLinksContainer.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    sidebar.classList.remove('open');
-                });
-            });
         }
     };
 
