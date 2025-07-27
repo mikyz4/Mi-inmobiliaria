@@ -5,18 +5,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- SISTEMA DE NOTIFICACIONES ---
+    // --- ESTADO GLOBAL Y SISTEMA DE NOTIFICACIONES ---
     const notificationBanner = document.getElementById('notification-banner');
+    let userFavorites = new Set(); // Almacena los IDs de los anuncios favoritos del usuario
+
     function showNotification(message, type = 'success', duration = 4000) {
         if (!notificationBanner) return;
-
         notificationBanner.textContent = message;
         notificationBanner.className = 'notification-hidden';
         void notificationBanner.offsetWidth; 
-        
         notificationBanner.classList.add('show');
         notificationBanner.classList.add(type === 'success' ? 'notification-success' : 'notification-error');
-
         setTimeout(() => {
             notificationBanner.classList.remove('show');
         }, duration);
@@ -55,6 +54,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // --- GESTIÓN DE FAVORITOS (FUNCIÓN DE CARGA) ---
+    const cargarFavoritos = async (userId) => {
+        if (!userId) {
+            userFavorites.clear();
+            return;
+        }
+        try {
+            const { data, error } = await supabaseClient
+                .from('favoritos')
+                .select('anuncio_id')
+                .eq('user_id', userId);
+            if (error) throw error;
+            userFavorites = new Set(data.map(fav => fav.anuncio_id));
+        } catch (error) {
+            console.error('Error al cargar favoritos:', error);
+        }
+    };
+
 
     // --- LÓGICA DE AUTENTICACIÓN Y MENÚ DINÁMICO ---
     const signUpForm = document.getElementById('signUpForm');
@@ -96,9 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!navLinksContainer) return;
         
-        navLinksContainer.innerHTML = '';
-
-        navLinksContainer.innerHTML += `
+        if (user) {
+            await cargarFavoritos(user.id);
+        }
+        
+        navLinksContainer.innerHTML = `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
@@ -125,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('logoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
+                userFavorites.clear(); 
                 window.location.href = 'Index.html';
             });
         } else {
@@ -222,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtroSuperficie = document.getElementById('filtro-superficie');
         const resetFiltrosBtn = document.getElementById('reset-filtros');
 
-        const renderAnuncios = (anuncios) => {
+        const renderAnuncios = (anuncios, userIsLoggedIn) => {
             anunciosContainer.innerHTML = '';
             if (anuncios.length === 0) {
                 anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se encontraron anuncios con estos criterios.</p>';
@@ -231,7 +252,14 @@ document.addEventListener('DOMContentLoaded', function() {
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
+                card.dataset.id = anuncio.id;
+
+                const isFavorited = userFavorites.has(anuncio.id);
+
                 card.innerHTML = `
+                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''} ${userIsLoggedIn ? 'visible' : ''}" data-id="${anuncio.id}">
+                        <i class="fas fa-heart"></i>
+                    </button>
                     <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
@@ -240,52 +268,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
                     </div>`;
                 
-                card.addEventListener('click', () => {
-                    if (modal) {
-                        const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
-                        let imagenActual = 0;
-                        if (imagenes.length === 0) return;
-                        const mainImage = modal.querySelector('#modal-img');
-                        const thumbnailContainer = modal.querySelector('#thumbnail-container');
-                        const prevBtn = modal.querySelector('.gallery-nav.prev');
-                        const nextBtn = modal.querySelector('.gallery-nav.next');
-                        const mostrarImagen = (index) => {
-                            if (index < 0 || index >= imagenes.length) return;
-                            mainImage.src = imagenes[index];
-                            imagenActual = index;
-                            thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
-                                img.classList.toggle('active', i === index);
-                            });
-                        };
-                        modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
-                        modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
-                        modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
-                        modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
-                        thumbnailContainer.innerHTML = '';
-                        imagenes.forEach((url, index) => {
-                            const thumb = document.createElement('img');
-                            thumb.src = url;
-                            thumb.alt = `Miniatura ${index + 1}`;
-                            thumb.addEventListener('click', () => mostrarImagen(index));
-                            thumbnailContainer.appendChild(thumb);
-                        });
-                        prevBtn.onclick = () => {
-                            const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
-                            mostrarImagen(nuevaPosicion);
-                        };
-                        nextBtn.onclick = () => {
-                            const nuevaPosicion = (imagenActual + 1) % imagenes.length;
-                            mostrarImagen(nuevaPosicion);
-                        };
-                        mostrarImagen(0);
-                        modal.classList.add('active');
-                    }
-                });
                 anunciosContainer.appendChild(card);
             });
         };
 
-        const aplicarFiltros = () => {
+        const aplicarFiltros = async () => {
             let anunciosFiltrados = [...todosLosAnuncios];
             const tipo = filtroTipo.value;
             const habitaciones = parseInt(filtroHabitaciones.value) || 0;
@@ -299,7 +286,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (banos > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.banos >= banos);
             if (superficie > 0) anunciosFiltrados = anunciosFiltrados.filter(a => a.superficie >= superficie);
             anunciosFiltrados = anunciosFiltrados.filter(a => (a.precio || 0) <= precio);
-            renderAnuncios(anunciosFiltrados);
+            
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            renderAnuncios(anunciosFiltrados, !!session);
         };
         
         const cargarAnunciosDesdeSupabase = async () => {
@@ -308,13 +297,95 @@ document.addEventListener('DOMContentLoaded', function() {
                 const { data, error } = await supabaseClient.from('anuncios').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 todosLosAnuncios = data;
-                renderAnuncios(todosLosAnuncios);
+                await aplicarFiltros();
             } catch (error) {
                 console.error('Error al cargar anuncios desde Supabase:', error);
                 showNotification('No se pudieron cargar los anuncios. Inténtalo más tarde.', 'error');
                 anunciosContainer.innerHTML = '';
             }
         };
+
+        anunciosContainer.addEventListener('click', async (e) => {
+            const favoriteBtn = e.target.closest('.favorite-btn');
+            const card = e.target.closest('.anuncio-card');
+
+            if (favoriteBtn) {
+                e.stopPropagation(); 
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    showNotification('Debes iniciar sesión para guardar favoritos.', 'error');
+                    return;
+                }
+
+                const anuncioId = parseInt(favoriteBtn.dataset.id);
+                const isFavorited = favoriteBtn.classList.contains('favorited');
+                favoriteBtn.disabled = true;
+
+                if (isFavorited) {
+                    const { error } = await supabaseClient.from('favoritos').delete().match({ user_id: session.user.id, anuncio_id: anuncioId });
+                    if (!error) {
+                        favoriteBtn.classList.remove('favorited');
+                        userFavorites.delete(anuncioId);
+                    }
+                } else {
+                    const { error } = await supabaseClient.from('favoritos').insert({ user_id: session.user.id, anuncio_id: anuncioId });
+                    if (!error) {
+                        favoriteBtn.classList.add('favorited');
+                        userFavorites.add(anuncioId);
+                    }
+                }
+                favoriteBtn.disabled = false;
+            
+            } else if (card && modal) {
+                const anuncioId = parseInt(card.dataset.id);
+                const anuncio = todosLosAnuncios.find(a => a.id === anuncioId);
+                if (!anuncio) return;
+                
+                const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
+                let imagenActual = 0;
+                if (imagenes.length === 0) return;
+                
+                const mainImage = modal.querySelector('#modal-img');
+                const thumbnailContainer = modal.querySelector('#thumbnail-container');
+                const prevBtn = modal.querySelector('.gallery-nav.prev');
+                const nextBtn = modal.querySelector('.gallery-nav.next');
+                
+                const mostrarImagen = (index) => {
+                    if (index < 0 || index >= imagenes.length) return;
+                    mainImage.src = imagenes[index];
+                    imagenActual = index;
+                    thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                        img.classList.toggle('active', i === index);
+                    });
+                };
+
+                modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
+                modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
+                modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
+                modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                thumbnailContainer.innerHTML = '';
+                
+                imagenes.forEach((url, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = url;
+                    thumb.alt = `Miniatura ${index + 1}`;
+                    thumb.addEventListener('click', () => mostrarImagen(index));
+                    thumbnailContainer.appendChild(thumb);
+                });
+                
+                prevBtn.onclick = () => {
+                    const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                    mostrarImagen(nuevaPosicion);
+                };
+                nextBtn.onclick = () => {
+                    const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                    mostrarImagen(nuevaPosicion);
+                };
+                
+                mostrarImagen(0);
+                modal.classList.add('active');
+            }
+        });
 
         [filtroTipo, filtroHabitaciones, filtroPrecio, filtroUbicacion, filtroBanos, filtroSuperficie].forEach(filtro => {
             if (filtro) filtro.addEventListener('input', aplicarFiltros);
@@ -661,6 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentImage = 0;
         const images = heroSection.querySelectorAll('.carousel-image');
         setInterval(() => {
+            if (images.length === 0) return;
             images[currentImage].classList.remove('active');
             currentImage = (currentImage + 1) % images.length;
             images[currentImage].classList.add('active');

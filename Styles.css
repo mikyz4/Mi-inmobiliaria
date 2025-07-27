@@ -197,12 +197,16 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    display: flex;
+    display: none; /* Oculto por defecto */
     justify-content: center;
     align-items: center;
     font-size: 1.2rem;
     transition: transform 0.2s, color 0.2s;
     z-index: 5;
+}
+
+.favorite-btn.visible {
+    display: flex; /* Se hace visible con JS si el usuario está logueado */
 }
 
 .favorite-btn:hover {
@@ -346,7 +350,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 /* --- ESTILOS PARA LA BARRA DE NOTIFICACIONES --- */
 #notification-banner {
     position: fixed;
-    top: -100px; /* Empieza oculta arriba */
+    top: -100px;
     left: 0;
     width: 100%;
     padding: 16px;
@@ -359,17 +363,14 @@ footer a { color: var(--accent-color); text-decoration: none;}
     border-bottom: 3px solid;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
-
 #notification-banner.show {
-    transform: translateY(100px); /* Se desliza hacia abajo */
+    transform: translateY(100px);
 }
-
 .notification-success {
     background-color: var(--accent-color);
     color: var(--primary-color);
     border-color: #078c4e;
 }
-
 .notification-error {
     background-color: var(--delete-color);
     color: var(--primary-color);
