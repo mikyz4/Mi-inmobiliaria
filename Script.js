@@ -105,9 +105,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
+            // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
             navLinksContainer.innerHTML += `
                 <li><a href="mis-anuncios.html">Mis Anuncios</a></li>
-                <li><a href="favoritos.html" style="color: var(--favorite-color);">Mis Favoritos</a></li>
+                <li><a href="favoritos.html" style="color: var(--accent-color);">Mis Favoritos</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
                 <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
             `;
@@ -128,10 +129,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- FUNCIÓN PRINCIPAL DE INICIALIZACIÓN ---
     const inicializarPagina = async () => {
-        // 1. Esperamos a que el estado del usuario y los favoritos se carguen
         await checkUserStatus();
 
-        // 2. Comprobamos la página actual para proteger rutas
         const currentPage = window.location.pathname.split('/').pop();
         const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'favoritos.html'];
         if (privatePages.includes(currentPage)) {
@@ -139,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!session) {
                 showNotification('Debes iniciar sesión para acceder a esta página.', 'error', 2000);
                 setTimeout(() => { window.location.href = 'login.html'; }, 2000);
-                return; // Detenemos la ejecución si no hay sesión en página privada
+                return; 
             }
         }
         if (currentPage === 'admin.html') {
@@ -157,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // 3. Ahora que los datos están listos, ejecutamos la lógica específica de cada página
         cargarLogicaDePagina();
     };
 
@@ -981,6 +979,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Llamamos a la función principal para que inicie todo en el orden correcto
     inicializarPagina();
 });
