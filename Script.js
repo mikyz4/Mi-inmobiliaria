@@ -100,38 +100,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
-            // El menú del usuario logueado ahora solo tiene el contacto
             navLinksContainer.innerHTML += `
                 <li><a href="Index.html#contact">Contacto</a></li>
             `;
-            // La lógica del perfil y logout se moverá al nuevo menú de usuario
 
-            // --- Crear y añadir el nuevo menú de usuario en la esquina ---
-            const userMenuContainer = document.createElement('div');
-            userMenuContainer.className = 'user-menu-container';
+            // Evitar duplicados si la función se llama varias veces
+            if (!document.getElementById('userMenuButton')) {
+                const userMenuContainer = document.createElement('div');
+                userMenuContainer.className = 'user-menu-container';
+                userMenuContainer.innerHTML = `
+                    <button id="userMenuButton" class="user-menu-button">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div id="userDropdown" class="user-dropdown-menu">
+                        <a href="perfil.html">Mi Perfil</a>
+                        <a href="mis-anuncios.html">Mis Anuncios</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" id="userLogoutBtn">Cerrar Sesión</a>
+                    </div>
+                `;
+                document.body.appendChild(userMenuContainer);
 
-            userMenuContainer.innerHTML = `
-                <button id="userMenuButton" class="user-menu-button">
-                    <i class="fas fa-user"></i>
-                </button>
-                <div id="userDropdown" class="user-dropdown-menu">
-                    <a href="perfil.html">Mi Perfil</a>
-                    <a href="mis-anuncios.html">Mis Anuncios</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" id="userLogoutBtn">Cerrar Sesión</a>
-                </div>
-            `;
-            
-            // Añadir el nuevo menú al cuerpo del documento
-            document.body.appendChild(userMenuContainer);
+                // Asignar funcionalidad a los elementos recién creados
+                const userMenuButton = document.getElementById('userMenuButton');
+                const userDropdown = document.getElementById('userDropdown');
 
-            // Añadir la funcionalidad de logout al nuevo botón
-            document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await supabaseClient.auth.signOut();
-                window.location.href = 'Index.html';
-            });
+                userMenuButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
 
+                document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await supabaseClient.auth.signOut();
+                    // Eliminar el menú de usuario al cerrar sesión
+                    const menuToRemove = document.querySelector('.user-menu-container');
+                    if(menuToRemove) menuToRemove.remove();
+                    window.location.href = 'Index.html';
+                });
+            }
         } else {
             navLinksContainer.innerHTML += `
                 <li><a href="Index.html#contact">Contacto</a></li>
@@ -139,13 +146,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="registro.html">Registrarse</a></li>
             `;
         }
-    }
+    };
+
     checkUserStatus();
+
+    // --- LÓGICA UNIVERSAL PARA CERRAR EL MENÚ DE USUARIO ---
+    // Se define una sola vez y funciona para toda la aplicación.
+    window.addEventListener('click', (event) => {
+        const userDropdown = document.getElementById('userDropdown');
+        if (userDropdown && userDropdown.classList.contains('show')) {
+            const userMenuButton = document.getElementById('userMenuButton');
+            // Si el clic fue fuera del botón Y fuera del menú, ciérralo.
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.remove('show');
+            }
+        }
+    });
 
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html']; // Añadimos perfil.html
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html'];
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -644,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
                     }
-                } catch (error) {
+                } catch (error) => {
                     alert('Error al guardar los cambios: ' + error.message);
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
@@ -880,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         window.location.href = 'Index.html';
                     }, 3000);
-                } catch (error) {
+                } catch (error) => {
                     showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
                 }
             } else {
