@@ -51,9 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (error) {
                 alert('Error al registrar: ' + error.message);
             } else {
-                // Con la confirmación por email desactivada, Supabase inicia sesión automáticamente.
                 alert('¡Registro exitoso! Serás redirigido a la página principal.');
-                window.location.href = 'Index.html'; // Lo llevamos directo al inicio ya logueado
+                window.location.href = 'Index.html'; 
             }
         });
     }
@@ -101,16 +100,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
+            // El menú del usuario logueado ahora solo tiene el contacto
             navLinksContainer.innerHTML += `
-                <li><a href="mis-anuncios.html" style="color: var(--accent-color);">Mis Anuncios</a></li>
                 <li><a href="Index.html#contact">Contacto</a></li>
-                <li><a href="#" id="logoutBtn" style="color: #ff8a80;">Cerrar Sesión</a></li>
             `;
-            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            // La lógica del perfil y logout se moverá al nuevo menú de usuario
+
+            // --- Crear y añadir el nuevo menú de usuario en la esquina ---
+            const userMenuContainer = document.createElement('div');
+            userMenuContainer.className = 'user-menu-container';
+
+            userMenuContainer.innerHTML = `
+                <button id="userMenuButton" class="user-menu-button">
+                    <i class="fas fa-user"></i>
+                </button>
+                <div id="userDropdown" class="user-dropdown-menu">
+                    <a href="perfil.html">Mi Perfil</a>
+                    <a href="mis-anuncios.html">Mis Anuncios</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="userLogoutBtn">Cerrar Sesión</a>
+                </div>
+            `;
+            
+            // Añadir el nuevo menú al cuerpo del documento
+            document.body.appendChild(userMenuContainer);
+
+            // Añadir la funcionalidad de logout al nuevo botón
+            document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
                 window.location.href = 'Index.html';
             });
+
         } else {
             navLinksContainer.innerHTML += `
                 <li><a href="Index.html#contact">Contacto</a></li>
@@ -124,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html'];
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html']; // Añadimos perfil.html
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -620,7 +641,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
                     if (error) throw error;
                     editModal.classList.remove('active');
-                    // Dependiendo de la página, recargamos una u otra lista
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
                     }
@@ -757,42 +777,136 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     // --- LÓGICA PARA EL BOTÓN DE INSTALACIÓN DE LA PWA ---
-let deferredPrompt; // Esta variable guardará el evento de instalación
-const installBtn = document.getElementById('installBtn');
+    let deferredPrompt; 
+    const installBtn = document.getElementById('installBtn');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Previene que el mini-infobar de Chrome aparezca en móviles
-  e.preventDefault();
-  // Guarda el evento para que pueda ser disparado más tarde.
-  deferredPrompt = e;
-  // Muestra nuestro botón de instalación personalizado
-  if (installBtn) {
-    installBtn.style.display = 'block';
-    console.log('La aplicación se puede instalar. Mostrando botón.');
-  }
-});
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) {
+        installBtn.style.display = 'block';
+        console.log('La aplicación se puede instalar. Mostrando botón.');
+      }
+    });
 
-if (installBtn) {
-  installBtn.addEventListener('click', async () => {
-    // Oculta el botón, ya que solo se puede usar una vez.
-    installBtn.style.display = 'none';
-    // Muestra el aviso de instalación del navegador.
-    deferredPrompt.prompt();
-    // Espera a que el usuario responda al aviso
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`Respuesta del usuario: ${outcome}`);
-    // Ya no necesitamos la variable, la limpiamos.
-    deferredPrompt = null;
-  });
-}
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`Respuesta del usuario: ${outcome}`);
+        deferredPrompt = null;
+      });
+    }
 
-window.addEventListener('appinstalled', () => {
-  // Oculta el botón de instalación si la app ya fue instalada
-  if (installBtn) {
-    installBtn.style.display = 'none';
-  }
-  deferredPrompt = null;
-  console.log('PWA fue instalada');
-});
+    window.addEventListener('appinstalled', () => {
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+      deferredPrompt = null;
+      console.log('PWA fue instalada');
+    });
+
+    // --- LÓGICA PARA LA PÁGINA DE PERFIL ---
+    const profileContainer = document.querySelector('.profile-container');
+    if (profileContainer) {
+        const profileForm = document.getElementById('profileForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+
+        const showNotification = (message, type = 'success') => {
+            const banner = document.getElementById('notification-banner');
+            banner.textContent = message;
+            banner.className = `notification-${type}`;
+            banner.classList.add('show');
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4000);
+        };
+
+        const loadUserData = async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                emailInput.value = user.email;
+                usernameInput.value = user.user_metadata.username || '';
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = usernameInput.value.trim();
+            if (!newUsername) {
+                showNotification('El nombre de usuario no puede estar vacío.', 'error');
+                return;
+            }
+            const { error } = await supabaseClient.auth.updateUser({
+                data: { username: newUsername }
+            });
+            if (error) {
+                showNotification('Error al actualizar el nombre: ' + error.message, 'error');
+            } else {
+                showNotification('Nombre de usuario actualizado con éxito.');
+            }
+        });
+
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+            if (error) {
+                showNotification('Error al actualizar la contraseña: ' + error.message, 'error');
+            } else {
+                showNotification('Contraseña actualizada con éxito.');
+                passwordForm.reset();
+            }
+        });
+
+        deleteAccountBtn.addEventListener('click', async () => {
+            const confirmation = prompt("Esta acción es irreversible. Para confirmar, escribe 'BORRAR CUENTA' en el siguiente campo:");
+            if (confirmation === 'BORRAR CUENTA') {
+                try {
+                    const { error } = await supabaseClient.functions.invoke('delete-user-account');
+                    if (error) {
+                        throw error;
+                    }
+                    showNotification('Tu cuenta ha sido eliminada. Serás redirigido.');
+                    await supabaseClient.auth.signOut();
+                    setTimeout(() => {
+                        window.location.href = 'Index.html';
+                    }, 3000);
+                } catch (error) {
+                    showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
+                }
+            } else {
+                showNotification('La confirmación no es correcta. Acción cancelada.', 'error');
+            }
+        });
+        loadUserData();
+    }
+
+    // --- LÓGICA PARA CONTROLAR EL MENÚ DESPLEGABLE DE USUARIO ---
+    const userMenuButton = document.getElementById('userMenuButton');
+    const userDropdown = document.getElementById('userDropdown');
+
+    if (userMenuButton && userDropdown) {
+        userMenuButton.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            userDropdown.classList.toggle('show');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                if (userDropdown.classList.contains('show')) {
+                    userDropdown.classList.remove('show');
+                }
+            }
+        });
+    }
 
 });
