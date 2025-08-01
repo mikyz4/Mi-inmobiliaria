@@ -103,8 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navLinksContainer.innerHTML += `
                 <li><a href="Index.html#contact">Contacto</a></li>
             `;
-
-            // Evitar duplicados si la función se llama varias veces
+            
             if (!document.getElementById('userMenuButton')) {
                 const userMenuContainer = document.createElement('div');
                 userMenuContainer.className = 'user-menu-container';
@@ -121,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 document.body.appendChild(userMenuContainer);
 
-                // Asignar funcionalidad a los elementos recién creados
                 const userMenuButton = document.getElementById('userMenuButton');
                 const userDropdown = document.getElementById('userDropdown');
 
@@ -133,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
                     e.preventDefault();
                     await supabaseClient.auth.signOut();
-                    // Eliminar el menú de usuario al cerrar sesión
                     const menuToRemove = document.querySelector('.user-menu-container');
                     if(menuToRemove) menuToRemove.remove();
                     window.location.href = 'Index.html';
@@ -147,23 +144,18 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     };
-
     checkUserStatus();
 
-    // --- LÓGICA UNIVERSAL PARA CERRAR EL MENÚ DE USUARIO ---
-    // Se define una sola vez y funciona para toda la aplicación.
     window.addEventListener('click', (event) => {
         const userDropdown = document.getElementById('userDropdown');
         if (userDropdown && userDropdown.classList.contains('show')) {
             const userMenuButton = document.getElementById('userMenuButton');
-            // Si el clic fue fuera del botón Y fuera del menú, ciérralo.
             if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
                 userDropdown.classList.remove('show');
             }
         }
     });
 
-    // --- PROTEGER PÁGINAS PRIVADAS ---
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
         const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html'];
@@ -189,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
     
-    // --- LÓGICA DE LA PÁGINA DE INICIO ---
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         const services = [
@@ -235,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
@@ -358,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarAnunciosDesdeSupabase();
     }
     
-    // --- LÓGICA PARA LA PÁGINA "MIS ANUNCIOS" ---
     const misAnunciosContainer = document.getElementById('misAnunciosContainer');
     if (misAnunciosContainer) {
         const modal = document.getElementById('anuncioModal');
@@ -520,7 +509,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarMisAnuncios();
     }
 
-    // --- LÓGICA PARA LA PÁGINA DE ADMINISTRADOR ---
     const adminAnunciosContainer = document.getElementById('adminAnunciosContainer');
     if (adminAnunciosContainer) {
         const modal = document.getElementById('anuncioModal');
@@ -665,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (document.getElementById('adminAnunciosContainer')) {
                         cargarTodosLosAnuncios();
                     }
-                } catch (error) => {
+                } catch (error) { // <-- ERROR CORREGIDO AQUÍ
                     alert('Error al guardar los cambios: ' + error.message);
                 } finally {
                     submitButton.textContent = 'Guardar Cambios';
@@ -677,7 +665,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarTodosLosAnuncios();
     }
 
-    // --- LÓGICA PARA EL BOTÓN "MOSTRAR FILTROS" ---
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
     if (toggleFiltrosBtn && filtrosWrapper) {
@@ -688,7 +675,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA PARA EL CARRUSEL DE LA PÁGINA DE INICIO ---
     const heroSection = document.getElementById('hero');
     if (heroSection) {
         let currentImage = 0;
@@ -700,7 +686,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // --- LÓGICA PARA EL BANNER DE COOKIES ---
     const cookieBanner = document.getElementById('cookie-banner');
     const acceptCookiesBtn = document.getElementById('accept-cookies');
     if (cookieBanner && !localStorage.getItem('cookiesAccepted')) {
@@ -713,7 +698,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA PARA ENVIAR EL FORMULARIO DE NUEVO ANUNCIO ---
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
         if (!anuncioForm.querySelector('#tipo')) {
@@ -797,10 +781,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // --- LÓGICA PARA EL BOTÓN DE INSTALACIÓN DE LA PWA ---
+
     let deferredPrompt; 
     const installBtn = document.getElementById('installBtn');
-
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -809,7 +792,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('La aplicación se puede instalar. Mostrando botón.');
       }
     });
-
     if (installBtn) {
       installBtn.addEventListener('click', async () => {
         installBtn.style.display = 'none';
@@ -819,7 +801,6 @@ document.addEventListener('DOMContentLoaded', function() {
         deferredPrompt = null;
       });
     }
-
     window.addEventListener('appinstalled', () => {
       if (installBtn) {
         installBtn.style.display = 'none';
@@ -828,7 +809,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('PWA fue instalada');
     });
 
-    // --- LÓGICA PARA LA PÁGINA DE PERFIL ---
     const profileContainer = document.querySelector('.profile-container');
     if (profileContainer) {
         const profileForm = document.getElementById('profileForm');
@@ -901,7 +881,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         window.location.href = 'Index.html';
                     }, 3000);
-                } catch (error) => {
+                } catch (error) { // <-- ERROR CORREGIDO AQUÍ
                     showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
                 }
             } else {
@@ -910,24 +890,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         loadUserData();
     }
-
-    // --- LÓGICA PARA CONTROLAR EL MENÚ DESPLEGABLE DE USUARIO ---
-    const userMenuButton = document.getElementById('userMenuButton');
-    const userDropdown = document.getElementById('userDropdown');
-
-    if (userMenuButton && userDropdown) {
-        userMenuButton.addEventListener('click', (event) => {
-            event.stopPropagation(); 
-            userDropdown.classList.toggle('show');
-        });
-
-        window.addEventListener('click', (event) => {
-            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
-                if (userDropdown.classList.contains('show')) {
-                    userDropdown.classList.remove('show');
-                }
-            }
-        });
-    }
-
 });
