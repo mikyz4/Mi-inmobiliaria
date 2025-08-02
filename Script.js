@@ -48,51 +48,47 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Verificando...';
 
-            // 1. Obtenemos los tres valores del formulario
             const username = signUpForm.querySelector('#username').value.trim();
             const email = signUpForm.querySelector('#email').value;
             const password = signUpForm.querySelector('#password').value;
 
             try {
-                // 2. Comprobamos si el nombre de usuario ya existe en la tabla 'profiles'
                 const { data: existingUser, error: checkError } = await supabaseClient
                     .from('profiles')
                     .select('username')
                     .eq('username', username)
                     .single();
 
-                if (checkError && checkError.code !== 'PGRST116') { // Ignorar el error 'PGRST116' que significa "no se encontró la fila"
+                if (checkError && checkError.code !== 'PGRST116') {
                     throw checkError;
                 }
 
                 if (existingUser) {
                     alert('Error: El nombre de usuario "' + username + '" ya está en uso. Por favor, elige otro.');
-                    return; // Detenemos la ejecución si el usuario ya existe
+                    return; 
                 }
 
-                // 3. Si no existe, procedemos con el registro
                 submitButton.textContent = 'Registrando...';
                 const { data, error: signUpError } = await supabaseClient.auth.signUp({
                     email,
                     password,
                     options: {
                         data: {
-                            username: username // Se pasa el 'username' en el objeto 'data'
+                            username: username 
                         }
                     }
                 });
 
                 if (signUpError) {
-                    throw signUpError; // Lanzamos el error para que lo capture el bloque catch
+                    throw signUpError;
                 }
 
-                alert('¡Registro exitoso! Serás redirigido a la página principal.');
+                alert('¡Registro exitoso! Por favor, revisa tu email para confirmar la cuenta.');
                 window.location.href = 'Index.html';
 
             } catch (error) {
                 alert('Error: ' + error.message);
             } finally {
-                // Reactivamos el botón en cualquier caso (éxito o error)
                 submitButton.disabled = false;
                 submitButton.textContent = 'Registrarse';
             }
@@ -226,51 +222,97 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
     
+    // --- LÓGICA DE LA PÁGINA DE INICIO (AHORA DINÁMICA) ---
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
-        const services = [
-            { icon: 'fa-search-dollar', title: 'Valoración de Inmuebles', text: 'Obtén una valoración precisa y de mercado para tu propiedad.' },
-            { icon: 'fa-camera', title: 'Fotografía Profesional', text: 'Destacamos tu inmueble con imágenes de alta calidad que atraen compradores.' },
-            { icon: 'fa-file-signature', title: 'Gestión de Contratos', text: 'Nos encargamos de todo el papeleo para una transacción segura.' }
-        ];
-        servicesContainer.innerHTML = services.map(service => `<div class="service-item"><i class="fas ${service.icon}"></i><h3>${service.title}</h3><p>${service.text}</p></div>`).join('');
-    }
-    const newsContainer = document.getElementById('news-container');
-    if(newsContainer) {
-        const newsData = [
-            { id: 1, titulo: 'Tendencias del Mercado', imagen: 'Images/Noticia1.jpg', descripcion: 'Descubre qué zonas de Gerona están en auge y qué tipo de propiedades son las más demandadas este año.'},
-            { id: 2, titulo: 'Consejos para Vender', imagen: 'Images/Noticia2.jpg', descripcion: 'Pequeños cambios pueden hacer una gran diferencia. Prepara tu casa para el éxito en el mercado.'},
-            { id: 3, titulo: 'Guía para Compradores', imagen: 'Images/Noticia3.jpg', descripcion: 'Desde la financiación hasta la firma, todo lo que necesitas saber para tu primera compra.'}
-        ];
-        const newsModal = document.getElementById('newsModal');
-        newsData.forEach(news => {
-            const card = document.createElement('div');
-            card.className = 'anuncio-card';
-            card.innerHTML = `<img src="${news.imagen}" alt="${news.titulo}" loading="lazy"><div class="anuncio-card-content"><h3>${news.titulo}</h3></div>`;
-            card.addEventListener('click', () => {
-                if(newsModal) {
-                    newsModal.querySelector('#news-modal-img').src = news.imagen;
-                    newsModal.querySelector('#news-modal-titulo').textContent = news.titulo;
-                    newsModal.querySelector('#news-modal-descripcion').textContent = news.descripcion;
-                    newsModal.classList.add('active');
-                }
-            });
-            newsContainer.appendChild(card);
-        });
-    }
-    const faqContainer = document.querySelector('.faq-container');
-    if (faqContainer) {
-        const faqs = [
-            { question: '¿Cómo subo un anuncio?', answer: 'Inicia sesión, ve a "Publicar Anuncio", rellena todos los campos y adjunta tus imágenes.' },
-            { question: '¿Cuánto cuesta publicar?', answer: 'Publicar tu anuncio es completamente gratuito.' },
-            { question: '¿Cuánto dura el anuncio?', answer: 'Los anuncios no tienen fecha de caducidad por ahora.' },
-        ];
-        faqContainer.innerHTML = faqs.map(faq => `<div class="faq-item"><h3>${faq.question}</h3><p>${faq.answer}</p></div>`).join('');
-        document.querySelectorAll('.faq-item h3').forEach(item => {
-            item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
-        });
+        async function loadServices() {
+            const { data, error } = await supabaseClient
+                .from('services')
+                .select('*')
+                .order('display_order', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                servicesContainer.innerHTML = '<p>De momento no hay servicios para mostrar.</p>';
+                return;
+            }
+
+            servicesContainer.innerHTML = data.map(service => `
+                <div class="service-item">
+                    <i class="fas ${service.icon}"></i>
+                    <h3>${service.title}</h3>
+                    <p>${service.text}</p>
+                </div>
+            `).join('');
+        }
+        loadServices();
     }
 
+    const newsContainer = document.getElementById('news-container');
+    if(newsContainer) {
+        const newsModal = document.getElementById('newsModal');
+
+        async function loadPosts() {
+            const { data, error } = await supabaseClient
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error || !data || data.length === 0) {
+                newsContainer.innerHTML = '<p>No hay novedades recientes.</p>';
+                return;
+            }
+
+            newsContainer.innerHTML = '';
+            data.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'anuncio-card';
+                card.innerHTML = `
+                    <img src="${post.image_url || 'Images/Carrusel1.jpg'}" alt="${post.title}" loading="lazy">
+                    <div class="anuncio-card-content">
+                        <h3>${post.title}</h3>
+                    </div>`;
+                card.addEventListener('click', () => {
+                    if(newsModal) {
+                        newsModal.querySelector('#news-modal-img').src = post.image_url || 'Images/Carrusel1.jpg';
+                        newsModal.querySelector('#news-modal-titulo').textContent = post.title;
+                        newsModal.querySelector('#news-modal-descripcion').textContent = post.description;
+                        newsModal.classList.add('active');
+                    }
+                });
+                newsContainer.appendChild(card);
+            });
+        }
+        loadPosts();
+    }
+
+    const faqContainer = document.querySelector('.faq-container');
+    if (faqContainer) {
+        async function loadFaqs() {
+            const { data, error } = await supabaseClient
+                .from('faqs')
+                .select('*')
+                .order('display_order', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                faqContainer.innerHTML = '<p>No hay preguntas frecuentes para mostrar.</p>';
+                return;
+            }
+
+            faqContainer.innerHTML = data.map(faq => `
+                <div class="faq-item">
+                    <h3>${faq.question}</h3>
+                    <p>${faq.answer}</p>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.faq-item h3').forEach(item => {
+                item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
+            });
+        }
+        loadFaqs();
+    }
+
+    // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
