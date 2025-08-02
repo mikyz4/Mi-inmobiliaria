@@ -1,3 +1,4 @@
+// Este es el código COMPLETO y CORRECTO que debes usar
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
