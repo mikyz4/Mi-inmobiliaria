@@ -968,19 +968,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if(adminUserList){
             const userModal = document.getElementById('userModal');
             const userForm = document.getElementById('userForm');
-            const userModalTitle = document.getElementById('userModalTitle');
             const saveUserBtn = document.getElementById('saveUserBtn');
 
             const loadAdminUsers = async () => {
-                const { data, error } = await supabaseClient.from('profiles').select('*').order('username');
+                const { data, error } = await supabaseClient.from('user_profiles_view').select('*').order('username');
                 if(error) { adminUserList.innerHTML = '<p>Error al cargar usuarios.</p>'; return; }
                 if(data.length === 0) { adminUserList.innerHTML = '<p>No hay usuarios registrados.</p>'; return; }
 
                 adminUserList.innerHTML = data.map(user => `
                     <div class="admin-item-card">
                         <div>
-                            <p>${user.username}</p>
-                            <small>Rol: ${user.role}</small>
+                            <p>${user.username || '<em>Usuario sin nombre</em>'}</p>
+                            <small>Rol: ${user.role} | Email: ${user.email}</small>
                         </div>
                         <div class="actions">
                             <button class="btn-secondary btn-edit-user" data-id="${user.id}">Editar Rol</button>
@@ -994,15 +993,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const userId = target.dataset.id;
                 if(!userId || !target.classList.contains('btn-edit-user')) return;
 
-                const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
+                const { data, error } = await supabaseClient.from('user_profiles_view').select('*').eq('id', userId).single();
                 if(error){ alert('No se pudo cargar el usuario.'); return; }
-                
-                const { data: authUser, error: authErr } = await supabaseClient.auth.admin.getUserById(userId);
-                if(authErr){ alert('No se pudo cargar el email del usuario.'); return; }
                 
                 document.getElementById('editUserId').value = data.id;
                 document.getElementById('userModalUsername').textContent = data.username;
-                document.getElementById('userModalEmail').textContent = authUser.user.email;
+                document.getElementById('userModalEmail').textContent = data.email;
                 document.getElementById('userRole').value = data.role;
                 userModal.classList.add('active');
             });
