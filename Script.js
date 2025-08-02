@@ -605,21 +605,21 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarMisAnuncios();
     }
 
-    // --- LÓGICA PARA LA PÁGINA DE ADMINISTRADOR (CENTRAL Y SUBPÁGINAS) ---
+    // --- LÓGICA PARA PÁGINAS DE ADMINISTRADOR ---
     const adminPage = document.querySelector('body#admin-page');
     if (adminPage) {
         
-        const adminAnunciosContainer = document.getElementById('adminAnunciosList');
-        if (adminAnunciosContainer) {
+        const adminAnunciosList = document.getElementById('adminAnunciosList');
+        if (adminAnunciosList) {
             const editModal = document.getElementById('editModal');
             const editAnuncioForm = document.getElementById('editAnuncioForm');
             
             const cargarTodosLosAnuncios = async () => {
                 const { data, error } = await supabaseClient.from('anuncios_con_usuario').select('*').order('created_at', { ascending: false });
-                if (error) { adminAnunciosContainer.innerHTML = '<p>Error cargando anuncios.</p>'; return; }
-                if (data.length === 0) { adminAnunciosContainer.innerHTML = '<p>No hay ningún anuncio en la plataforma.</p>'; return; }
+                if (error) { adminAnunciosList.innerHTML = '<p>Error cargando anuncios.</p>'; return; }
+                if (data.length === 0) { adminAnunciosList.innerHTML = '<p>No hay ningún anuncio en la plataforma.</p>'; return; }
 
-                adminAnunciosContainer.innerHTML = data.map(anuncio => `
+                adminAnunciosList.innerHTML = data.map(anuncio => `
                     <div class="admin-item-card">
                         <div>
                             <p>${anuncio.titulo}</p>
@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
             };
 
-            adminAnunciosContainer.addEventListener('click', async (e) => {
+            adminAnunciosList.addEventListener('click', async (e) => {
                 const anuncioId = e.target.dataset.id;
                 if (!anuncioId) return;
 
@@ -781,11 +781,258 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             loadAdminServices();
         }
+
+        const adminPostList = document.getElementById('adminPostList');
+        if (adminPostList) {
+            const postModal = document.getElementById('postModal');
+            const postForm = document.getElementById('postForm');
+            const addPostBtn = document.getElementById('addPostBtn');
+            const postModalTitle = document.getElementById('postModalTitle');
+            const savePostBtn = document.getElementById('savePostBtn');
+
+            const loadAdminPosts = async () => {
+                const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
+                if (error) { adminPostList.innerHTML = "<p>Error al cargar las novedades.</p>"; return; }
+                if (data.length === 0) { adminPostList.innerHTML = "<p>No hay novedades creadas. ¡Añade la primera!</p>"; return; }
+                adminPostList.innerHTML = data.map(post => `
+                    <div class="admin-item-card">
+                        <p>${post.title}</p>
+                        <div class="actions">
+                            <button class="btn-secondary btn-edit-post" data-id="${post.id}">Editar</button>
+                            <button class="btn-delete btn-delete-post" data-id="${post.id}">Borrar</button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            addPostBtn.addEventListener('click', () => {
+                postModalTitle.textContent = "Añadir Nueva Novedad";
+                postForm.reset();
+                document.getElementById('editPostId').value = '';
+                postModal.classList.add('active');
+            });
+
+            postForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                savePostBtn.disabled = true;
+                savePostBtn.textContent = 'Guardando...';
+                const postId = document.getElementById('editPostId').value;
+                const title = document.getElementById('postTitle').value;
+                const description = document.getElementById('postDescription').value;
+                const imageFile = document.getElementById('postImage').files[0];
+                let imageUrl = null;
+                try {
+                    if (imageFile) {
+                        const { data: { user } } = await supabaseClient.auth.getUser();
+                        const fileName = `${user.id}/${Date.now()}-${imageFile.name}`;
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-posts').upload(fileName, imageFile);
+                        if (uploadError) throw uploadError;
+                        const { data: publicUrlData } = supabaseClient.storage.from('imagenes-posts').getPublicUrl(fileName);
+                        imageUrl = publicUrlData.publicUrl;
+                    }
+                    const postData = { title, description };
+                    if (imageUrl) postData.image_url = imageUrl;
+                    let error;
+                    if (postId) {
+                        const { error: updateError } = await supabaseClient.from('posts').update(postData).eq('id', postId);
+                        error = updateError;
+                    } else {
+                        if (!imageUrl) throw new Error("La imagen de portada es obligatoria al crear una nueva novedad.");
+                        const { error: insertError } = await supabaseClient.from('posts').insert([postData]);
+                        error = insertError;
+                    }
+                    if (error) throw error;
+                    postModal.classList.remove('active');
+                    loadAdminPosts();
+                } catch (error) {
+                    alert("Error al guardar la novedad: " + error.message);
+                } finally {
+                    savePostBtn.disabled = false;
+                    savePostBtn.textContent = 'Guardar';
+                }
+            });
+
+            adminPostList.addEventListener('click', async (e) => {
+                const target = e.target;
+                const postId = target.dataset.id;
+                if (!postId) return;
+                if (target.classList.contains('btn-delete-post')) {
+                    if (confirm('¿Estás seguro de que quieres borrar esta novedad?')) {
+                        const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
+                        if (error) alert("Error al borrar: " + error.message);
+                        else loadAdminPosts();
+                    }
+                }
+                if (target.classList.contains('btn-edit-post')) {
+                    const { data, error } = await supabaseClient.from('posts').select('*').eq('id', postId).single();
+                    if (error) { alert("No se pudo cargar la novedad para editar."); return; }
+                    
+                    postModalTitle.textContent = "Editar Novedad";
+                    document.getElementById('editPostId').value = data.id;
+                    document.getElementById('postTitle').value = data.title;
+                    document.getElementById('postDescription').value = data.description;
+                    postForm.querySelector('small').style.display = 'block';
+                    postModal.classList.add('active');
+                }
+            });
+            loadAdminPosts();
+        }
+
+        const adminFaqList = document.getElementById('adminFaqList');
+        if(adminFaqList) {
+            const faqModal = document.getElementById('faqModal');
+            const faqForm = document.getElementById('faqForm');
+            const addFaqBtn = document.getElementById('addFaqBtn');
+            const faqModalTitle = document.getElementById('faqModalTitle');
+            const saveFaqBtn = document.getElementById('saveFaqBtn');
+            
+            const loadAdminFaqs = async () => {
+                const { data, error } = await supabaseClient.from('faqs').select('*').order('display_order');
+                if (error) { adminFaqList.innerHTML = "<p>Error al cargar las preguntas.</p>"; return; }
+                if (data.length === 0) { adminFaqList.innerHTML = "<p>No hay preguntas creadas. ¡Añade la primera!</p>"; return; }
+                adminFaqList.innerHTML = data.map(faq => `
+                    <div class="admin-item-card">
+                        <p>${faq.display_order}. ${faq.question}</p>
+                        <div class="actions">
+                            <button class="btn-secondary btn-edit-faq" data-id="${faq.id}">Editar</button>
+                            <button class="btn-delete btn-delete-faq" data-id="${faq.id}">Borrar</button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            addFaqBtn.addEventListener('click', () => {
+                faqModalTitle.textContent = "Añadir Nueva Pregunta";
+                faqForm.reset();
+                document.getElementById('editFaqId').value = '';
+                faqModal.classList.add('active');
+            });
+
+            faqForm.addEventListener('submit', async(e) => {
+                e.preventDefault();
+                saveFaqBtn.disabled = true;
+                saveFaqBtn.textContent = 'Guardando...';
+                const faqData = {
+                    question: document.getElementById('faqQuestion').value,
+                    answer: document.getElementById('faqAnswer').value,
+                    display_order: parseInt(document.getElementById('faqOrder').value)
+                };
+                const faqId = document.getElementById('editFaqId').value;
+                let error;
+                if(faqId){
+                    const { error: updateError } = await supabaseClient.from('faqs').update(faqData).eq('id', faqId);
+                    error = updateError;
+                } else {
+                    const { error: insertError } = await supabaseClient.from('faqs').insert([faqData]);
+                    error = insertError;
+                }
+
+                if(error) {
+                    alert('Error al guardar la pregunta: ' + error.message);
+                } else {
+                    faqModal.classList.remove('active');
+                    loadAdminFaqs();
+                }
+                saveFaqBtn.disabled = false;
+                saveFaqBtn.textContent = 'Guardar';
+            });
+
+            adminFaqList.addEventListener('click', async(e) => {
+                const target = e.target;
+                const faqId = target.dataset.id;
+                if (!faqId) return;
+
+                if(target.classList.contains('btn-delete-faq')){
+                    if(confirm('¿Seguro que quieres borrar esta pregunta?')){
+                        const { error } = await supabaseClient.from('faqs').delete().eq('id', faqId);
+                        if(error) alert("Error al borrar: " + error.message);
+                        else loadAdminFaqs();
+                    }
+                }
+                if(target.classList.contains('btn-edit-faq')){
+                    const { data, error } = await supabaseClient.from('faqs').select('*').eq('id', faqId).single();
+                    if(error) { alert('No se pudo cargar la pregunta para editar.'); return; }
+                    
+                    faqModalTitle.textContent = 'Editar Pregunta';
+                    document.getElementById('editFaqId').value = data.id;
+                    document.getElementById('faqQuestion').value = data.question;
+                    document.getElementById('faqAnswer').value = data.answer;
+                    document.getElementById('faqOrder').value = data.display_order;
+                    faqModal.classList.add('active');
+                }
+            });
+            loadAdminFaqs();
+        }
+
+        const adminUserList = document.getElementById('adminUserList');
+        if(adminUserList){
+            const userModal = document.getElementById('userModal');
+            const userForm = document.getElementById('userForm');
+            const userModalTitle = document.getElementById('userModalTitle');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+
+            const loadAdminUsers = async () => {
+                const { data, error } = await supabaseClient.from('profiles').select('*').order('username');
+                if(error) { adminUserList.innerHTML = '<p>Error al cargar usuarios.</p>'; return; }
+                if(data.length === 0) { adminUserList.innerHTML = '<p>No hay usuarios registrados.</p>'; return; }
+
+                adminUserList.innerHTML = data.map(user => `
+                    <div class="admin-item-card">
+                        <div>
+                            <p>${user.username}</p>
+                            <small>Rol: ${user.role}</small>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-secondary btn-edit-user" data-id="${user.id}">Editar Rol</button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            adminUserList.addEventListener('click', async (e) => {
+                const target = e.target;
+                const userId = target.dataset.id;
+                if(!userId || !target.classList.contains('btn-edit-user')) return;
+
+                const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
+                if(error){ alert('No se pudo cargar el usuario.'); return; }
+                
+                const { data: authUser, error: authErr } = await supabaseClient.auth.admin.getUserById(userId);
+                if(authErr){ alert('No se pudo cargar el email del usuario.'); return; }
+                
+                document.getElementById('editUserId').value = data.id;
+                document.getElementById('userModalUsername').textContent = data.username;
+                document.getElementById('userModalEmail').textContent = authUser.user.email;
+                document.getElementById('userRole').value = data.role;
+                userModal.classList.add('active');
+            });
+            
+            userForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                saveUserBtn.disabled = true;
+                saveUserBtn.textContent = 'Guardando...';
+
+                const userId = document.getElementById('editUserId').value;
+                const newRole = document.getElementById('userRole').value;
+
+                const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
+                if(error){
+                    alert('Error al actualizar el rol: ' + error.message);
+                } else {
+                    userModal.classList.remove('active');
+                    loadAdminUsers();
+                }
+                saveUserBtn.disabled = false;
+                saveUserBtn.textContent = 'Guardar Rol';
+            });
+
+            loadAdminUsers();
+        }
     }
 
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
-    const filtrosWrapper = document.getElementById('filtros-wrapper');
-    if (toggleFiltrosBtn && filtrosWrapper) {
+    if (toggleFiltrosBtn) {
+        const filtrosWrapper = document.getElementById('filtros-wrapper');
         toggleFiltrosBtn.addEventListener('click', () => {
             const isVisible = filtrosWrapper.style.display === 'grid';
             filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
@@ -798,6 +1045,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentImage = 0;
         const images = heroSection.querySelectorAll('.carousel-image');
         setInterval(() => {
+            if (images.length === 0) return;
             images[currentImage].classList.remove('active');
             currentImage = (currentImage + 1) % images.length;
             images[currentImage].classList.add('active');
@@ -902,30 +1150,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let deferredPrompt; 
     const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (installBtn) {
-        installBtn.style.display = 'block';
-        console.log('La aplicación se puede instalar. Mostrando botón.');
-      }
-    });
     if (installBtn) {
-      installBtn.addEventListener('click', async () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Respuesta del usuario: ${outcome}`);
-        deferredPrompt = null;
-      });
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          if (installBtn) {
+            installBtn.style.display = 'block';
+            console.log('La aplicación se puede instalar. Mostrando botón.');
+          }
+        });
+        installBtn.addEventListener('click', async () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Respuesta del usuario: ${outcome}`);
+            deferredPrompt = null;
+        });
+        window.addEventListener('appinstalled', () => {
+          if (installBtn) {
+            installBtn.style.display = 'none';
+          }
+          deferredPrompt = null;
+          console.log('PWA fue instalada');
+        });
     }
-    window.addEventListener('appinstalled', () => {
-      if (installBtn) {
-        installBtn.style.display = 'none';
-      }
-      deferredPrompt = null;
-      console.log('PWA fue instalada');
-    });
 
     const profileContainer = document.querySelector('.profile-container');
     if (profileContainer) {
