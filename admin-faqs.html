@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Preguntas - Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="admin-page">
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul></ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Gestionar Preguntas Frecuentes</h2>
+            <p>Edita las preguntas y respuestas frecuentes de la web.</p>
+        </section>
+
+        <section class="admin-content-container">
+            <div class="admin-actions">
+                <a href="admin.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+                <button id="addFaqBtn" class="btn"><i class="fas fa-plus"></i> Añadir Nueva Pregunta</button>
+            </div>
+            
+            <div id="adminFaqList" class="admin-item-list">
+                </div>
+        </section>
+    </main>
+    
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="faqModalTitle">Añadir Nueva Pregunta</h3>
+            <form id="faqForm">
+                <input type="hidden" id="editFaqId">
+                <div class="form-group">
+                    <label for="faqQuestion">Pregunta</label>
+                    <input type="text" id="faqQuestion" required>
+                </div>
+                <div class="form-group">
+                    <label for="faqAnswer">Respuesta</label>
+                    <textarea id="faqAnswer" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="faqOrder">Orden (ej: 1, 2, 3)</label>
+                    <input type="number" id="faqOrder" required>
+                </div>
+                <button type="submit" id="saveFaqBtn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

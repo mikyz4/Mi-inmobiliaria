@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'login.html';
             }
         }
-        if (currentPage.startsWith('admin')) { // Protección mejorada para todas las páginas de admin
+        if (currentPage.startsWith('admin')) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Acceso denegado.');
@@ -604,12 +604,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         cargarMisAnuncios();
     }
-    
+
     // --- LÓGICA PARA LA PÁGINA DE ADMINISTRADOR (CENTRAL Y SUBPÁGINAS) ---
     const adminPage = document.querySelector('body#admin-page');
-    if(adminPage) {
+    if (adminPage) {
         
-        // --- GESTIÓN DE ANUNCIOS (admin-anuncios.html) ---
         const adminAnunciosContainer = document.getElementById('adminAnunciosList');
         if (adminAnunciosContainer) {
             const editModal = document.getElementById('editModal');
@@ -624,11 +623,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="admin-item-card">
                         <div>
                             <p>${anuncio.titulo}</p>
-                            <small>Por: ${anuncio.username || 'N/A'} | Precio: ${anuncio.precio.toLocaleString('es-ES')} €</small>
+                            <small>Por: ${anuncio.username || 'N/A'} | Precio: ${(anuncio.precio || 0).toLocaleString('es-ES')} €</small>
                         </div>
                         <div class="actions">
-                             <button class="btn-secondary btn-edit" data-id="${anuncio.id}">Editar</button>
-                             <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
+                             <button class="btn-secondary btn-edit-anuncio" data-id="${anuncio.id}">Editar</button>
+                             <button class="btn-delete btn-delete-anuncio" data-id="${anuncio.id}">Borrar</button>
                         </div>
                     </div>
                 `).join('');
@@ -638,14 +637,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const anuncioId = e.target.dataset.id;
                 if (!anuncioId) return;
 
-                if (e.target.classList.contains('btn-delete')) {
+                if (e.target.classList.contains('btn-delete-anuncio')) {
                     if (confirm('ADMIN: ¿Seguro que quieres borrar este anuncio? Esta acción es irreversible.')) {
                         const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
                         if (error) alert('Error al borrar el anuncio: ' + error.message);
                         else cargarTodosLosAnuncios();
                     }
                 }
-                if (e.target.classList.contains('btn-edit')) {
+                if (e.target.classList.contains('btn-edit-anuncio')) {
                     const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
                     if (error) { alert('Error al cargar los datos del anuncio: ' + error.message); return; }
                     
@@ -694,7 +693,6 @@ document.addEventListener('DOMContentLoaded', function() {
             cargarTodosLosAnuncios();
         }
         
-        // --- LÓGICA DE GESTIÓN DE SERVICIOS ---
         const adminServiceList = document.getElementById('adminServiceList');
         if (adminServiceList) {
             const serviceModal = document.getElementById('serviceModal');
@@ -785,22 +783,229 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
-    if (toggleFiltrosBtn) { /* ... */ }
+    const filtrosWrapper = document.getElementById('filtros-wrapper');
+    if (toggleFiltrosBtn && filtrosWrapper) {
+        toggleFiltrosBtn.addEventListener('click', () => {
+            const isVisible = filtrosWrapper.style.display === 'grid';
+            filtrosWrapper.style.display = isVisible ? 'none' : 'grid';
+            toggleFiltrosBtn.innerHTML = isVisible ? '<i class="fas fa-filter"></i> Mostrar Filtros' : '<i class="fas fa-times"></i> Ocultar Filtros';
+        });
+    }
 
     const heroSection = document.getElementById('hero');
-    if (heroSection) { /* ... */ }
+    if (heroSection) {
+        let currentImage = 0;
+        const images = heroSection.querySelectorAll('.carousel-image');
+        setInterval(() => {
+            images[currentImage].classList.remove('active');
+            currentImage = (currentImage + 1) % images.length;
+            images[currentImage].classList.add('active');
+        }, 5000);
+    }
 
     const cookieBanner = document.getElementById('cookie-banner');
-    if (cookieBanner) { /* ... */ }
+    const acceptCookiesBtn = document.getElementById('accept-cookies');
+    if (cookieBanner && !localStorage.getItem('cookiesAccepted')) {
+        cookieBanner.style.display = 'flex';
+    }
+    if (acceptCookiesBtn) {
+        acceptCookiesBtn.addEventListener('click', () => {
+            cookieBanner.style.display = 'none';
+            localStorage.setItem('cookiesAccepted', 'true');
+        });
+    }
 
     const anuncioForm = document.getElementById('anuncioForm');
-    if (anuncioForm) { /* ... */ }
+    if (anuncioForm) {
+        if (!anuncioForm.querySelector('#tipo')) {
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            formGroup.innerHTML = `
+                <label for="tipo">Tipo de Propiedad</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecciona un tipo</option>
+                    <option value="Piso">Piso</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Ático">Ático</option>
+                </select>`;
+            const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
+            if(descripcionGroup) descripcionGroup.after(formGroup);
+        }
 
+        anuncioForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const submitButton = anuncioForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Enviando...';
+            submitButton.disabled = true;
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('Debes estar logueado para crear un anuncio.');
+
+                const formData = new FormData(anuncioForm);
+                let imagenPrincipalUrl = '';
+                const imagenesAdicionalesUrls = [];
+                const fileInputs = [
+                    anuncioForm.querySelector('#imagen1'), 
+                    anuncioForm.querySelector('#imagen2'), 
+                    anuncioForm.querySelector('#imagen3'), 
+                    anuncioForm.querySelector('#imagen4')
+                ];
+
+                for (let i = 0; i < fileInputs.length; i++) {
+                    const file = fileInputs[i]?.files[0];
+                    if (file) {
+                        const fileName = `${user.id}/${Date.now()}-${file.name}`;
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-anuncios').upload(fileName, file);
+                        if (uploadError) throw uploadError;
+
+                        const { data: publicUrlData } = supabaseClient.storage.from('imagenes-anuncios').getPublicUrl(fileName);
+                        
+                        if (i === 0) {
+                            imagenPrincipalUrl = publicUrlData.publicUrl;
+                        } else {
+                            imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
+                        }
+                    }
+                }
+                if (!imagenPrincipalUrl) throw new Error('La imagen principal es obligatoria.');
+
+                const nuevoAnuncio = {
+                    titulo: formData.get('titulo'),
+                    direccion: formData.get('direccion'),
+                    email_contacto: formData.get('email'),
+                    descripcion: formData.get('descripcion'),
+                    tipo: formData.get('tipo'),
+                    precio: parseFloat(formData.get('precio')),
+                    habitaciones: parseInt(formData.get('habitaciones')),
+                    banos: parseInt(formData.get('banos')),
+                    superficie: parseInt(formData.get('superficie')),
+                    imagen_principal_url: imagenPrincipalUrl,
+                    imagenes_adicionales_urls: imagenesAdicionalesUrls,
+                    user_id: user.id
+                };
+
+                const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
+                if (insertError) throw insertError;
+
+                window.location.href = 'Gracias.html';
+
+            } catch (error) {
+                console.error('Error al enviar el anuncio:', error);
+                alert('Hubo un error al enviar tu anuncio: ' + error.message);
+                submitButton.textContent = 'Enviar Anuncio';
+                submitButton.disabled = false;
+            }
+        });
+    }
+
+    let deferredPrompt; 
     const installBtn = document.getElementById('installBtn');
-    if (installBtn) { /* ... */ }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) {
+        installBtn.style.display = 'block';
+        console.log('La aplicación se puede instalar. Mostrando botón.');
+      }
+    });
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`Respuesta del usuario: ${outcome}`);
+        deferredPrompt = null;
+      });
+    }
+    window.addEventListener('appinstalled', () => {
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+      deferredPrompt = null;
+      console.log('PWA fue instalada');
+    });
 
     const profileContainer = document.querySelector('.profile-container');
-    if (profileContainer) { /* ... */ }
+    if (profileContainer) {
+        const profileForm = document.getElementById('profileForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+
+        const showNotification = (message, type = 'success') => {
+            const banner = document.getElementById('notification-banner');
+            banner.textContent = message;
+            banner.className = `notification-${type}`;
+            banner.classList.add('show');
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4000);
+        };
+
+        const loadUserData = async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                emailInput.value = user.email;
+                usernameInput.value = user.user_metadata.username || '';
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = usernameInput.value.trim();
+            if (!newUsername) {
+                showNotification('El nombre de usuario no puede estar vacío.', 'error');
+                return;
+            }
+            const { error } = await supabaseClient.auth.updateUser({
+                data: { username: newUsername }
+            });
+            if (error) {
+                showNotification('Error al actualizar el nombre: ' + error.message, 'error');
+            } else {
+                showNotification('Nombre de usuario actualizado con éxito.');
+            }
+        });
+
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+            if (error) {
+                showNotification('Error al actualizar la contraseña: ' + error.message, 'error');
+            } else {
+                showNotification('Contraseña actualizada con éxito.');
+                passwordForm.reset();
+            }
+        });
+
+        deleteAccountBtn.addEventListener('click', async () => {
+            const confirmation = prompt("Esta acción es irreversible. Para confirmar, escribe 'BORRAR CUENTA' en el siguiente campo:");
+            if (confirmation === 'BORRAR CUENTA') {
+                try {
+                    const { error } = await supabaseClient.functions.invoke('delete-user-account');
+                    if (error) {
+                        throw error;
+                    }
+                    showNotification('Tu cuenta ha sido eliminada. Serás redirigido.');
+                    await supabaseClient.auth.signOut();
+                    setTimeout(() => {
+                        window.location.href = 'Index.html';
+                    }, 3000);
+                } catch (error) {
+                    showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
+                }
+            } else {
+                showNotification('La confirmación no es correcta. Acción cancelada.', 'error');
+            }
+        });
+        loadUserData();
+    }
 });

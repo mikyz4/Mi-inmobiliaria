@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Anuncios - Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="admin-page">
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul></ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Gestionar Anuncios</h2>
+            <p>Modera y revisa los anuncios publicados por los usuarios.</p>
+        </section>
+
+        <section class="admin-content-container">
+            <div class="admin-actions">
+                <a href="admin.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+            </div>
+            
+            <div id="adminAnunciosList" class="admin-item-list">
+                </div>
+        </section>
+    </main>
+    
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Editando Anuncio</h3>
+            <form id="editAnuncioForm">
+                <input type="hidden" id="edit-anuncio-id">
+                 <div class="form-group">
+                    <label for="edit-titulo">Título del Anuncio</label>
+                    <input type="text" id="edit-titulo" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-direccion">Dirección</label>
+                    <input type="text" id="edit-direccion" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-descripcion">Descripción</label>
+                    <textarea id="edit-descripcion" rows="5" required></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-precio">Precio (€)</label>
+                    <input type="number" id="edit-precio" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-habitaciones">Habitaciones</label>
+                    <input type="number" id="edit-habitaciones" required>
+                </div>
+                 <div class="form-group">
+                    <label for="edit-banos">Baños</label>
+                    <input type="number" id="edit-banos" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-superficie">Superficie (m²)</label>
+                    <input type="number" id="edit-superficie" required>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--font-color-secondary); text-align: center;">(La edición de imágenes no está disponible por ahora)</p>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

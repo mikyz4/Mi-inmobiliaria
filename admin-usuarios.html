@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Usuarios - Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="admin-page">
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul></ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Gestionar Usuarios</h2>
+            <p>Consulta la lista de usuarios y administra sus roles.</p>
+        </section>
+
+        <section class="admin-content-container">
+            <div class="admin-actions">
+                <a href="admin.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+            </div>
+            
+            <div id="adminUserList" class="admin-item-list">
+                </div>
+        </section>
+    </main>
+    
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="userModalTitle">Editar Usuario</h3>
+            <form id="userForm">
+                <input type="hidden" id="editUserId">
+                <p><strong>Usuario:</strong> <span id="userModalUsername"></span></p>
+                <p><strong>Email:</strong> <span id="userModalEmail"></span></p>
+                <div class="form-group">
+                    <label for="userRole">Rol</label>
+                    <select id="userRole">
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" id="saveUserBtn">Guardar Rol</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>
