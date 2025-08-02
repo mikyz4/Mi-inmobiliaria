@@ -1,4 +1,3 @@
-// Este es el código COMPLETO y CORRECTO que debes usar
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
@@ -103,11 +102,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             navLinksContainer.innerHTML += `<li><a href="Index.html#contact">Contacto</a></li>`;
             
+            const username = user.user_metadata.username || 'Usuario';
             userMenuContainer.innerHTML = `
                 <button id="userMenuButton" class="user-menu-button">
                     <i class="fas fa-user"></i>
                 </button>
                 <div id="userDropdown" class="user-dropdown-menu">
+                    <div class="dropdown-header">Hola, ${username}</div>
                     <a href="perfil.html">Mi Perfil</a>
                     <a href="mis-anuncios.html">Mis Anuncios</a>
                     <div class="dropdown-divider"></div>
@@ -256,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
                         <p class="anuncio-card-details">${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²</p>
                         <p class="anuncio-card-location"><i class="fas fa-map-marker-alt"></i> ${anuncio.direccion || 'Ubicación no especificada'}</p>
+                        <p class="anuncio-card-author"><i class="fas fa-user-tie"></i> Publicado por ${anuncio.username || 'Propietario'}</p>
                     </div>`;
                 
                 card.addEventListener('click', () => {
@@ -279,6 +281,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
                         modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
                         modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
+                        
+                        const existingAuthor = modal.querySelector('.modal-author');
+                        if (existingAuthor) existingAuthor.remove();
+                        
+                        const authorElement = document.createElement('p');
+                        authorElement.className = 'modal-author';
+                        authorElement.innerHTML = `<i class="fas fa-user-tie"></i> Publicado por <strong>${anuncio.username || 'Propietario'}</strong>`;
+                        modal.querySelector('#modal-descripcion').after(authorElement);
+
                         thumbnailContainer.innerHTML = '';
                         imagenes.forEach((url, index) => {
                             const thumb = document.createElement('img');
@@ -323,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cargarAnunciosDesdeSupabase = async () => {
             anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando anuncios...</p>';
             try {
-                const { data, error } = await supabaseClient.from('anuncios').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('anuncios_con_usuario').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 todosLosAnuncios = data;
                 renderAnuncios(todosLosAnuncios);
@@ -522,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 const { data, error } = await supabaseClient
-                    .from('anuncios')
+                    .from('anuncios_con_usuario')
                     .select('*')
                     .order('created_at', { ascending: false });
 
@@ -542,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="anuncio-card-content">
                             <h3>${anuncio.titulo}</h3>
                             <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                            <p class="anuncio-card-details">Publicado por: ${anuncio.email_contacto || 'No especificado'}</p>
+                            <p class="anuncio-card-details"><strong>Usuario:</strong> ${anuncio.username || 'N/A'} <br> <strong>Email:</strong> ${anuncio.email_contacto || 'No especificado'}</p>
                             <div class="gestion-buttons">
                                 <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
                                 <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
