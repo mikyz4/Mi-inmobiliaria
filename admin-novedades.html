@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Novedades - Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="admin-page">
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Gestionar Novedades</h2>
+            <p>Crea y administra los artículos del blog y las novedades.</p>
+        </section>
+
+        <section class="admin-content-container">
+            <div class="admin-actions">
+                <a href="admin.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+                <button id="addPostBtn" class="btn"><i class="fas fa-plus"></i> Añadir Nueva Novedad</button>
+            </div>
+            
+            <div id="adminPostList" class="admin-item-list">
+                </div>
+        </section>
+    </main>
+    
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="postModalTitle">Añadir Nueva Novedad</h3>
+            <form id="postForm">
+                <input type="hidden" id="editPostId">
+                <div class="form-group">
+                    <label for="postTitle">Título</label>
+                    <input type="text" id="postTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="postImage">Imagen de Portada</label>
+                    <input type="file" id="postImage" accept="image/*">
+                    <small>Deja en blanco si no quieres cambiar la imagen actual al editar.</small>
+                </div>
+                <div class="form-group">
+                    <label for="postDescription">Descripción</label>
+                    <textarea id="postDescription" rows="6" required></textarea>
+                </div>
+                <button type="submit" id="savePostBtn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>
