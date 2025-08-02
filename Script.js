@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'login.html';
             }
         }
-        if (currentPage === 'admin.html' || currentPage.startsWith('admin-')) {
+        if (currentPage.startsWith('admin')) { // <-- MEJORA: Ahora protege todas las páginas de admin
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Acceso denegado.');
@@ -605,240 +605,116 @@ document.addEventListener('DOMContentLoaded', function() {
         cargarMisAnuncios();
     }
 
-    const adminAnunciosContainer = document.getElementById('adminAnunciosContainer');
-    if (adminAnunciosContainer) {
-        const modal = document.getElementById('anuncioModal');
-        const editModal = document.getElementById('editModal');
-        const editAnuncioForm = document.getElementById('editAnuncioForm');
-        
-        const cargarTodosLosAnuncios = async () => {
-            const { data, error } = await supabaseClient
-                .from('anuncios_con_usuario')
-                .select('*')
-                .order('created_at', { ascending: false });
+    // --- LÓGICA PARA LA PÁGINA DE ADMINISTRADOR (CENTRAL) ---
+    const adminPage = document.querySelector('body#admin-page'); // Usamos el ID del body para detectar páginas de admin
+    if (adminPage) {
+        // --- LÓGICA DE GESTIÓN DE SERVICIOS ---
+        const adminServiceList = document.getElementById('adminServiceList');
+        if (adminServiceList) {
+            const serviceModal = document.getElementById('serviceModal');
+            const serviceForm = document.getElementById('serviceForm');
+            const addServiceBtn = document.getElementById('addServiceBtn');
+            const serviceModalTitle = document.getElementById('serviceModalTitle');
+            const saveServiceBtn = document.getElementById('saveServiceBtn');
 
-            if (error) {
-                adminAnunciosContainer.innerHTML = '<p>Error cargando anuncios.</p>';
-                return;
-            }
-            if (data.length === 0) {
-                adminAnunciosContainer.innerHTML = '<p>No hay ningún anuncio en la plataforma.</p>';
-                return;
-            }
-            adminAnunciosContainer.innerHTML = '';
-            data.forEach(anuncio => {
-                const card = document.createElement('div');
-                card.className = 'anuncio-card gestion-card';
-                card.innerHTML = `
-                    <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
-                    <div class="anuncio-card-content">
-                        <h3>${anuncio.titulo}</h3>
-                        <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                        <p class="anuncio-card-details"><strong>Usuario:</strong> ${anuncio.username || 'N/A'} <br> <strong>Email:</strong> ${anuncio.email_contacto || 'No especificado'}</p>
-                        <div class="gestion-buttons">
-                            <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
-                            <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
-                        </div>
-                    </div>`;
-                adminAnunciosContainer.appendChild(card);
-            });
-        };
-
-        adminAnunciosContainer.addEventListener('click', async (e) => {
-            const anuncioId = e.target.dataset.id;
-            if (e.target.classList.contains('btn-delete')) {
-                if (confirm('ADMIN: ¿Seguro que quieres borrar este anuncio? Esta acción es irreversible.')) {
-                    try {
-                        const { error } = await supabaseClient.from('anuncios').delete().eq('id', anuncioId);
-                        if (error) throw error;
-                        cargarTodosLosAnuncios();
-                    } catch (error) {
-                        alert('Error al borrar el anuncio: ' + error.message);
-                    }
-                }
-            }
-            if (e.target.classList.contains('btn-edit')) {
-                const { data, error } = await supabaseClient.from('anuncios').select('*').eq('id', anuncioId).single();
+            const loadAdminServices = async () => {
+                const { data, error } = await supabaseClient.from('services').select('*').order('display_order');
                 if (error) {
-                    alert('Error al cargar los datos del anuncio: ' + error.message);
+                    adminServiceList.innerHTML = "<p>Error al cargar los servicios.</p>";
                     return;
                 }
-                document.getElementById('edit-anuncio-id').value = data.id;
-                document.getElementById('edit-titulo').value = data.titulo;
-                document.getElementById('edit-direccion').value = data.direccion;
-                document.getElementById('edit-descripcion').value = data.descripcion;
-                document.getElementById('edit-precio').value = data.precio;
-                document.getElementById('edit-habitaciones').value = data.habitaciones;
-                document.getElementById('edit-banos').value = data.banos;
-                document.getElementById('edit-superficie').value = data.superficie;
-                editModal.classList.add('active');
-            }
-        });
-
-        if (editAnuncioForm) {
-            editAnuncioForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const anuncioId = document.getElementById('edit-anuncio-id').value;
-                const submitButton = editAnuncioForm.querySelector('button[type="submit"]');
-                submitButton.textContent = 'Guardando...';
-                submitButton.disabled = true;
-                const updatedData = {
-                    titulo: document.getElementById('edit-titulo').value,
-                    direccion: document.getElementById('edit-direccion').value,
-                    descripcion: document.getElementById('edit-descripcion').value,
-                    precio: parseFloat(document.getElementById('edit-precio').value),
-                    habitaciones: parseInt(document.getElementById('edit-habitaciones').value),
-                    banos: parseInt(document.getElementById('edit-banos').value),
-                    superficie: parseInt(document.getElementById('edit-superficie').value),
-                };
-                try {
-                    const { error } = await supabaseClient.from('anuncios').update(updatedData).eq('id', anuncioId);
-                    if (error) throw error;
-                    editModal.classList.remove('active');
-                    if (document.getElementById('adminAnunciosContainer')) {
-                        cargarTodosLosAnuncios();
-                    }
-                } catch (error) {
-                    alert('Error al guardar los cambios: ' + error.message);
-                } finally {
-                    submitButton.textContent = 'Guardar Cambios';
-                    submitButton.disabled = false;
+                if (data.length === 0) {
+                    adminServiceList.innerHTML = "<p>No hay servicios creados. ¡Añade el primero!</p>";
+                    return;
                 }
-            });
-        }
-        
-        cargarTodosLosAnuncios();
-    }
-
-    const adminServicesContainer = document.getElementById('adminServicesContainer');
-    if (adminServicesContainer) {
-        const serviceForm = document.getElementById('serviceForm');
-
-        async function loadAdminServices() {
-            const { data, error } = await supabaseClient.from('services').select('*').order('display_order');
-            if(error) return;
-            adminServicesContainer.innerHTML = data.map(s => `
-                <div class="admin-item">
-                    <span>${s.display_order}. ${s.title} (${s.icon})</span>
-                    <div>
-                        <button class="btn-edit-item" data-id="${s.id}" data-type="service">Editar</button>
-                        <button class="btn-delete" data-id="${s.id}" data-type="service">Borrar</button>
+                adminServiceList.innerHTML = data.map(service => `
+                    <div class="admin-item-card">
+                        <p>${service.display_order}. ${service.title}</p>
+                        <div class="actions">
+                            <button class="btn-secondary btn-edit-service" data-id="${service.id}">Editar</button>
+                            <button class="btn-delete btn-delete-service" data-id="${service.id}">Borrar</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        serviceForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newService = {
-                title: document.getElementById('serviceTitle').value,
-                icon: document.getElementById('serviceIcon').value,
-                text: document.getElementById('serviceText').value,
-                display_order: parseInt(document.getElementById('serviceOrder').value)
+                `).join('');
             };
-            const { error } = await supabaseClient.from('services').insert(newService);
-            if(error) alert("Error al guardar el servicio: " + error.message);
-            else {
+
+            addServiceBtn.addEventListener('click', () => {
+                serviceModalTitle.textContent = "Añadir Nuevo Servicio";
                 serviceForm.reset();
-                loadAdminServices();
-            }
-        });
-        loadAdminServices();
-    }
-    
-    const adminPostsContainer = document.getElementById('adminPostsContainer');
-    if (adminPostsContainer) {
-        const postForm = document.getElementById('postForm');
-        async function loadAdminPosts() {
-            const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
-            if(error) return;
-            adminPostsContainer.innerHTML = data.map(p => `
-                <div class="admin-item">
-                    <span>${p.title}</span>
-                    <div>
-                        <button class="btn-edit-item" data-id="${p.id}" data-type="post">Editar</button>
-                        <button class="btn-delete" data-id="${p.id}" data-type="post">Borrar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+                document.getElementById('editServiceId').value = '';
+                serviceModal.classList.add('active');
+            });
 
-        postForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newPost = {
-                title: document.getElementById('postTitle').value,
-                image_url: document.getElementById('postImageUrl').value,
-                description: document.getElementById('postDescription').value,
-            };
-            const { error } = await supabaseClient.from('posts').insert(newPost);
-            if(error) alert("Error al guardar la novedad: " + error.message);
-            else {
-                postForm.reset();
-                loadAdminPosts();
-            }
-        });
-        loadAdminPosts();
-    }
+            serviceForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                saveServiceBtn.disabled = true;
+                saveServiceBtn.textContent = 'Guardando...';
 
-    const adminFaqsContainer = document.getElementById('adminFaqsContainer');
-    if (adminFaqsContainer) {
-        const faqForm = document.getElementById('faqForm');
-        async function loadAdminFaqs() {
-            const { data, error } = await supabaseClient.from('faqs').select('*').order('display_order');
-            if(error) return;
-            adminFaqsContainer.innerHTML = data.map(f => `
-                <div class="admin-item">
-                    <span>${f.display_order}. ${f.question}</span>
-                    <div>
-                        <button class="btn-edit-item" data-id="${f.id}" data-type="faq">Editar</button>
-                        <button class="btn-delete" data-id="${f.id}" data-type="faq">Borrar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+                const serviceData = {
+                    title: document.getElementById('serviceTitle').value,
+                    icon: document.getElementById('serviceIcon').value,
+                    text: document.getElementById('serviceText').value,
+                    display_order: parseInt(document.getElementById('serviceOrder').value)
+                };
+                
+                const serviceId = document.getElementById('editServiceId').value;
+                let error;
 
-        faqForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newFaq = {
-                question: document.getElementById('faqQuestion').value,
-                answer: document.getElementById('faqAnswer').value,
-                display_order: parseInt(document.getElementById('faqOrder').value)
-            };
-            const { error } = await supabaseClient.from('faqs').insert(newFaq);
-            if(error) alert("Error al guardar la pregunta: " + error.message);
-            else {
-                faqForm.reset();
-                loadAdminFaqs();
-            }
-        });
-        loadAdminFaqs();
-    }
-    
-    const adminContentContainers = document.querySelectorAll('.admin-list-container');
-    if(adminContentContainers.length > 0) {
-        adminContentContainers.forEach(container => {
-            container.addEventListener('click', async (e) => {
+                if (serviceId) {
+                    const { error: updateError } = await supabaseClient.from('services').update(serviceData).eq('id', serviceId);
+                    error = updateError;
+                } else {
+                    const { error: insertError } = await supabaseClient.from('services').insert([serviceData]);
+                    error = insertError;
+                }
+
+                if(error){
+                    alert("Error al guardar el servicio: " + error.message);
+                } else {
+                    serviceModal.classList.remove('active');
+                    loadAdminServices();
+                }
+                saveServiceBtn.disabled = false;
+                saveServiceBtn.textContent = 'Guardar';
+            });
+
+            adminServiceList.addEventListener('click', async (e) => {
                 const target = e.target;
-                const id = target.dataset.id;
-                const type = target.dataset.type;
-                if (!id || !type) return;
+                const serviceId = target.dataset.id;
 
-                const tableName = type === 'post' ? 'posts' : (type === 'service' ? 'services' : 'faqs');
-
-                if(target.classList.contains('btn-delete')){
-                    if(confirm(`¿Seguro que quieres borrar este elemento?`)){
-                        const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
-                        if(error) alert('Error al borrar: ' + error.message);
-                        else {
-                            if(tableName === 'services') document.getElementById('adminServicesContainer') && loadAdminServices();
-                            if(tableName === 'posts') document.getElementById('adminPostsContainer') && loadAdminPosts();
-                            if(tableName === 'faqs') document.getElementById('adminFaqsContainer') && loadAdminFaqs();
+                if(target.classList.contains('btn-delete-service')){
+                    if(confirm('¿Estás seguro de que quieres borrar este servicio?')){
+                        const { error } = await supabaseClient.from('services').delete().eq('id', serviceId);
+                        if(error){
+                            alert("Error al borrar: " + error.message);
+                        } else {
+                            loadAdminServices();
                         }
                     }
                 }
+
+                if(target.classList.contains('btn-edit-service')){
+                    const { data, error } = await supabaseClient.from('services').select('*').eq('id', serviceId).single();
+                    if(error){
+                        alert("No se pudo cargar el servicio para editar.");
+                        return;
+                    }
+                    
+                    serviceModalTitle.textContent = "Editar Servicio";
+                    document.getElementById('editServiceId').value = data.id;
+                    document.getElementById('serviceTitle').value = data.title;
+                    document.getElementById('serviceIcon').value = data.icon;
+                    document.getElementById('serviceText').value = data.text;
+                    document.getElementById('serviceOrder').value = data.display_order;
+
+                    serviceModal.classList.add('active');
+                }
             });
-        });
+
+            loadAdminServices();
+        }
     }
+
 
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
     const filtrosWrapper = document.getElementById('filtros-wrapper');
