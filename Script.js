@@ -44,15 +44,57 @@ document.addEventListener('DOMContentLoaded', function() {
     if (signUpForm) {
         signUpForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const submitButton = signUpForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Verificando...';
+
+            // 1. Obtenemos los tres valores del formulario
+            const username = signUpForm.querySelector('#username').value.trim();
             const email = signUpForm.querySelector('#email').value;
             const password = signUpForm.querySelector('#password').value;
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            
-            if (error) {
-                alert('Error al registrar: ' + error.message);
-            } else {
+
+            try {
+                // 2. Comprobamos si el nombre de usuario ya existe en la tabla 'profiles'
+                const { data: existingUser, error: checkError } = await supabaseClient
+                    .from('profiles')
+                    .select('username')
+                    .eq('username', username)
+                    .single();
+
+                if (checkError && checkError.code !== 'PGRST116') { // Ignorar el error 'PGRST116' que significa "no se encontró la fila"
+                    throw checkError;
+                }
+
+                if (existingUser) {
+                    alert('Error: El nombre de usuario "' + username + '" ya está en uso. Por favor, elige otro.');
+                    return; // Detenemos la ejecución si el usuario ya existe
+                }
+
+                // 3. Si no existe, procedemos con el registro
+                submitButton.textContent = 'Registrando...';
+                const { data, error: signUpError } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            username: username // Se pasa el 'username' en el objeto 'data'
+                        }
+                    }
+                });
+
+                if (signUpError) {
+                    throw signUpError; // Lanzamos el error para que lo capture el bloque catch
+                }
+
                 alert('¡Registro exitoso! Serás redirigido a la página principal.');
-                window.location.href = 'Index.html'; 
+                window.location.href = 'Index.html';
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                // Reactivamos el botón en cualquier caso (éxito o error)
+                submitButton.disabled = false;
+                submitButton.textContent = 'Registrarse';
             }
         });
     }
