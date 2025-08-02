@@ -620,3 +620,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     display: flex;
     gap: 10px;
 }
+/* --- Ajuste para Novedades en Página Principal --- */
+#news .anuncio-card-content h3 {
+    color: var(--accent-color);
+}
