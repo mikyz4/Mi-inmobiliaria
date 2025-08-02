@@ -628,7 +628,3 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .service-item h3 {
     color: var(--accent-color);
 }
-/* --- Ajuste para Títulos de Preguntas Frecuentes --- */
-.faq-item h3 {
-    color: var(--accent-color);
-}
