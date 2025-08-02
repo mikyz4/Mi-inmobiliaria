@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
     
-    // --- LÓGICA DE LA PÁGINA DE INICIO (AHORA DINÁMICA) ---
+    // --- LÓGICA DE LA PÁGINA DE INICIO (DINÁMICA) ---
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         async function loadServices() {
@@ -250,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const newsContainer = document.getElementById('news-container');
     if(newsContainer) {
         const newsModal = document.getElementById('newsModal');
-
         async function loadPosts() {
             const { data, error } = await supabaseClient
                 .from('posts')
@@ -613,87 +612,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const editAnuncioForm = document.getElementById('editAnuncioForm');
         
         const cargarTodosLosAnuncios = async () => {
-            adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Cargando todos los anuncios...</p>';
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('anuncios_con_usuario')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+            const { data, error } = await supabaseClient
+                .from('anuncios_con_usuario')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-                if (error) throw error;
-
-                if (data.length === 0) {
-                    adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No hay ningún anuncio en la plataforma.</p>';
-                    return;
-                }
-
-                adminAnunciosContainer.innerHTML = '';
-                data.forEach(anuncio => {
-                    const card = document.createElement('div');
-                    card.className = 'anuncio-card gestion-card';
-                    card.innerHTML = `
-                        <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
-                        <div class="anuncio-card-content">
-                            <h3>${anuncio.titulo}</h3>
-                            <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
-                            <p class="anuncio-card-details"><strong>Usuario:</strong> ${anuncio.username || 'N/A'} <br> <strong>Email:</strong> ${anuncio.email_contacto || 'No especificado'}</p>
-                            <div class="gestion-buttons">
-                                <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
-                                <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
-                            </div>
-                        </div>`;
-
-                    card.addEventListener('click', (e) => {
-                        if (e.target.closest('.gestion-buttons')) return;
-                        if (modal) {
-                            const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
-                            let imagenActual = 0;
-                            if (imagenes.length === 0) return;
-                            const mainImage = modal.querySelector('#modal-img');
-                            const thumbnailContainer = modal.querySelector('#thumbnail-container');
-                            const prevBtn = modal.querySelector('.gallery-nav.prev');
-                            const nextBtn = modal.querySelector('.gallery-nav.next');
-                            const mostrarImagen = (index) => {
-                                if (index < 0 || index >= imagenes.length) return;
-                                mainImage.src = imagenes[index];
-                                imagenActual = index;
-                                thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
-                                    img.classList.toggle('active', i === index);
-                                });
-                            };
-                            modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
-                            modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
-                            modal.querySelector('#modal-detalles').textContent = `${anuncio.habitaciones || 0} hab | ${anuncio.banos || 0} baños | ${anuncio.superficie || 0} m²`;
-                            modal.querySelector('#modal-descripcion').textContent = anuncio.descripcion;
-                            thumbnailContainer.innerHTML = '';
-                            imagenes.forEach((url, index) => {
-                                const thumb = document.createElement('img');
-                                thumb.src = url;
-                                thumb.alt = `Miniatura ${index + 1}`;
-                                thumb.addEventListener('click', () => mostrarImagen(index));
-                                thumbnailContainer.appendChild(thumb);
-                            });
-                            prevBtn.onclick = () => {
-                                const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
-                                mostrarImagen(nuevaPosicion);
-                            };
-                            nextBtn.onclick = () => {
-                                const nuevaPosicion = (imagenActual + 1) % imagenes.length;
-                                mostrarImagen(nuevaPosicion);
-                            };
-                            mostrarImagen(0);
-                            modal.classList.add('active');
-                        }
-                    });
-                    
-                    adminAnunciosContainer.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error('Error al cargar todos los anuncios:', error);
-                adminAnunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">Hubo un error al cargar los anuncios.</p>';
+            if (error) {
+                adminAnunciosContainer.innerHTML = '<p>Error cargando anuncios.</p>';
+                return;
             }
+            if (data.length === 0) {
+                adminAnunciosContainer.innerHTML = '<p>No hay ningún anuncio en la plataforma.</p>';
+                return;
+            }
+            adminAnunciosContainer.innerHTML = '';
+            data.forEach(anuncio => {
+                const card = document.createElement('div');
+                card.className = 'anuncio-card gestion-card';
+                card.innerHTML = `
+                    <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
+                    <div class="anuncio-card-content">
+                        <h3>${anuncio.titulo}</h3>
+                        <p class="anuncio-card-price">${(anuncio.precio || 0).toLocaleString('es-ES')} €</p>
+                        <p class="anuncio-card-details"><strong>Usuario:</strong> ${anuncio.username || 'N/A'} <br> <strong>Email:</strong> ${anuncio.email_contacto || 'No especificado'}</p>
+                        <div class="gestion-buttons">
+                            <button class="btn-edit" data-id="${anuncio.id}">Editar</button>
+                            <button class="btn-delete" data-id="${anuncio.id}">Borrar</button>
+                        </div>
+                    </div>`;
+                adminAnunciosContainer.appendChild(card);
+            });
         };
 
         adminAnunciosContainer.addEventListener('click', async (e) => {
@@ -760,6 +708,134 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         cargarTodosLosAnuncios();
+
+        // --- GESTIÓN DE SERVICIOS ---
+        const serviceForm = document.getElementById('serviceForm');
+        const adminServicesContainer = document.getElementById('adminServicesContainer');
+
+        async function loadAdminServices() {
+            const { data, error } = await supabaseClient.from('services').select('*').order('display_order');
+            if(error) return;
+            adminServicesContainer.innerHTML = data.map(s => `
+                <div class="admin-item">
+                    <span>${s.display_order}. ${s.title} (${s.icon})</span>
+                    <div>
+                        <button class="btn-edit-item" data-id="${s.id}" data-type="service">Editar</button>
+                        <button class="btn-delete" data-id="${s.id}" data-type="service">Borrar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        serviceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newService = {
+                title: document.getElementById('serviceTitle').value,
+                icon: document.getElementById('serviceIcon').value,
+                text: document.getElementById('serviceText').value,
+                display_order: parseInt(document.getElementById('serviceOrder').value)
+            };
+            const { error } = await supabaseClient.from('services').insert(newService);
+            if(error) alert("Error al guardar el servicio: " + error.message);
+            else {
+                serviceForm.reset();
+                loadAdminServices();
+            }
+        });
+
+        // --- Gestión de NOVEDADES ---
+        const postForm = document.getElementById('postForm');
+        const adminPostsContainer = document.getElementById('adminPostsContainer');
+
+        async function loadAdminPosts() {
+            const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
+            if(error) return;
+            adminPostsContainer.innerHTML = data.map(p => `
+                <div class="admin-item">
+                    <span>${p.title}</span>
+                    <div>
+                        <button class="btn-edit-item" data-id="${p.id}" data-type="post">Editar</button>
+                        <button class="btn-delete" data-id="${p.id}" data-type="post">Borrar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPost = {
+                title: document.getElementById('postTitle').value,
+                image_url: document.getElementById('postImageUrl').value,
+                description: document.getElementById('postDescription').value,
+            };
+            const { error } = await supabaseClient.from('posts').insert(newPost);
+            if(error) alert("Error al guardar la novedad: " + error.message);
+            else {
+                postForm.reset();
+                loadAdminPosts();
+            }
+        });
+
+        // --- Gestión de FAQs ---
+        const faqForm = document.getElementById('faqForm');
+        const adminFaqsContainer = document.getElementById('adminFaqsContainer');
+
+        async function loadAdminFaqs() {
+            const { data, error } = await supabaseClient.from('faqs').select('*').order('display_order');
+            if(error) return;
+            adminFaqsContainer.innerHTML = data.map(f => `
+                <div class="admin-item">
+                    <span>${f.display_order}. ${f.question}</span>
+                    <div>
+                        <button class="btn-edit-item" data-id="${f.id}" data-type="faq">Editar</button>
+                        <button class="btn-delete" data-id="${f.id}" data-type="faq">Borrar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        faqForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newFaq = {
+                question: document.getElementById('faqQuestion').value,
+                answer: document.getElementById('faqAnswer').value,
+                display_order: parseInt(document.getElementById('faqOrder').value)
+            };
+            const { error } = await supabaseClient.from('faqs').insert(newFaq);
+            if(error) alert("Error al guardar la pregunta: " + error.message);
+            else {
+                faqForm.reset();
+                loadAdminFaqs();
+            }
+        });
+
+        // --- Lógica para BORRAR y EDITAR contenido (genérica) ---
+        const adminContentContainers = [adminServicesContainer, adminPostsContainer, adminFaqsContainer];
+        adminContentContainers.forEach(container => {
+            container.addEventListener('click', async (e) => {
+                const target = e.target;
+                const id = target.dataset.id;
+                const type = target.dataset.type;
+                const tableName = type === 'post' ? 'posts' : (type === 'service' ? 'services' : 'faqs');
+
+                if(target.classList.contains('btn-delete')){
+                    if(confirm(`¿Seguro que quieres borrar este elemento?`)){
+                        const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
+                        if(error) alert('Error al borrar: ' + error.message);
+                        else {
+                            if(tableName === 'services') loadAdminServices();
+                            if(tableName === 'posts') loadAdminPosts();
+                            if(tableName === 'faqs') loadAdminFaqs();
+                        }
+                    }
+                }
+                // (La lógica para EDITAR se podría añadir aquí)
+            });
+        });
+
+        loadAdminServices();
+        loadAdminPosts();
+        loadAdminFaqs();
     }
 
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
