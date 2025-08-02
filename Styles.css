@@ -628,3 +628,22 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .service-item h3 {
     color: var(--accent-color);
 }
+/* --- Estilos para miniatura en lista de admin --- */
+.admin-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-item-info {
+    flex-grow: 1; /* Hace que la info ocupe el espacio disponible */
+}
+
+.admin-item-thumbnail {
+    width: 90px;
+    height: 65px;
+    object-fit: cover; /* Recorta la imagen para que encaje sin deformarse */
+    border-radius: 5px;
+    flex-shrink: 0; /* Evita que la imagen se encoja */
+}

@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminPage = document.querySelector('body#admin-page');
     if (adminPage) {
         
+        // --- GESTIÓN DE ANUNCIOS (admin-anuncios.html) ---
         const adminAnunciosList = document.getElementById('adminAnunciosList');
         if (adminAnunciosList) {
             const editModal = document.getElementById('editModal');
@@ -621,14 +622,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 adminAnunciosList.innerHTML = data.map(anuncio => `
                     <div class="admin-item-card">
-                        <div>
+                        <div class="admin-item-info">
                             <p>${anuncio.titulo}</p>
                             <small>Por: ${anuncio.username || 'N/A'} | Precio: ${(anuncio.precio || 0).toLocaleString('es-ES')} €</small>
+                            <div class="actions">
+                                 <button class="btn-secondary btn-edit-anuncio" data-id="${anuncio.id}">Editar</button>
+                                 <button class="btn-delete btn-delete-anuncio" data-id="${anuncio.id}">Borrar</button>
+                            </div>
                         </div>
-                        <div class="actions">
-                             <button class="btn-secondary btn-edit-anuncio" data-id="${anuncio.id}">Editar</button>
-                             <button class="btn-delete btn-delete-anuncio" data-id="${anuncio.id}">Borrar</button>
-                        </div>
+                        <img src="${anuncio.imagen_principal_url}" alt="Miniatura" class="admin-item-thumbnail">
                     </div>
                 `).join('');
             };
@@ -693,6 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cargarTodosLosAnuncios();
         }
         
+        // --- LÓGICA DE GESTIÓN DE SERVICIOS ---
         const adminServiceList = document.getElementById('adminServiceList');
         if (adminServiceList) {
             const serviceModal = document.getElementById('serviceModal');
@@ -782,6 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadAdminServices();
         }
 
+        // --- LÓGICA DE GESTIÓN DE NOVEDADES ---
         const adminPostList = document.getElementById('adminPostList');
         if (adminPostList) {
             const postModal = document.getElementById('postModal');
@@ -878,6 +882,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadAdminPosts();
         }
 
+        // --- LÓGICA DE GESTIÓN DE FAQS ---
         const adminFaqList = document.getElementById('adminFaqList');
         if(adminFaqList) {
             const faqModal = document.getElementById('faqModal');
@@ -943,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!faqId) return;
 
                 if(target.classList.contains('btn-delete-faq')){
-                    if(confirm('¿Seguro que quieres borrar esta pregunta?')){
+                    if(confirm('¿Seguro de que quieres borrar esta pregunta?')){
                         const { error } = await supabaseClient.from('faqs').delete().eq('id', faqId);
                         if(error) alert("Error al borrar: " + error.message);
                         else loadAdminFaqs();
@@ -964,6 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadAdminFaqs();
         }
 
+        // --- LÓGICA DE GESTIÓN DE USUARIOS ---
         const adminUserList = document.getElementById('adminUserList');
         if(adminUserList){
             const userModal = document.getElementById('userModal');
