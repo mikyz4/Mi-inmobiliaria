@@ -624,3 +624,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 #news .anuncio-card-content h3 {
     color: var(--accent-color);
 }
+/* --- Ajuste para Títulos de Servicios --- */
+.service-item h3 {
+    color: var(--accent-color);
+}
