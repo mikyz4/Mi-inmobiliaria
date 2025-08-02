@@ -535,3 +535,88 @@ footer a { color: var(--accent-color); text-decoration: none;}
     margin-right: 8px;
     color: var(--accent-color);
 }
+/* --- ESTILOS PARA EL NUEVO PANEL DE ADMIN --- */
+.admin-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
+.admin-menu-card {
+    display: block;
+    background-color: var(--secondary-color);
+    padding: 30px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--font-color-primary);
+    border-left: 4px solid var(--accent-color);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.admin-menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+.admin-menu-card i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.admin-menu-card h3 {
+    margin-bottom: 10px;
+    color: white;
+}
+
+.admin-menu-card p {
+    color: var(--font-color-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+/* --- ESTILOS PARA PÁGINAS DE GESTIÓN DE ADMIN --- */
+.admin-content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-item-card {
+    background-color: var(--secondary-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-item-card p {
+    margin: 0;
+    color: var(--font-color-primary);
+    font-weight: 600;
+}
+
+.admin-item-card .actions {
+    display: flex;
+    gap: 10px;
+}

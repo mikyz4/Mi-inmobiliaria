@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'login.html';
             }
         }
-        if (currentPage === 'admin.html') {
+        if (currentPage === 'admin.html' || currentPage.startsWith('admin-')) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Acceso denegado.');
@@ -708,10 +708,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         cargarTodosLosAnuncios();
+    }
 
-        // --- GESTIÓN DE SERVICIOS ---
+    const adminServicesContainer = document.getElementById('adminServicesContainer');
+    if (adminServicesContainer) {
         const serviceForm = document.getElementById('serviceForm');
-        const adminServicesContainer = document.getElementById('adminServicesContainer');
 
         async function loadAdminServices() {
             const { data, error } = await supabaseClient.from('services').select('*').order('display_order');
@@ -742,11 +743,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadAdminServices();
             }
         });
-
-        // --- Gestión de NOVEDADES ---
+        loadAdminServices();
+    }
+    
+    const adminPostsContainer = document.getElementById('adminPostsContainer');
+    if (adminPostsContainer) {
         const postForm = document.getElementById('postForm');
-        const adminPostsContainer = document.getElementById('adminPostsContainer');
-
         async function loadAdminPosts() {
             const { data, error } = await supabaseClient.from('posts').select('*').order('created_at', { ascending: false });
             if(error) return;
@@ -775,11 +777,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadAdminPosts();
             }
         });
+        loadAdminPosts();
+    }
 
-        // --- Gestión de FAQs ---
+    const adminFaqsContainer = document.getElementById('adminFaqsContainer');
+    if (adminFaqsContainer) {
         const faqForm = document.getElementById('faqForm');
-        const adminFaqsContainer = document.getElementById('adminFaqsContainer');
-
         async function loadAdminFaqs() {
             const { data, error } = await supabaseClient.from('faqs').select('*').order('display_order');
             if(error) return;
@@ -808,14 +811,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadAdminFaqs();
             }
         });
-
-        // --- Lógica para BORRAR y EDITAR contenido (genérica) ---
-        const adminContentContainers = [adminServicesContainer, adminPostsContainer, adminFaqsContainer];
+        loadAdminFaqs();
+    }
+    
+    const adminContentContainers = document.querySelectorAll('.admin-list-container');
+    if(adminContentContainers.length > 0) {
         adminContentContainers.forEach(container => {
             container.addEventListener('click', async (e) => {
                 const target = e.target;
                 const id = target.dataset.id;
                 const type = target.dataset.type;
+                if (!id || !type) return;
+
                 const tableName = type === 'post' ? 'posts' : (type === 'service' ? 'services' : 'faqs');
 
                 if(target.classList.contains('btn-delete')){
@@ -823,19 +830,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
                         if(error) alert('Error al borrar: ' + error.message);
                         else {
-                            if(tableName === 'services') loadAdminServices();
-                            if(tableName === 'posts') loadAdminPosts();
-                            if(tableName === 'faqs') loadAdminFaqs();
+                            if(tableName === 'services') document.getElementById('adminServicesContainer') && loadAdminServices();
+                            if(tableName === 'posts') document.getElementById('adminPostsContainer') && loadAdminPosts();
+                            if(tableName === 'faqs') document.getElementById('adminFaqsContainer') && loadAdminFaqs();
                         }
                     }
                 }
-                // (La lógica para EDITAR se podría añadir aquí)
             });
         });
-
-        loadAdminServices();
-        loadAdminPosts();
-        loadAdminFaqs();
     }
 
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
