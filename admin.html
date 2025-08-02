@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link rel="manifest" href="/manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administrador - Selettas</title>
@@ -11,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
     <div id="notification-banner" class="notification-hidden"></div>
@@ -29,70 +29,65 @@
     <main>
         <section class="page-hero">
             <h2>Panel de Administrador</h2>
-            <p>Gestiona todos los anuncios de la plataforma</p>
+            <p>Gestiona todo el contenido de la plataforma Selettas</p>
         </section>
 
-        <section id="adminAnunciosContainer" class="anuncios-container">
-            </section>
+        <section class="admin-section">
+            <h2><i class="fas fa-bullhorn"></i> Anuncios de Usuarios</h2>
+            <div id="adminAnunciosContainer" class="anuncios-container">
+                </div>
+        </section>
+
+        <section class="admin-section">
+            <h2><i class="fas fa-concierge-bell"></i> Servicios de la Página Principal</h2>
+            <div class="admin-form-container">
+                <h3>Añadir Nuevo Servicio</h3>
+                <form id="serviceForm" class="admin-form">
+                    <input type="text" id="serviceTitle" placeholder="Título del servicio" required>
+                    <input type="text" id="serviceIcon" placeholder="Icono (ej: fa-camera)" required>
+                    <textarea id="serviceText" placeholder="Descripción del servicio" required></textarea>
+                    <input type="number" id="serviceOrder" placeholder="Orden de aparición (ej: 1, 2, 3)" required>
+                    <button type="submit">Guardar Servicio</button>
+                </form>
+            </div>
+            <div id="adminServicesContainer" class="admin-list-container">
+                </div>
+        </section>
+
+        <section class="admin-section">
+            <h2><i class="fas fa-newspaper"></i> Novedades (Blog)</h2>
+            <div class="admin-form-container">
+                <h3>Añadir Nueva Novedad</h3>
+                <form id="postForm" class="admin-form">
+                    <input type="text" id="postTitle" placeholder="Título de la novedad" required>
+                    <input type="text" id="postImageUrl" placeholder="URL de la imagen" required>
+                    <textarea id="postDescription" placeholder="Descripción completa" rows="5" required></textarea>
+                    <button type="submit">Guardar Novedad</button>
+                </form>
+            </div>
+            <div id="adminPostsContainer" class="admin-list-container">
+                </div>
+        </section>
+
+        <section class="admin-section">
+            <h2><i class="fas fa-question-circle"></i> Preguntas Frecuentes (FAQ)</h2>
+            <div class="admin-form-container">
+                <h3>Añadir Nueva Pregunta</h3>
+                <form id="faqForm" class="admin-form">
+                    <input type="text" id="faqQuestion" placeholder="Pregunta" required>
+                    <textarea id="faqAnswer" placeholder="Respuesta" required></textarea>
+                    <input type="number" id="faqOrder" placeholder="Orden de aparición (ej: 1, 2, 3)" required>
+                    <button type="submit">Guardar Pregunta</button>
+                </form>
+            </div>
+            <div id="adminFaqsContainer" class="admin-list-container">
+                </div>
+        </section>
+
     </main>
     
-    <div id="anuncioModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div class="gallery">
-                <div class="gallery-main">
-                    <img id="modal-img" src="" alt="Imagen principal del anuncio">
-                    <button class="gallery-nav prev">&#10094;</button>
-                    <button class="gallery-nav next">&#10095;</button>
-                </div>
-                <div id="thumbnail-container" class="thumbnail-list"></div>
-            </div>
-            <h3 id="modal-titulo"></h3>
-            <p id="modal-precio" class="anuncio-card-price"></p>
-            <p id="modal-detalles" class="anuncio-card-details"></p>
-            <p id="modal-descripcion"></p>
-        </div>
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h3>Editando Anuncio</h3>
-            <form id="editAnuncioForm">
-                <input type="hidden" id="edit-anuncio-id">
-                <div class="form-group">
-                    <label for="edit-titulo">Título del Anuncio</label>
-                    <input type="text" id="edit-titulo" required>
-                </div>
-                 <div class="form-group">
-                    <label for="edit-direccion">Dirección</label>
-                    <input type="text" id="edit-direccion" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-descripcion">Descripción</label>
-                    <textarea id="edit-descripcion" rows="5" required></textarea>
-                </div>
-                 <div class="form-group">
-                    <label for="edit-precio">Precio (€)</label>
-                    <input type="number" id="edit-precio" required>
-                </div>
-                 <div class="form-group">
-                    <label for="edit-habitaciones">Habitaciones</label>
-                    <input type="number" id="edit-habitaciones" required>
-                </div>
-                 <div class="form-group">
-                    <label for="edit-banos">Baños</label>
-                    <input type="number" id="edit-banos" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-superficie">Superficie (m²)</label>
-                    <input type="number" id="edit-superficie" required>
-                </div>
-                <p style="font-size: 0.9rem; color: var(--font-color-secondary); text-align: center;">(La edición de imágenes no está disponible por ahora)</p>
-                <button type="submit">Guardar Cambios</button>
-            </form>
-        </div>
-    </div>
+    <div id="anuncioModal" class="modal"></div>
+    <div id="editModal" class="modal"></div>
     
     <footer>
         <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
