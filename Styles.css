@@ -262,7 +262,17 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .whatsapp-button.show, .scroll-to-top.show { display: grid; opacity: 1; }
 .whatsapp-button:hover, .scroll-to-top:hover { transform: scale(1.1); }
 .whatsapp-button { bottom: 80px; background-color: #25D366; color: white; }
-.scroll-to-top { bottom: 20px; background-color: var(--accent-color); color: var(--primary-color); border:none; cursor: pointer;}
+.scroll-to-top {
+    bottom: 20px;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    cursor: pointer;
+    /* --- LÍNEAS AÑADIDAS PARA CENTRAR --- */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /* --- BANNER DE COOKIES --- */
 #cookie-banner {
