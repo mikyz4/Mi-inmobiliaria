@@ -45,10 +45,10 @@
         <section id="services" class="servicios-section">
             <div class="container">
                 <h2 class="section-title">Asesoramiento Inmobiliario a tu Medida</h2>
-                <p class="section-subtitle">Desde una consulta puntual hasta la gestión integral de tu inversión. Elige el plan que se adapta a ti.</p>
+                <p class="section-subtitle">Selecciona uno o varios planes que te interesen y envíanos tu consulta.</p>
 
                 <div class="servicios-container">
-                    <div class="servicio-card">
+                    <div class="servicio-card" data-plan="Consulta Express">
                         <h3>Consulta Express</h3>
                         <p class="precio">120€</p>
                         <p class="descripcion">Ideal para resolver dudas concretas y obtener una opinión experta al instante.</p>
@@ -57,10 +57,10 @@
                             <li><i class="fas fa-check-circle"></i> Informe de viabilidad de 1 propiedad</li>
                             <li><i class="fas fa-check-circle"></i> Recomendaciones sobre una zona</li>
                         </ul>
-                        <a href="#contact" class="btn">Solicitar Consulta</a>
+                        <a class="btn">Seleccionar Plan</a>
                     </div>
 
-                    <div class="servicio-card popular">
+                    <div class="servicio-card popular" data-plan="Asesoría Continua">
                         <span class="popular-badge">Más Popular</span>
                         <h3>Asesoría Continua</h3>
                         <p class="precio">150€<span>/mes</span></p>
@@ -71,10 +71,10 @@
                             <li><i class="fas fa-check-circle"></i> Soporte continuo por WhatsApp/Email</li>
                             <li><i class="fas fa-check-circle"></i> Revisión de contratos y documentos</li>
                         </ul>
-                        <a href="#contact" class="btn">Empezar Suscripción</a>
+                        <a class="btn">Seleccionar Plan</a>
                     </div>
 
-                    <div class="servicio-card">
+                    <div class="servicio-card" data-plan="Gestión Integral">
                         <h3>Gestión Integral</h3>
                         <p class="precio">Desde 800€</p>
                         <p class="descripcion">Delegas todo el proceso de compra de inicio a fin. Tu tranquilidad es nuestra prioridad.</p>
@@ -84,7 +84,7 @@
                             <li><i class="fas fa-check-circle"></i> Negociación con vendedores</li>
                             <li><i class="fas fa-check-circle"></i> Acompañamiento en notaría</li>
                         </ul>
-                        <a href="#contact" class="btn">Pedir Información</a>
+                        <a class="btn">Seleccionar Plan</a>
                     </div>
                 </div>
             </div>
@@ -102,6 +102,9 @@
                 <input type="text" name="name" placeholder="Nombre" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <textarea name="message" placeholder="Tu mensaje" rows="5" required></textarea>
+                
+                <input type="hidden" name="Planes Seleccionados" id="selected-plans-input">
+                
                 <button type="submit">Enviar</button>
             </form>
         </section>
