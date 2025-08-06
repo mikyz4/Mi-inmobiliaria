@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesoría Inmobiliaria - Selettas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Asesoría Inmobiliaria a tu Medida</h2>
+            <p>Elige el plan que mejor se adapta a tus necesidades y deja que un experto te guíe en cada paso.</p>
+        </section>
+
+        <section id="subscription-plans">
+            <h2>Planes de Suscripción Mensual</h2>
+            <div class="pricing-table-container">
+
+                <div class="pricing-card">
+                    <h3>Plan Explorador</h3>
+                    <p class="target-audience">Para quienes empiezan a explorar el mercado</p>
+                    <div class="price">49€<span>/mes</span></div>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Sesión de Estrategia Inicial (30 min)</li>
+                        <li><i class="fas fa-check"></i> Informe Mensual de Mercado</li>
+                        <li><i class="fas fa-check"></i> Alertas de Propiedades Personalizadas</li>
+                        <li><i class="fas fa-check"></i> Consultas por Email (hasta 5/mes)</li>
+                    </ul>
+                    <a href="#contact-form-section" class="btn btn-secondary">Empezar Ahora</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="featured-badge">Recomendado</div>
+                    <h3>Plan Comprador / Vendedor</h3>
+                    <p class="target-audience">Para quienes están en búsqueda o venta activa</p>
+                    <div class="price">119€<span>/mes</span></div>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Todo lo del Plan Explorador</li>
+                        <li><i class="fas fa-check"></i> 2 Videollamadas de Seguimiento/mes</li>
+                        <li><i class="fas fa-check"></i> Análisis y "Segunda Opinión" de propiedades</li>
+                        <li><i class="fas fa-check"></i> Asesoramiento en Negociación</li>
+                        <li><i class="fas fa-check"></i> Revisión Documental Básica</li>
+                        <li><i class="fas fa-check"></i> Soporte Prioritario por WhatsApp</li>
+                    </ul>
+                    <a href="#contact-form-section" class="btn">Contratar Plan</a>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Plan Inversor Premium</h3>
+                    <p class="target-audience">Para inversores o clientes que delegan todo</p>
+                    <div class="price">299€<span>/mes</span></div>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Todo lo del Plan Comprador</li>
+                        <li><i class="fas fa-check"></i> Soporte y Llamadas Ilimitadas</li>
+                        <li><i class="fas fa-check"></i> Búsqueda Proactiva de Oportunidades</li>
+                        <li><i class="fas fa-check"></i> Análisis de Rentabilidad Financiera (ROI)</li>
+                        <li><i class="fas fa-check"></i> Coordinación con Técnicos (arquitectos, etc.)</li>
+                    </ul>
+                    <a href="#contact-form-section" class="btn btn-secondary">Solicitar Consulta</a>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="project-services">
+            <h2>Gestión Integral por Proyecto</h2>
+            <div class="project-services-container">
+                <div class="project-card">
+                    <i class="fas fa-key"></i>
+                    <h3>Compra Inteligente (Personal Shopper)</h3>
+                    <p>Nos encargamos de todo el proceso de compra por ti, desde la búsqueda hasta la firma en notaría, asegurando el mejor precio y condiciones.</p>
+                    <p class="pricing-details"><strong>Precio:</strong> 250€ (Estudio Inicial) + Comisión de Éxito.</p>
+                    <a href="#contact-form-section" class="btn">Infórmate Aquí</a>
+                </div>
+                <div class="project-card">
+                    <i class="fas fa-tags"></i>
+                    <h3>Venta Estratégica</h3>
+                    <p>Gestionamos la venta de tu propiedad con una estrategia de marketing profesional para maximizar el precio en el menor tiempo posible.</p>
+                    <p class="pricing-details"><strong>Precio:</strong> 150€ (Plan de Marketing) + Comisión de Éxito.</p>
+                    <a href="#contact-form-section" class="btn">Infórmate Aquí</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-form-section">
+            <h2>Contacta para Empezar</h2>
+            <p>Rellena el formulario y nos pondremos en contacto contigo para resolver tus dudas y arrancar tu plan.</p>
+            <form action="https://formsubmit.co/infoselettas@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="Nuevo contacto desde la página de Asesoría Selettas">
+                <input type="hidden" name="_next" value="https://selettas.netlify.app/Gracias.html">
+                
+                <input type="text" name="name" placeholder="Tu Nombre" required>
+                <input type="email" name="email" placeholder="Tu Email" required>
+                <textarea name="message" placeholder="Cuéntanos un poco sobre tu proyecto y qué plan te interesa..." rows="5" required></textarea>
+                <button type="submit">Enviar Consulta</button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

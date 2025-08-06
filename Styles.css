@@ -657,3 +657,140 @@ footer a { color: var(--accent-color); text-decoration: none;}
     border-radius: 5px;
     flex-shrink: 0; /* Evita que la imagen se encoja */
 }
+/* --- ESTILOS PARA LA PÁGINA DE ASESORÍA / PRECIOS --- */
+
+.pricing-table-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+}
+
+@media (min-width: 768px) {
+    .pricing-table-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.pricing-card {
+    background-color: var(--secondary-color);
+    padding: 30px;
+    border-radius: 10px;
+    border: 2px solid #333;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-color);
+}
+
+.pricing-card.featured {
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    padding: 5px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 0 0 0 10px;
+}
+
+.pricing-card h3 {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.pricing-card .target-audience {
+    color: var(--font-color-secondary);
+    font-size: 0.9rem;
+    min-height: 40px; /* Para alinear tarjetas */
+    margin-bottom: 20px;
+}
+
+.pricing-card .price {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 25px;
+}
+
+.pricing-card .price span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--font-color-secondary);
+}
+
+.features-list {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 30px;
+    flex-grow: 1; /* Empuja el botón hacia abajo */
+}
+
+.features-list li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.features-list li .fa-check {
+    color: var(--accent-color);
+}
+
+.pricing-card .btn {
+    width: 100%;
+}
+
+.project-services-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    max-width: 1000px;
+    margin: 40px auto 0 auto;
+}
+
+@media (min-width: 768px) {
+    .project-services-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.project-card {
+    background-color: var(--secondary-color);
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: transform 0.3s, border-color 0.3s;
+}
+.project-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+}
+
+.project-card i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.project-card .pricing-details {
+    font-weight: bold;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}

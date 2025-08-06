@@ -124,11 +124,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         navLinksContainer.innerHTML = '';
 
+        // --- MODIFICACIÓN AQUÍ ---
+        // Se ha añadido el enlace a 'asesoria.html'
         navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+            <li><a href="asesoria.html">Asesoría</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
         `;
+        // --- FIN DE LA MODIFICACIÓN ---
 
         const userMenuContainer = document.createElement('div');
         userMenuContainer.className = 'user-menu-container';
