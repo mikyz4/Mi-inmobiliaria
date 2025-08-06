@@ -657,3 +657,126 @@ footer a { color: var(--accent-color); text-decoration: none;}
     border-radius: 5px;
     flex-shrink: 0; /* Evita que la imagen se encoja */
 }
+/* ================================================================== */
+/* ESTILOS AÑADIDOS PARA LA NUEVA SECCIÓN DE PLANES DE ASESORÍA */
+/* ================================================================== */
+.servicios-section {
+    padding: 60px 5%; /* Ajustamos el padding para consistencia */
+    background-color: var(--primary-color);
+    text-align: center;
+}
+
+.servicios-section .section-title {
+    color: var(--accent-color);
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+    display: inline-block;
+}
+
+.servicios-section .section-subtitle {
+    color: var(--font-color-secondary);
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+}
+
+/* El .services-container ahora tendrá las nuevas tarjetas */
+.servicios-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Asegura que todas las tarjetas tengan la misma altura */
+    flex-wrap: wrap;
+    gap: 30px; /* Espacio entre las tarjetas */
+    max-width: 1200px; /* Añadimos un ancho máximo */
+    margin: 0 auto;
+}
+
+.servicio-card {
+    background-color: var(--secondary-color);
+    border: 1px solid var(--accent-color-translucent, #2CFF8E33); /* Usamos un color con transparencia */
+    border-radius: 12px;
+    padding: 30px;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Para la insignia de "Más Popular" */
+    overflow: hidden; /* Para la insignia */
+}
+
+.servicio-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.servicio-card h3 {
+    color: var(--font-color-primary); /* Ajustado para que resalte más que los servicios anteriores */
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.servicio-card .precio {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    line-height: 1;
+}
+
+.servicio-card .precio span {
+    font-size: 1rem;
+    font-weight: normal;
+    color: var(--font-color-secondary);
+}
+
+.servicio-card .descripcion {
+    color: var(--font-color-secondary);
+    margin-bottom: 20px;
+    flex-grow: 1; /* Empuja la lista y el botón hacia abajo */
+}
+
+.servicio-card ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.servicio-card ul li {
+    color: var(--font-color-primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.servicio-card ul li i {
+    color: var(--accent-color);
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.servicio-card .btn {
+    margin-top: auto; /* Pega el botón a la parte inferior */
+    text-align: center;
+}
+
+/* Estilo para la tarjeta popular */
+.servicio-card.popular {
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 25px rgba(44, 255, 142, 0.2); /* Sutil brillo para destacar */
+}
+
+.popular-badge {
+    position: absolute;
+    top: 15px;
+    right: -45px;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    padding: 5px 40px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transform: rotate(45deg);
+    text-align: center;
+}
