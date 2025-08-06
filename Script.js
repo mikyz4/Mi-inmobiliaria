@@ -124,15 +124,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         navLinksContainer.innerHTML = '';
 
-        // --- MODIFICACIÓN AQUÍ ---
-        // Se ha añadido el enlace a 'asesoria.html'
         navLinksContainer.innerHTML += `
             <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
             <li><a href="asesoria.html">Asesoría</a></li>
             <li><a href="Anuncio.html">Publicar Anuncio</a></li>
         `;
-        // --- FIN DE LA MODIFICACIÓN ---
 
         const userMenuContainer = document.createElement('div');
         userMenuContainer.className = 'user-menu-container';
@@ -230,23 +227,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         async function loadServices() {
+            // 1. Crear la tarjeta de Asesoría como un enlace que abre en una nueva pestaña
+            const asesoriaCardHTML = `
+                <a href="asesoria.html" class="service-item-link">
+                    <div class="service-item">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Asesoría Inmobiliaria</h3>
+                        <p>Planes flexibles para comprar, vender o invertir con un experto a tu lado. Pulsa aquí para ver los planes.</p>
+                    </div>
+                </a>
+            `;
+
+            // 2. Cargar los otros servicios desde Supabase
             const { data, error } = await supabaseClient
                 .from('services')
                 .select('*')
                 .order('display_order', { ascending: true });
 
-            if (error || !data || data.length === 0) {
-                servicesContainer.innerHTML = '<p>De momento no hay servicios para mostrar.</p>';
-                return;
+            let supabaseServicesHTML = '';
+            if (error) {
+                console.error("Error cargando servicios desde Supabase:", error);
+                supabaseServicesHTML = '<p>No se pudieron cargar los demás servicios.</p>';
+            } else if (!data || data.length === 0) {
+                 supabaseServicesHTML = ''; // No mostrar nada si no hay otros servicios
+            } else {
+                 supabaseServicesHTML = data.map(service => `
+                    <div class="service-item">
+                        <i class="fas ${service.icon}"></i>
+                        <h3>${service.title}</h3>
+                        <p>${service.text}</p>
+                    </div>
+                `).join('');
             }
-
-            servicesContainer.innerHTML = data.map(service => `
-                <div class="service-item">
-                    <i class="fas ${service.icon}"></i>
-                    <h3>${service.title}</h3>
-                    <p>${service.text}</p>
-                </div>
-            `).join('');
+            
+            // 3. Unir todo y mostrarlo, poniendo la tarjeta de asesoría siempre al principio
+            servicesContainer.innerHTML = asesoriaCardHTML + supabaseServicesHTML;
         }
         loadServices();
     }

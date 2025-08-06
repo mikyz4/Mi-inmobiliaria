@@ -794,3 +794,12 @@ footer a { color: var(--accent-color); text-decoration: none;}
     margin-top: 15px;
     margin-bottom: 25px;
 }
+/* --- ESTILOS PARA LA TARJETA DE SERVICIO-ENLACE --- */
+a.service-item-link {
+    text-decoration: none; /* Quita el subrayado del enlace */
+    color: inherit; /* Hereda el color del texto para que no se vea azul */
+}
+
+a.service-item-link .service-item {
+    height: 100%; /* Asegura que la tarjeta ocupe todo el alto del enlace */
+}
