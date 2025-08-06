@@ -332,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
-        let userFavorites = new Set();
         const modal = document.getElementById('anuncioModal');
         const filtroTipo = document.getElementById('filtro-tipo');
         const filtroHabitaciones = document.getElementById('filtro-habitaciones');
@@ -342,66 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtroSuperficie = document.getElementById('filtro-superficie');
         const resetFiltrosBtn = document.getElementById('reset-filtros');
 
-        const handleFavoriteClick = async (btn, anuncioId) => {
-            btn.disabled = true;
-            const isFavorited = btn.classList.contains('favorited');
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                alert("Debes iniciar sesión para añadir a favoritos.");
-                btn.disabled = false;
-                return;
-            }
-            
-            try {
-                if (isFavorited) {
-                    const { error } = await supabaseClient.from('favorites').delete().match({ user_id: user.id, anuncio_id: anuncioId });
-                    if (error) throw error;
-                    btn.classList.remove('favorited');
-                    userFavorites.delete(anuncioId);
-                } else {
-                    const { error } = await supabaseClient.from('favorites').insert({ user_id: user.id, anuncio_id: anuncioId });
-                    if (error) throw error;
-                    btn.classList.add('favorited');
-                    userFavorites.add(anuncioId);
-                }
-            } catch (error) {
-                console.error("Error updating favorite:", error);
-                alert("No se pudo actualizar el favorito. Inténtalo de nuevo.");
-            } finally {
-                btn.disabled = false;
-            }
-        };
-
-        const renderAnuncios = async (anuncios) => {
+        const renderAnuncios = (anuncios) => {
             anunciosContainer.innerHTML = '';
             if (anuncios.length === 0) {
                 anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se encontraron anuncios con estos criterios.</p>';
                 return;
             }
-
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const userIsLoggedIn = !!session?.user;
-
-            if (userIsLoggedIn) {
-                const { data, error } = await supabaseClient.from('favorites').select('anuncio_id').eq('user_id', session.user.id);
-                if (!error) {
-                    userFavorites = new Set(data.map(f => f.anuncio_id));
-                }
-            }
-
             anuncios.forEach(anuncio => {
                 const card = document.createElement('div');
                 card.className = 'anuncio-card';
-                
-                const isFavorited = userFavorites.has(anuncio.id);
-                const favoriteButtonHTML = userIsLoggedIn ? `
-                    <button class="favorite-btn visible ${isFavorited ? 'favorited' : ''}" data-id="${anuncio.id}" aria-label="Añadir a favoritos">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                ` : '';
-
                 card.innerHTML = `
-                    ${favoriteButtonHTML}
                     <img src="${anuncio.imagen_principal_url}" alt="${anuncio.titulo}" loading="lazy">
                     <div class="anuncio-card-content">
                         <h3>${anuncio.titulo}</h3>
@@ -411,8 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="anuncio-card-author"><i class="fas fa-user-tie"></i> Publicado por ${anuncio.username || 'Propietario'}</p>
                     </div>`;
                 
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.favorite-btn')) return;
+                card.addEventListener('click', () => {
                     if (modal) {
                         const imagenes = [anuncio.imagen_principal_url, ...(anuncio.imagenes_adicionales_urls || [])].filter(Boolean);
                         let imagenActual = 0;
@@ -425,7 +373,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (index < 0 || index >= imagenes.length) return;
                             mainImage.src = imagenes[index];
                             imagenActual = index;
-                            thumbnailContainer.querySelectorAll('img').forEach((img, i) => img.classList.toggle('active', i === index));
+                            thumbnailContainer.querySelectorAll('img').forEach((img, i) => {
+                                img.classList.toggle('active', i === index);
+                            });
                         };
                         modal.querySelector('#modal-titulo').textContent = anuncio.titulo;
                         modal.querySelector('#modal-precio').textContent = `${(anuncio.precio || 0).toLocaleString('es-ES')} €`;
@@ -444,23 +394,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         imagenes.forEach((url, index) => {
                             const thumb = document.createElement('img');
                             thumb.src = url;
+                            thumb.alt = `Miniatura ${index + 1}`;
                             thumb.addEventListener('click', () => mostrarImagen(index));
                             thumbnailContainer.appendChild(thumb);
                         });
-                        prevBtn.onclick = () => mostrarImagen((imagenActual - 1 + imagenes.length) % imagenes.length);
-                        nextBtn.onclick = () => mostrarImagen((imagenActual + 1) % imagenes.length);
+                        prevBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual - 1 + imagenes.length) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
+                        nextBtn.onclick = () => {
+                            const nuevaPosicion = (imagenActual + 1) % imagenes.length;
+                            mostrarImagen(nuevaPosicion);
+                        };
                         mostrarImagen(0);
                         modal.classList.add('active');
                     }
                 });
-                
-                const favBtn = card.querySelector('.favorite-btn');
-                if (favBtn) {
-                    favBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        handleFavoriteClick(favBtn, anuncio.id);
-                    });
-                }
                 anunciosContainer.appendChild(card);
             });
         };
@@ -488,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const { data, error } = await supabaseClient.from('anuncios_con_usuario').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 todosLosAnuncios = data;
-                await renderAnuncios(todosLosAnuncios);
+                renderAnuncios(todosLosAnuncios);
             } catch (error) {
                 console.error('Error al cargar anuncios desde Supabase:', error);
                 anunciosContainer.innerHTML = '<p style="text-align:center; width:100%;">No se pudieron cargar los anuncios. Inténtalo más tarde.</p>';
@@ -1098,161 +1047,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             loadAdminUsers();
         }
-
-        // --- LÓGICA DE MENSAJERÍA DE ADMIN ---
-        const adminChatContainer = document.getElementById('admin-chat-container');
-        if (adminChatContainer) {
-            const conversationsList = document.getElementById('conversations-list');
-            const messageHistory = document.getElementById('message-history');
-            const messageForm = document.getElementById('message-form');
-            const messageInput = document.getElementById('message-input');
-            const chatWithUsername = document.getElementById('chat-with-username');
-
-            let adminUser = null;
-            let currentConversationId = null;
-            let messagesSubscription = null;
-            let allConversations = [];
-
-            const displayMessage = (message) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                const messageClass = message.sender_id === adminUser.id ? 'sent' : 'received';
-                messageDiv.classList.add(messageClass);
-
-                const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                
-                const p = document.createElement('p');
-                p.textContent = message.content;
-
-                const meta = document.createElement('div');
-                meta.className = 'message-meta';
-                meta.textContent = time;
-
-                messageDiv.appendChild(p);
-                messageDiv.appendChild(meta);
-                
-                const infoMessage = messageHistory.querySelector('.chat-info');
-                if (infoMessage) infoMessage.remove();
-                
-                messageHistory.appendChild(messageDiv);
-                messageHistory.scrollTop = messageHistory.scrollHeight;
-            };
-
-            const subscribeToNewMessages = () => {
-                if (messagesSubscription) {
-                    supabaseClient.removeChannel(messagesSubscription);
-                }
-                if (!currentConversationId) return;
-
-                messagesSubscription = supabaseClient.channel(`admin_messages_for_${currentConversationId}`)
-                    .on('postgres_changes', { 
-                        event: 'INSERT', 
-                        schema: 'public', 
-                        table: 'messages',
-                        filter: `conversation_id=eq.${currentConversationId}`
-                    }, payload => {
-                        if (payload.new.sender_id !== adminUser.id) {
-                            displayMessage(payload.new);
-                        }
-                    })
-                    .subscribe();
-            };
-
-            const loadMessagesForConversation = async (conversationId) => {
-                messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
-                const { data: messages, error } = await supabaseClient.from('messages').select('*').eq('conversation_id', conversationId).order('created_at', { ascending: true });
-
-                if (error) {
-                    messageHistory.innerHTML = '<p class="chat-info">No se pudo cargar el historial.</p>';
-                    return;
-                }
-
-                messageHistory.innerHTML = ''; 
-                if (messages.length === 0) {
-                    messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación.</p>';
-                } else {
-                    messages.forEach(displayMessage);
-                }
-                subscribeToNewMessages();
-            };
-
-            const selectConversation = (convElement) => {
-                document.querySelectorAll('.conversation-item.active').forEach(item => item.classList.remove('active'));
-                convElement.classList.add('active');
-                
-                currentConversationId = convElement.dataset.conversationId;
-                const selectedConv = allConversations.find(c => c.id == currentConversationId);
-                
-                if (selectedConv) {
-                    chatWithUsername.textContent = `Chat con ${selectedConv.profiles.username || 'Usuario'}`;
-                    messageForm.style.display = 'flex';
-                    messageInput.disabled = false;
-                    loadMessagesForConversation(currentConversationId);
-                }
-            };
-            
-            const loadConversations = async () => {
-                const { data, error } = await supabaseClient.from('conversations').select('*, profiles(username)').order('updated_at', { ascending: false });
-
-                if (error) {
-                    conversationsList.innerHTML = '<p class="chat-info">Error al cargar.</p>';
-                    return;
-                }
-                if (data.length === 0) {
-                    conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones activas.</p>';
-                    return;
-                }
-                
-                allConversations = data;
-                conversationsList.innerHTML = '';
-                data.forEach(conv => {
-                    const item = document.createElement('div');
-                    item.className = 'conversation-item';
-                    item.dataset.conversationId = conv.id;
-                    const time = new Date(conv.updated_at).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-
-                    item.innerHTML = `
-                        <span class="conversation-user">${conv.profiles.username || 'Usuario desconocido'}</span>
-                        <span class="conversation-time">Última act.: ${time}</span>
-                    `;
-                    item.addEventListener('click', () => selectConversation(item));
-                    conversationsList.appendChild(item);
-                });
-            };
-
-            messageForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const content = messageInput.value.trim();
-                if (!content || !adminUser || !currentConversationId) return;
-
-                const messageData = {
-                    conversation_id: currentConversationId,
-                    sender_id: adminUser.id,
-                    content: content
-                };
-                
-                displayMessage({ ...messageData, created_at: new Date().toISOString() });
-                messageInput.value = '';
-
-                const { error } = await supabaseClient.from('messages').insert(messageData);
-                if (error) {
-                    alert('No se pudo enviar tu mensaje.');
-                    messageHistory.lastChild.remove();
-                }
-            });
-
-            const initAdminChat = async () => {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) {
-                    conversationsList.innerHTML = '<p class="chat-info">Error de autenticación.</p>';
-                    return;
-                }
-                adminUser = user;
-                await loadConversations();
-            };
-
-            initAdminChat();
-        }
     }
 
     const toggleFiltrosBtn = document.getElementById('toggle-filtros');
@@ -1279,6 +1073,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
+        if (!anuncioForm.querySelector('#tipo')) {
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            formGroup.innerHTML = `
+                <label for="tipo">Tipo de Propiedad</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecciona un tipo</option>
+                    <option value="Piso">Piso</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Ático">Ático</option>
+                </select>`;
+            const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
+            if(descripcionGroup) descripcionGroup.after(formGroup);
+        }
+
         anuncioForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             const submitButton = anuncioForm.querySelector('button[type="submit"]');
@@ -1398,6 +1207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 emailInput.value = user.email;
                 usernameInput.value = user.user_metadata.username || '';
 
+                // --- CÓDIGO PARA CARGAR DATOS DE SUSCRIPCIÓN ---
                 const { data: profile, error } = await supabaseClient
                     .from('profiles')
                     .select('subscription_plan, subscription_status, subscription_end_date')
@@ -1458,11 +1268,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirmation === 'BORRAR CUENTA') {
                 try {
                     const { error } = await supabaseClient.functions.invoke('delete-user-account');
-                    if (error) throw error;
-                    
+                    if (error) {
+                        throw error;
+                    }
                     showNotification('Tu cuenta ha sido eliminada. Serás redirigido.');
                     await supabaseClient.auth.signOut();
-                    setTimeout(() => window.location.href = 'Index.html', 3000);
+                    setTimeout(() => {
+                        window.location.href = 'Index.html';
+                    }, 3000);
                 } catch (error) {
                     showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
                 }
@@ -1475,37 +1288,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
     const banner = document.getElementById('cookie-consent-banner');
-    const cookieModal = document.getElementById('cookie-settings-modal');
+    const modal = document.getElementById('cookie-settings-modal');
     const acceptAllBtn = document.getElementById('cookie-accept-all');
     const rejectAllBtn = document.getElementById('cookie-reject-all');
     const settingsBtn = document.getElementById('cookie-settings-btn');
     const savePrefsBtn = document.getElementById('cookie-save-prefs');
-    
-    if (cookieModal) {
-        const closeModalBtn = cookieModal.querySelector('.close-button');
+    if (modal) {
+        const closeModalBtn = modal.querySelector('.close-button');
         if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', () => cookieModal.classList.remove('active'));
+            closeModalBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
         }
     }
 
-    const consentCookie = { necesarias: true, analiticas: false };
-    function loadAnalyticsScripts() { console.log("Cargando scripts de ANÁLISIS"); }
+
+    const consentCookie = {
+        necesarias: true,
+        analiticas: false,
+    };
+
+    function loadAnalyticsScripts() {
+        console.log("Cargando scripts de ANÁLISIS");
+    }
+
     function executeScripts() {
         const currentConsent = JSON.parse(localStorage.getItem('cookie_consent'));
-        if (currentConsent?.analiticas) loadAnalyticsScripts();
+        if (!currentConsent) return;
+
+        if (currentConsent.analiticas) {
+            loadAnalyticsScripts();
+        }
     }
+    
     function showBanner() {
         if (banner) {
             banner.classList.remove('cookie-banner-hidden');
             banner.classList.add('cookie-banner-show');
         }
     }
+
     function hideBanner() {
         if (banner) {
             banner.classList.remove('cookie-banner-show');
             banner.classList.add('cookie-banner-hidden');
         }
     }
+
     if (acceptAllBtn) {
         acceptAllBtn.addEventListener('click', () => {
             consentCookie.analiticas = true;
@@ -1514,6 +1343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             executeScripts();
         });
     }
+
     if (rejectAllBtn) {
         rejectAllBtn.addEventListener('click', () => {
             consentCookie.analiticas = false;
@@ -1521,25 +1351,32 @@ document.addEventListener('DOMContentLoaded', function() {
             hideBanner();
         });
     }
+
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
-            if (cookieModal) {
+            if (modal) {
                 hideBanner();
-                cookieModal.classList.add('active');
+                modal.classList.add('active');
             }
         });
     }
+
     if (savePrefsBtn) {
         savePrefsBtn.addEventListener('click', () => {
             const analiticasCheckbox = document.getElementById('cookie-analiticas');
-            if (analiticasCheckbox) consentCookie.analiticas = analiticasCheckbox.checked;
+            if (analiticasCheckbox) {
+                consentCookie.analiticas = analiticasCheckbox.checked;
+            }
             localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
-            if (cookieModal) cookieModal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+            }
             executeScripts();
         });
     }
     
-    if (!localStorage.getItem('cookie_consent')) {
+    const userConsent = localStorage.getItem('cookie_consent');
+    if (!userConsent) {
         showBanner();
     } else {
         executeScripts();
@@ -1556,15 +1393,20 @@ document.addEventListener('DOMContentLoaded', function() {
         infoButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault(); 
-                modalTitle.textContent = button.dataset.title;
-                modalDetails.textContent = button.dataset.details;
-                modalContactBtn.onclick = () => infoModal.classList.remove('active');
+                const title = button.dataset.title;
+                const details = button.dataset.details;
+                modalTitle.textContent = title;
+                modalDetails.textContent = details;
+
+                modalContactBtn.onclick = () => { // Usamos onclick para sobreescribir
+                    infoModal.classList.remove('active');
+                };
+
                 infoModal.classList.add('active');
             });
         });
     }
-    
-    // --- LÓGICA DE MENSAJERÍA DE USUARIO ---
+        // --- LÓGICA DE MENSAJERÍA ---
     const chatContainer = document.querySelector('.chat-container');
     if (chatContainer) {
         const messageHistory = document.getElementById('message-history');
@@ -1577,20 +1419,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const displayMessage = (message) => {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
+            
             const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
             messageDiv.classList.add(messageClass);
+
             const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
             
-            p.textContent = message.content;
+            const p = document.createElement('p');
+            p.textContent = message.content; // Seguro contra inyección de HTML
+
             const meta = document.createElement('div');
             meta.className = 'message-meta';
             meta.textContent = time;
-            
+
             messageDiv.appendChild(p);
             messageDiv.appendChild(meta);
             
             const infoMessage = messageHistory.querySelector('.chat-info');
-            if (infoMessage) infoMessage.remove();
+            if (infoMessage) {
+                infoMessage.remove();
+            }
             
             messageHistory.appendChild(messageDiv);
             messageHistory.scrollTop = messageHistory.scrollHeight;
@@ -1598,12 +1446,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const loadMessages = async () => {
             if (!conversationId) return;
-            const { data: messages, error } = await supabaseClient.from('messages').select('*').eq('conversation_id', conversationId).order('created_at', { ascending: true });
+
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', conversationId)
+                .order('created_at', { ascending: true });
 
             if (error) {
+                console.error('Error cargando mensajes:', error);
                 messageHistory.innerHTML = '<p class="chat-info">No se pudo cargar el historial.</p>';
                 return;
             }
+
             messageHistory.innerHTML = ''; 
             if (messages.length === 0) {
                 messageHistory.innerHTML = '<p class="chat-info">Aún no hay mensajes. ¡Envía el primero!</p>';
@@ -1613,7 +1468,10 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const subscribeToMessages = () => {
-            if (messagesSubscription) supabaseClient.removeChannel(messagesSubscription);
+            if (messagesSubscription) {
+                supabaseClient.removeChannel(messagesSubscription);
+            }
+
             messagesSubscription = supabaseClient.channel(`messages_for_${conversationId}`)
                 .on('postgres_changes', { 
                     event: 'INSERT', 
@@ -1639,13 +1497,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 content: content
             };
             
-            displayMessage({ ...messageData, created_at: new Date().toISOString() });
+            displayMessage({
+                ...messageData,
+                created_at: new Date().toISOString()
+            });
             messageInput.value = '';
 
             const { error } = await supabaseClient.from('messages').insert(messageData);
+
             if (error) {
+                console.error('Error enviando mensaje:', error);
                 alert('No se pudo enviar tu mensaje. Inténtalo de nuevo.');
-                messageHistory.lastChild.remove();
+                messageHistory.lastChild.remove(); // Elimina el mensaje que se mostró si falla el envío
             }
         });
 
@@ -1658,15 +1521,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             currentUser = user;
 
-            let { data: conversation, error: convError } = await supabaseClient.from('conversations').select('id').eq('user_id', currentUser.id).single();
+            let { data: conversation, error: convError } = await supabaseClient
+                .from('conversations')
+                .select('id')
+                .eq('user_id', currentUser.id)
+                .single();
+
             if (convError && convError.code !== 'PGRST116') {
+                console.error('Error buscando conversación:', convError);
                 messageHistory.innerHTML = '<p class="chat-info">Error al iniciar el chat.</p>';
                 return;
             }
 
             if (!conversation) {
-                const { data: newConversation, error: newConvError } = await supabaseClient.from('conversations').insert({ user_id: currentUser.id }).select('id').single();
+                const { data: newConversation, error: newConvError } = await supabaseClient
+                    .from('conversations')
+                    .insert({ user_id: currentUser.id })
+                    .select('id')
+                    .single();
+                
                 if (newConvError) {
+                    console.error('Error creando conversación:', newConvError);
                     messageHistory.innerHTML = '<p class="chat-info">Error al crear tu sala de chat.</p>';
                     return;
                 }
@@ -1674,10 +1549,197 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             conversationId = conversation.id;
+            
             await loadMessages();
             subscribeToMessages();
         };
 
         initChat();
     }
+// --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
+const adminChatContainer = document.getElementById('admin-chat-container');
+if (adminChatContainer) {
+    const conversationsList = document.getElementById('conversations-list');
+    const chatWindow = document.getElementById('chat-window');
+    const messageHistory = document.getElementById('message-history');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const chatWithUsername = document.getElementById('chat-with-username');
+
+    let currentUser = null; // El admin logueado
+    let selectedConversationId = null;
+    let messagesSubscription = null;
+
+    // Función para mostrar un mensaje en la ventana de chat
+    const displayAdminChatMessage = (message) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        
+        // Si el sender_id es el del admin, es 'sent'. Si no, es 'received'.
+        const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
+        messageDiv.classList.add(messageClass);
+
+        const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        
+        const p = document.createElement('p');
+        p.textContent = message.content;
+
+        const meta = document.createElement('div');
+        meta.className = 'message-meta';
+        meta.textContent = time;
+
+        messageDiv.appendChild(p);
+        messageDiv.appendChild(meta);
+        
+        const infoMessage = messageHistory.querySelector('.chat-info');
+        if (infoMessage) {
+            infoMessage.remove();
+        }
+        
+        messageHistory.appendChild(messageDiv);
+        messageHistory.scrollTop = messageHistory.scrollHeight;
+    };
+
+    // Suscribirse a los mensajes de la conversación seleccionada
+    const subscribeToConversation = (conversationId) => {
+        if (messagesSubscription) {
+            supabaseClient.removeChannel(messagesSubscription);
+        }
+        messagesSubscription = supabaseClient.channel(`admin_chat_${conversationId}`)
+            .on('postgres_changes', { 
+                event: 'INSERT', 
+                schema: 'public', 
+                table: 'messages',
+                filter: `conversation_id=eq.${conversationId}`
+            }, payload => {
+                // Solo mostrar si el mensaje no lo ha enviado el propio admin
+                if (payload.new.sender_id !== currentUser.id) {
+                    displayAdminChatMessage(payload.new);
+                }
+            })
+            .subscribe();
+    };
+
+    // Función que se ejecuta al hacer clic en una conversación
+    const selectConversation = async (conversationId, username) => {
+        selectedConversationId = conversationId;
+
+        // Resalta la conversación activa en la lista
+        document.querySelectorAll('.conversation-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`[data-conversation-id="${conversationId}"]`).classList.add('active');
+
+        // Limpia y prepara la ventana de chat
+        messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
+        chatWithUsername.textContent = `Chat con ${username}`;
+        messageForm.style.display = 'flex'; // Muestra el formulario para responder
+        messageInput.value = '';
+
+        // Carga el historial de mensajes de la BBDD
+        const { data: messages, error } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            messageHistory.innerHTML = '<p class="chat-info">Error al cargar mensajes.</p>';
+            return;
+        }
+
+        messageHistory.innerHTML = '';
+        if(messages.length === 0) {
+            messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación.</p>';
+        } else {
+            messages.forEach(displayAdminChatMessage);
+        }
+        
+        // Empieza a escuchar por nuevos mensajes en esta conversación
+        subscribeToConversation(conversationId);
+    };
+
+    // Cargar la lista de todas las conversaciones de usuarios
+    const loadConversations = async () => {
+        // Para esto, es ideal tener una vista en Supabase que una 'conversations' con 'profiles'
+        // SQL para la vista (ejecutar en el SQL Editor de Supabase):
+        // create or replace view conversations_with_user as
+        // select c.id, c.user_id, c.created_at, p.username from conversations c
+        // join profiles p on c.user_id = p.id;
+        const { data, error } = await supabaseClient
+            .from('conversations_with_user') // Usamos la vista
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            conversationsList.innerHTML = '<p class="chat-info">Error al cargar conversaciones.</p>';
+            console.error(error);
+            return;
+        }
+        
+        if (data.length === 0) {
+            conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones iniciadas.</p>';
+            return;
+        }
+
+        conversationsList.innerHTML = '';
+        data.forEach(conv => {
+            const item = document.createElement('div');
+            item.className = 'conversation-item';
+            item.setAttribute('data-conversation-id', conv.id);
+            
+            const time = new Date(conv.created_at).toLocaleString('es-ES', { day: 'numeric', month: 'short' });
+
+            item.innerHTML = `
+                <span class="conversation-user">${conv.username || 'Usuario sin nombre'}</span>
+                <span class="conversation-time">Iniciada: ${time}</span>
+            `;
+
+            item.addEventListener('click', () => selectConversation(conv.id, conv.username));
+            conversationsList.appendChild(item);
+        });
+    };
+
+    // Enviar un mensaje como admin
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = messageInput.value.trim();
+        if (!content || !selectedConversationId || !currentUser) return;
+
+        const messageData = {
+            conversation_id: selectedConversationId,
+            sender_id: currentUser.id, // El ID del admin
+            content: content
+        };
+
+        // Muestra el mensaje enviado inmediatamente
+        displayAdminChatMessage({
+            ...messageData,
+            created_at: new Date().toISOString()
+        });
+        messageInput.value = '';
+
+        // Inserta el mensaje en la base de datos
+        const { error } = await supabaseClient.from('messages').insert(messageData);
+        if (error) {
+            alert('Error al enviar el mensaje.');
+            console.error(error);
+            // Opcional: podrías eliminar el mensaje que se mostró si falla el envío
+            messageHistory.lastChild.remove();
+        }
+    });
+
+    // Función inicial para arrancar todo
+    const initAdminChat = async () => {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            alert('Acceso denegado. Debes ser administrador.');
+            window.location.href = 'Index.html';
+            return;
+        }
+        currentUser = user;
+        loadConversations();
+    };
+
+    initAdminChat();
+}
+
 });
