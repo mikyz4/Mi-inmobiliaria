@@ -857,3 +857,21 @@ a.service-item-link .service-item {
     font-weight: bold;
     text-decoration: underline;
 }
+/* --- ESTILOS PARA BOTONES DUALES EN TARJETAS DE PRECIOS --- */
+.pricing-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* Empuja los botones al final de la tarjeta */
+    padding-top: 20px; /* Espacio antes de los botones */
+}
+
+.pricing-card-actions .btn {
+    flex-grow: 1; /* Hace que ambos botones ocupen el mismo espacio */
+    padding: 10px 5px; /* Un poco menos de padding para que quepan bien */
+    font-size: 0.9rem;
+}
+
+/* --- ESTILOS PARA EL MODAL DE INFORMACIÓN --- */
+#info-modal-details {
+    margin-bottom: 25px; /* Más espacio antes del botón */
+}

@@ -1274,3 +1274,35 @@ document.addEventListener('DOMContentLoaded', function() {
         executeScripts();
     }
 });
+// --- LÓGICA PARA EL MODAL DE 'MÁS INFORMACIÓN' EN ASESORIA.HTML ---
+document.addEventListener('DOMContentLoaded', () => {
+    const infoModal = document.getElementById('info-modal');
+    if (!infoModal) return; // Si no estamos en la página de asesoría, no hacer nada
+
+    const infoButtons = document.querySelectorAll('.btn-mas-info');
+    const modalTitle = document.getElementById('info-modal-title');
+    const modalDetails = document.getElementById('info-modal-details');
+    const modalContactBtn = document.getElementById('info-modal-contact-btn');
+
+    infoButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que el enlace '#' mueva la página
+
+            // 1. Coger la información de los atributos 'data-*' del botón
+            const title = button.dataset.title;
+            const details = button.dataset.details;
+
+            // 2. Rellenar el modal con esa información
+            modalTitle.textContent = title;
+            modalDetails.textContent = details;
+
+            // 3. Hacer que el botón del modal lleve al formulario
+            modalContactBtn.addEventListener('click', () => {
+                infoModal.classList.remove('active'); // Cierra el modal al pulsar
+            });
+
+            // 4. Mostrar el modal
+            infoModal.classList.add('active');
+        });
+    });
+});

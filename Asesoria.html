@@ -47,7 +47,12 @@
                         <li><i class="fas fa-check"></i> Alertas de Propiedades Personalizadas</li>
                         <li><i class="fas fa-check"></i> Consultas por Email (hasta 5/mes)</li>
                     </ul>
-                    <a href="#contact-form-section" class="btn btn-secondary">Empezar Ahora</a>
+                    <div class="pricing-card-actions">
+                        <a href="#" class="btn btn-secondary btn-mas-info" 
+                           data-title="Información sobre el Plan Explorador" 
+                           data-details="Este plan es perfecto si estás comenzando. Te ayudamos a definir tus metas, te mantenemos informado sobre la evolución de precios en tus zonas de interés y te enviamos propiedades que encajen contigo para que no te pierdas ninguna oportunidad.">Más Información</a>
+                        <a href="#contact-form-section" class="btn">Solicitar Suscripción</a>
+                    </div>
                 </div>
 
                 <div class="pricing-card featured">
@@ -63,7 +68,12 @@
                         <li><i class="fas fa-check"></i> Revisión Documental Básica</li>
                         <li><i class="fas fa-check"></i> Soporte Prioritario por WhatsApp</li>
                     </ul>
-                    <a href="#contact-form-section" class="btn">Contratar Plan</a>
+                    <div class="pricing-card-actions">
+                        <a href="#" class="btn btn-secondary btn-mas-info"
+                           data-title="Información sobre el Plan Comprador / Vendedor"
+                           data-details="Este es nuestro plan más popular. Damos un paso más allá y nos convertimos en tu asesor personal. Analizamos contigo las propiedades que te interesan, te damos una segunda opinión profesional, te ayudamos a preparar ofertas y revisamos la documentación clave para darte total seguridad.">Más Información</a>
+                        <a href="#contact-form-section" class="btn">Solicitar Suscripción</a>
+                    </div>
                 </div>
 
                 <div class="pricing-card">
@@ -77,7 +87,12 @@
                         <li><i class="fas fa-check"></i> Análisis de Rentabilidad Financiera (ROI)</li>
                         <li><i class="fas fa-check"></i> Coordinación con Técnicos (arquitectos, etc.)</li>
                     </ul>
-                    <a href="#contact-form-section" class="btn btn-secondary">Solicitar Consulta</a>
+                    <div class="pricing-card-actions">
+                         <a href="#" class="btn btn-secondary btn-mas-info"
+                           data-title="Información sobre el Plan Inversor Premium"
+                           data-details="El servicio definitivo para quien busca la máxima rentabilidad o quiere delegar por completo el proceso. No solo te asesoramos, sino que buscamos activamente oportunidades de inversión (incluso fuera de mercado), realizamos análisis financieros detallados y coordinamos a todos los profesionales necesarios para evaluar el potencial de cada activo.">Más Información</a>
+                        <a href="#contact-form-section" class="btn">Solicitar Suscripción</a>
+                    </div>
                 </div>
 
             </div>
@@ -91,14 +106,24 @@
                     <h3>Compra Inteligente (Personal Shopper)</h3>
                     <p>Nos encargamos de todo el proceso de compra por ti, desde la búsqueda hasta la firma en notaría, asegurando el mejor precio y condiciones.</p>
                     <p class="pricing-details"><strong>Precio:</strong> 250€ (Estudio Inicial) + Comisión de Éxito.</p>
-                    <a href="#contact-form-section" class="btn">Infórmate Aquí</a>
+                    <div class="pricing-card-actions">
+                        <a href="#" class="btn btn-secondary btn-mas-info"
+                           data-title="Información sobre Compra Inteligente"
+                           data-details="Este servicio es para ti si quieres comprar una propiedad pero no tienes tiempo o conocimiento del mercado. Actuamos como tu representante personal: buscamos, visitamos, negociamos y te guiamos en todo el papeleo hasta que tengas las llaves en la mano, defendiendo siempre tus intereses.">Más Información</a>
+                        <a href="#contact-form-section" class="btn">Solicitar Servicio</a>
+                    </div>
                 </div>
                 <div class="project-card">
                     <i class="fas fa-tags"></i>
                     <h3>Venta Estratégica</h3>
                     <p>Gestionamos la venta de tu propiedad con una estrategia de marketing profesional para maximizar el precio en el menor tiempo posible.</p>
                     <p class="pricing-details"><strong>Precio:</strong> 150€ (Plan de Marketing) + Comisión de Éxito.</p>
-                    <a href="#contact-form-section" class="btn">Infórmate Aquí</a>
+                    <div class="pricing-card-actions">
+                        <a href="#" class="btn btn-secondary btn-mas-info"
+                           data-title="Información sobre Venta Estratégica"
+                           data-details="Vender una propiedad va más allá de poner un anuncio. Creamos un plan de marketing a medida para tu inmueble, realizamos un reportaje profesional, filtramos a los compradores potenciales para evitarte pérdidas de tiempo y negociamos en tu nombre para conseguir el mejor precio de venta posible.">Más Información</a>
+                        <a href="#contact-form-section" class="btn">Solicitar Servicio</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -119,6 +144,14 @@
 
     </main>
 
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="info-modal-title"></h3>
+            <p id="info-modal-details"></p>
+            <a href="#contact-form-section" id="info-modal-contact-btn" class="btn">Solicitar este Plan</a>
+        </div>
+    </div>
     <div id="cookie-consent-banner" class="cookie-banner-hidden">
         <div class="cookie-banner-content">
             <p>
