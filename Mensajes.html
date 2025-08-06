@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Mensajes - Selettas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Mensajes Privados</h2>
+            <p>Comunícate directamente con nosotros para resolver tus dudas.</p>
+        </section>
+
+        <section class="chat-container">
+            <div id="message-history" class="message-history">
+                <p class="chat-info">Cargando tu historial de mensajes...</p>
+            </div>
+            <form id="message-form" class="message-form">
+                <textarea id="message-input" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Enviar</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

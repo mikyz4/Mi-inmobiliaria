@@ -905,3 +905,77 @@ a.service-item-link .service-item {
     color: var(--delete-color);
     font-weight: bold;
 }
+/* --- ESTILOS PARA LA PÁGINA DE MENSAJERÍA --- */
+.chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 70vh; /* Altura del contenedor del chat */
+}
+
+.message-history {
+    flex-grow: 1;
+    overflow-y: auto; /* Permite scroll si hay muchos mensajes */
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    max-width: 70%;
+    line-height: 1.5;
+}
+
+.message.sent {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    align-self: flex-end; /* Alinea los mensajes enviados a la derecha */
+    border-radius: 15px 15px 0 15px;
+}
+
+.message.received {
+    background-color: #333;
+    color: var(--font-color-primary);
+    align-self: flex-start; /* Alinea los mensajes recibidos a la izquierda */
+    border-radius: 15px 15px 15px 0;
+}
+
+.message-meta {
+    font-size: 0.75rem;
+    color: var(--font-color-secondary);
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message.received .message-meta {
+    text-align: left;
+}
+
+.message-form {
+    display: flex;
+    gap: 10px;
+}
+
+#message-input {
+    flex-grow: 1;
+    resize: none; /* Evita que el usuario pueda cambiar el tamaño del textarea */
+    height: 50px;
+}
+
+.message-form button {
+    height: 50px;
+    width: 60px;
+}
+
+.chat-info {
+    text-align: center;
+    padding: 20px;
+    color: var(--font-color-secondary);
+}

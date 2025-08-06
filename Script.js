@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="dropdown-header">Hola, ${username}</div>
                     <a href="perfil.html">Mi Perfil</a>
                     <a href="mis-anuncios.html">Mis Anuncios</a>
+                    <a href="mensajes.html">Mis Mensajes</a>
                     <div class="dropdown-divider"></div>
                     <a href="#" id="userLogoutBtn">Cerrar Sesión</a>
                 </div>
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     (async () => {
         const currentPage = window.location.pathname.split('/').pop();
-        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html'];
+        const privatePages = ['Anuncio.html', 'mis-anuncios.html', 'perfil.html', 'mensajes.html'];
         if (privatePages.includes(currentPage)) {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
