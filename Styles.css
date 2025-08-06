@@ -979,3 +979,183 @@ a.service-item-link .service-item {
     padding: 20px;
     color: var(--font-color-secondary);
 }
+/* --- ESTILOS PARA LA PÁGINA DE MENSAJERÍA DE ADMIN --- */
+.admin-chat-container {
+    display: flex;
+    height: 75vh;
+    gap: 20px;
+}
+
+.conversations-list {
+    width: 30%;
+    background-color: #121212;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+    border: 1px solid #333;
+}
+
+.conversation-item {
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.conversation-item:last-child {
+    border-bottom: none;
+}
+
+.conversation-item:hover {
+    background-color: #2a2a2a;
+}
+
+.conversation-item.active {
+    background-color: var(--accent-color);
+    border-radius: 5px;
+}
+
+.conversation-item.active .conversation-user,
+.conversation-item.active .conversation-time {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.conversation-user {
+    font-weight: bold;
+    color: var(--font-color-primary);
+    margin-bottom: 5px;
+    display: block;
+}
+
+.conversation-time {
+    font-size: 0.8rem;
+    color: var(--font-color-secondary);
+}
+
+.chat-window {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    background-color: #121212;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.chat-header {
+    padding: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.chat-header h3 {
+    margin: 0;
+    color: var(--accent-color);
+}
+/* --- ESTILOS MEJORADOS PARA LISTA DE CONVERSACIONES (WHATSAPP STYLE) --- */
+
+.conversations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Un pequeño espacio entre conversaciones */
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.conversation-item:hover {
+    background-color: #1E1E1E; /* Un gris un poco más claro al pasar el ratón */
+}
+
+.conversation-item.active {
+    background-color: var(--accent-color);
+}
+
+.conversation-item .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    flex-shrink: 0; /* Evita que el avatar se encoja */
+}
+
+.conversation-details {
+    flex-grow: 1;
+    overflow: hidden; /* Importante para que el texto no se desborde */
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* El nombre de usuario en la tarjeta de conversación */
+.conversation-item .conversation-user {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--font-color-primary);
+    margin: 0;
+}
+
+.conversation-item.active .conversation-user {
+    color: var(--primary-color);
+}
+
+.last-message-preview {
+    font-size: 0.9rem;
+    color: var(--font-color-secondary);
+    white-space: nowrap; /* Evita que el texto salte de línea */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Añade "..." si el texto es muy largo */
+    margin-top: 4px;
+}
+
+.conversation-item.active .last-message-preview {
+    color: #121212;
+}
+
+.conversation-meta {
+    text-align: right;
+}
+
+/* La hora del último mensaje */
+.conversation-item .conversation-time {
+    font-size: 0.8rem;
+    color: var(--font-color-secondary);
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+.conversation-item.active .conversation-time {
+     color: var(--primary-color);
+}
+
+.unread-badge {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+}
+
+/* Ocultar la insignia si no hay mensajes no leídos */
+.unread-badge:empty {
+    display: none;
+}
