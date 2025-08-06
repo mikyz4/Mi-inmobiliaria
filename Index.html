@@ -80,19 +80,57 @@
         </div>
     </div>
 
+    <div id="cookie-consent-banner" class="cookie-banner-hidden">
+        <div class="cookie-banner-content">
+            <p>
+                Utilizamos cookies para ofrecerte la mejor experiencia. Algunas son esenciales para el funcionamiento de la web, mientras que otras nos ayudan a mejorar nuestros servicios.
+                <a href="Legal.html#politica-cookies">Leer más</a>
+            </p>
+            <div class="cookie-banner-actions">
+                <button id="cookie-accept-all" class="btn">Aceptar Todas</button>
+                <button id="cookie-reject-all" class="btn btn-secondary">Rechazar Todas</button>
+                <button id="cookie-settings-btn" class="btn-link">Personalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cookie-settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Configuración de Cookies</h3>
+            <p>Puedes personalizar tus preferencias de cookies a continuación. Las cookies técnicas son necesarias y no se pueden desactivar.</p>
+            
+            <div class="cookie-category">
+                <div class="cookie-category-header">
+                    <label for="cookie-necesarias">Cookies Técnicas (Necesarias)</label>
+                    <input type="checkbox" id="cookie-necesarias" checked disabled>
+                </div>
+                <p class="cookie-category-description">
+                    Estas cookies son esenciales para que el sitio web funcione correctamente, como recordar tu sesión o tus preferencias de cookies.
+                </p>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-header">
+                    <label for="cookie-analiticas">Cookies de Análisis</label>
+                    <input type="checkbox" id="cookie-analiticas" checked>
+                </div>
+                <p class="cookie-category-description">
+                    Nos permiten entender cómo interactúas con la web (qué páginas visitas más, etc.) para mejorar nuestros servicios. Todos los datos son anónimos.
+                </p>
+            </div>
+
+            <button id="cookie-save-prefs" class="btn">Guardar Preferencias</button>
+        </div>
+    </div>
     <footer>
         <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
     </footer>
 
-    <div id="cookie-banner">
-        <p>Utilizamos cookies para asegurar que damos la mejor experiencia al usuario en nuestra web. Si continúas utilizando este sitio asumiremos que estás de acuerdo. <a href="Legal.html">Leer más</a></p>
-        <button id="accept-cookies" class="btn">Aceptar</button>
-    </div>
-
     <a href="https://wa.me/34632125872" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
     <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="Script.js"></script>
 
     <script>

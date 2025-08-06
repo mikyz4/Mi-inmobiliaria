@@ -227,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicesContainer = document.querySelector('.services-container');
     if (servicesContainer) {
         async function loadServices() {
-            // 1. Crear la tarjeta de Asesoría como un enlace que abre en una nueva pestaña
             const asesoriaCardHTML = `
                 <a href="asesoria.html" class="service-item-link">
                     <div class="service-item">
@@ -238,7 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
             `;
 
-            // 2. Cargar los otros servicios desde Supabase
             const { data, error } = await supabaseClient
                 .from('services')
                 .select('*')
@@ -249,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("Error cargando servicios desde Supabase:", error);
                 supabaseServicesHTML = '<p>No se pudieron cargar los demás servicios.</p>';
             } else if (!data || data.length === 0) {
-                 supabaseServicesHTML = ''; // No mostrar nada si no hay otros servicios
+                 supabaseServicesHTML = '';
             } else {
                  supabaseServicesHTML = data.map(service => `
                     <div class="service-item">
@@ -260,7 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
             }
             
-            // 3. Unir todo y mostrarlo, poniendo la tarjeta de asesoría siempre al principio
             servicesContainer.innerHTML = asesoriaCardHTML + supabaseServicesHTML;
         }
         loadServices();
@@ -1073,18 +1070,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    const cookieBanner = document.getElementById('cookie-banner');
-    const acceptCookiesBtn = document.getElementById('accept-cookies');
-    if (cookieBanner && !localStorage.getItem('cookiesAccepted')) {
-        cookieBanner.style.display = 'flex';
-    }
-    if (acceptCookiesBtn) {
-        acceptCookiesBtn.addEventListener('click', () => {
-            cookieBanner.style.display = 'none';
-            localStorage.setItem('cookiesAccepted', 'true');
-        });
-    }
-
     const anuncioForm = document.getElementById('anuncioForm');
     if (anuncioForm) {
         if (!anuncioForm.querySelector('#tipo')) {
@@ -1276,5 +1261,100 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         loadUserData();
+    }
+
+    // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
+    const banner = document.getElementById('cookie-consent-banner');
+    const modal = document.getElementById('cookie-settings-modal');
+    const acceptAllBtn = document.getElementById('cookie-accept-all');
+    const rejectAllBtn = document.getElementById('cookie-reject-all');
+    const settingsBtn = document.getElementById('cookie-settings-btn');
+    const savePrefsBtn = document.getElementById('cookie-save-prefs');
+    if (modal) {
+        const closeModalBtn = modal.querySelector('.close-button');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        }
+    }
+
+
+    const consentCookie = {
+        necesarias: true,
+        analiticas: false,
+    };
+
+    function loadAnalyticsScripts() {
+        console.log("Cargando scripts de ANÁLISIS");
+    }
+
+    function executeScripts() {
+        const currentConsent = JSON.parse(localStorage.getItem('cookie_consent'));
+        if (!currentConsent) return;
+
+        if (currentConsent.analiticas) {
+            loadAnalyticsScripts();
+        }
+    }
+    
+    function showBanner() {
+        if (banner) {
+            banner.classList.remove('cookie-banner-hidden');
+            banner.classList.add('cookie-banner-show');
+        }
+    }
+
+    function hideBanner() {
+        if (banner) {
+            banner.classList.remove('cookie-banner-show');
+            banner.classList.add('cookie-banner-hidden');
+        }
+    }
+
+    if (acceptAllBtn) {
+        acceptAllBtn.addEventListener('click', () => {
+            consentCookie.analiticas = true;
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            hideBanner();
+            executeScripts();
+        });
+    }
+
+    if (rejectAllBtn) {
+        rejectAllBtn.addEventListener('click', () => {
+            consentCookie.analiticas = false;
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            hideBanner();
+        });
+    }
+
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            if (modal) {
+                modal.classList.add('active');
+            }
+        });
+    }
+
+    if (savePrefsBtn) {
+        savePrefsBtn.addEventListener('click', () => {
+            const analiticasCheckbox = document.getElementById('cookie-analiticas');
+            if (analiticasCheckbox) {
+                consentCookie.analiticas = analiticasCheckbox.checked;
+            }
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            executeScripts();
+        });
+    }
+    
+    const userConsent = localStorage.getItem('cookie_consent');
+    if (!userConsent) {
+        showBanner();
+    } else {
+        executeScripts();
     }
 });
