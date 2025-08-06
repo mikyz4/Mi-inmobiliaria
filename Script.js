@@ -846,7 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (imageFile) {
                         const { data: { user } } = await supabaseClient.auth.getUser();
                         const fileName = `${user.id}/${Date.now()}-${imageFile.name}`;
-                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-posts').upload(fileName, imageFile);
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-posts').upload(fileName, file);
                         if (uploadError) throw uploadError;
                         const { data: publicUrlData } = supabaseClient.storage.from('imagenes-posts').getPublicUrl(fileName);
                         imageUrl = publicUrlData.publicUrl;
@@ -1179,6 +1179,231 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           deferredPrompt = null;
           console.log('PWA fue instalada');
+        });
+    }
+
+    const profileContainer = document.querySelector('.profile-container');
+    if (profileContainer) {
+        const profileForm = document.getElementById('profileForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const subscriptionInfoDiv = document.getElementById('subscription-info');
+
+        const showNotification = (message, type = 'success') => {
+            const banner = document.getElementById('notification-banner');
+            banner.textContent = message;
+            banner.className = `notification-${type}`;
+            banner.classList.add('show');
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 4000);
+        };
+
+        const loadUserData = async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                emailInput.value = user.email;
+                usernameInput.value = user.user_metadata.username || '';
+
+                // --- CÓDIGO PARA CARGAR DATOS DE SUSCRIPCIÓN ---
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('subscription_plan, subscription_status, subscription_end_date')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    subscriptionInfoDiv.innerHTML = '<p>No se pudo cargar la información de tu suscripción.</p>';
+                } else if (profile && profile.subscription_plan && profile.subscription_status === 'active') {
+                    const endDate = new Date(profile.subscription_end_date).toLocaleDateString('es-ES');
+                    subscriptionInfoDiv.innerHTML = `
+                        <p>Tu plan actual es: <span class="plan-name">${profile.subscription_plan}</span></p>
+                        <p>Estado: <span class="status-active">Activo</span></p>
+                        <p>Tu suscripción se renueva el: ${endDate}</p>
+                    `;
+                } else {
+                    subscriptionInfoDiv.innerHTML = '<p>Actualmente no tienes ninguna suscripción activa.</p>';
+                }
+
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = usernameInput.value.trim();
+            if (!newUsername) {
+                showNotification('El nombre de usuario no puede estar vacío.', 'error');
+                return;
+            }
+            const { error } = await supabaseClient.auth.updateUser({
+                data: { username: newUsername }
+            });
+            if (error) {
+                showNotification('Error al actualizar el nombre: ' + error.message, 'error');
+            } else {
+                showNotification('Nombre de usuario actualizado con éxito.');
+            }
+        });
+
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+            if (error) {
+                showNotification('Error al actualizar la contraseña: ' + error.message, 'error');
+            } else {
+                showNotification('Contraseña actualizada con éxito.');
+                passwordForm.reset();
+            }
+        });
+
+        deleteAccountBtn.addEventListener('click', async () => {
+            const confirmation = prompt("Esta acción es irreversible. Para confirmar, escribe 'BORRAR CUENTA' en el siguiente campo:");
+            if (confirmation === 'BORRAR CUENTA') {
+                try {
+                    const { error } = await supabaseClient.functions.invoke('delete-user-account');
+                    if (error) {
+                        throw error;
+                    }
+                    showNotification('Tu cuenta ha sido eliminada. Serás redirigido.');
+                    await supabaseClient.auth.signOut();
+                    setTimeout(() => {
+                        window.location.href = 'Index.html';
+                    }, 3000);
+                } catch (error) {
+                    showNotification('Error al eliminar la cuenta: ' + error.message, 'error');
+                }
+            } else {
+                showNotification('La confirmación no es correcta. Acción cancelada.', 'error');
+            }
+        });
+        loadUserData();
+    }
+    
+    // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
+    const banner = document.getElementById('cookie-consent-banner');
+    const modal = document.getElementById('cookie-settings-modal');
+    const acceptAllBtn = document.getElementById('cookie-accept-all');
+    const rejectAllBtn = document.getElementById('cookie-reject-all');
+    const settingsBtn = document.getElementById('cookie-settings-btn');
+    const savePrefsBtn = document.getElementById('cookie-save-prefs');
+    if (modal) {
+        const closeModalBtn = modal.querySelector('.close-button');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
         }
+    }
+
+
+    const consentCookie = {
+        necesarias: true,
+        analiticas: false,
+    };
+
+    function loadAnalyticsScripts() {
+        console.log("Cargando scripts de ANÁLISIS");
+    }
+
+    function executeScripts() {
+        const currentConsent = JSON.parse(localStorage.getItem('cookie_consent'));
+        if (!currentConsent) return;
+
+        if (currentConsent.analiticas) {
+            loadAnalyticsScripts();
+        }
+    }
+    
+    function showBanner() {
+        if (banner) {
+            banner.classList.remove('cookie-banner-hidden');
+            banner.classList.add('cookie-banner-show');
+        }
+    }
+
+    function hideBanner() {
+        if (banner) {
+            banner.classList.remove('cookie-banner-show');
+            banner.classList.add('cookie-banner-hidden');
+        }
+    }
+
+    if (acceptAllBtn) {
+        acceptAllBtn.addEventListener('click', () => {
+            consentCookie.analiticas = true;
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            hideBanner();
+            executeScripts();
+        });
+    }
+
+    if (rejectAllBtn) {
+        rejectAllBtn.addEventListener('click', () => {
+            consentCookie.analiticas = false;
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            hideBanner();
+        });
+    }
+
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            if (modal) {
+                hideBanner();
+                modal.classList.add('active');
+            }
+        });
+    }
+
+    if (savePrefsBtn) {
+        savePrefsBtn.addEventListener('click', () => {
+            const analiticasCheckbox = document.getElementById('cookie-analiticas');
+            if (analiticasCheckbox) {
+                consentCookie.analiticas = analiticasCheckbox.checked;
+            }
+            localStorage.setItem('cookie_consent', JSON.stringify(consentCookie));
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            executeScripts();
+        });
+    }
+    
+    const userConsent = localStorage.getItem('cookie_consent');
+    if (!userConsent) {
+        showBanner();
+    } else {
+        executeScripts();
+    }
+
+    // --- LÓGICA PARA EL MODAL DE 'MÁS INFORMACIÓN' EN ASESORIA.HTML ---
+    const infoModal = document.getElementById('info-modal');
+    if (infoModal) {
+        const infoButtons = document.querySelectorAll('.btn-mas-info');
+        const modalTitle = document.getElementById('info-modal-title');
+        const modalDetails = document.getElementById('info-modal-details');
+        const modalContactBtn = document.getElementById('info-modal-contact-btn');
+
+        infoButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                const title = button.dataset.title;
+                const details = button.dataset.details;
+                modalTitle.textContent = title;
+                modalDetails.textContent = details;
+
+                modalContactBtn.onclick = () => { // Usamos onclick para sobreescribir
+                    infoModal.classList.remove('active');
+                };
+
+                infoModal.classList.add('active');
+            });
+        });
     }
 });
