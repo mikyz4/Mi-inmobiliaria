@@ -875,3 +875,33 @@ a.service-item-link .service-item {
 #info-modal-details {
     margin-bottom: 25px; /* Más espacio antes del botón */
 }
+/* --- ESTILOS PARA TARJETA DE SUSCRIPCIÓN EN PERFIL --- */
+.subscription-card {
+    border-left-color: #FFD700; /* Un color dorado para destacar */
+}
+
+.subscription-card h3 {
+    color: #FFD700;
+}
+
+#subscription-info p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+#subscription-info .plan-name {
+    font-weight: bold;
+    color: var(--accent-color);
+    text-transform: capitalize;
+}
+
+#subscription-info .status-active {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+#subscription-info .status-inactive {
+    color: var(--delete-color);
+    font-weight: bold;
+}

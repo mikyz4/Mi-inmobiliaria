@@ -1069,7 +1069,91 @@ document.addEventListener('DOMContentLoaded', function() {
             images[currentImage].classList.add('active');
         }, 5000);
     }
-    
+
+    const anuncioForm = document.getElementById('anuncioForm');
+    if (anuncioForm) {
+        if (!anuncioForm.querySelector('#tipo')) {
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            formGroup.innerHTML = `
+                <label for="tipo">Tipo de Propiedad</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecciona un tipo</option>
+                    <option value="Piso">Piso</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Ático">Ático</option>
+                </select>`;
+            const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
+            if(descripcionGroup) descripcionGroup.after(formGroup);
+        }
+
+        anuncioForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const submitButton = anuncioForm.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Enviando...';
+            submitButton.disabled = true;
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('Debes estar logueado para crear un anuncio.');
+
+                const formData = new FormData(anuncioForm);
+                let imagenPrincipalUrl = '';
+                const imagenesAdicionalesUrls = [];
+                const fileInputs = [
+                    anuncioForm.querySelector('#imagen1'), 
+                    anuncioForm.querySelector('#imagen2'), 
+                    anuncioForm.querySelector('#imagen3'), 
+                    anuncioForm.querySelector('#imagen4')
+                ];
+
+                for (let i = 0; i < fileInputs.length; i++) {
+                    const file = fileInputs[i]?.files[0];
+                    if (file) {
+                        const fileName = `${user.id}/${Date.now()}-${file.name}`;
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-anuncios').upload(fileName, file);
+                        if (uploadError) throw uploadError;
+
+                        const { data: publicUrlData } = supabaseClient.storage.from('imagenes-anuncios').getPublicUrl(fileName);
+                        
+                        if (i === 0) {
+                            imagenPrincipalUrl = publicUrlData.publicUrl;
+                        } else {
+                            imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
+                        }
+                    }
+                }
+                if (!imagenPrincipalUrl) throw new Error('La imagen principal es obligatoria.');
+
+                const nuevoAnuncio = {
+                    titulo: formData.get('titulo'),
+                    direccion: formData.get('direccion'),
+                    email_contacto: formData.get('email'),
+                    descripcion: formData.get('descripcion'),
+                    tipo: formData.get('tipo'),
+                    precio: parseFloat(formData.get('precio')),
+                    habitaciones: parseInt(formData.get('habitaciones')),
+                    banos: parseInt(formData.get('banos')),
+                    superficie: parseInt(formData.get('superficie')),
+                    imagen_principal_url: imagenPrincipalUrl,
+                    imagenes_adicionales_urls: imagenesAdicionalesUrls,
+                    user_id: user.id
+                };
+
+                const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
+                if (insertError) throw insertError;
+
+                window.location.href = 'Gracias.html';
+
+            } catch (error) {
+                console.error('Error al enviar el anuncio:', error);
+                alert('Hubo un error al enviar tu anuncio: ' + error.message);
+                submitButton.textContent = 'Enviar Anuncio';
+                submitButton.disabled = false;
+            }
+        });
+    }
+
     let deferredPrompt; 
     const installBtn = document.getElementById('installBtn');
     if (installBtn) {
@@ -1104,6 +1188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteAccountBtn = document.getElementById('deleteAccountBtn');
         const usernameInput = document.getElementById('username');
         const emailInput = document.getElementById('email');
+        const subscriptionInfoDiv = document.getElementById('subscription-info');
 
         const showNotification = (message, type = 'success') => {
             const banner = document.getElementById('notification-banner');
@@ -1120,6 +1205,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (user) {
                 emailInput.value = user.email;
                 usernameInput.value = user.user_metadata.username || '';
+
+                // --- CÓDIGO PARA CARGAR DATOS DE SUSCRIPCIÓN ---
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('subscription_plan, subscription_status, subscription_end_date')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    subscriptionInfoDiv.innerHTML = '<p>No se pudo cargar la información de tu suscripción.</p>';
+                } else if (profile && profile.subscription_plan && profile.subscription_status === 'active') {
+                    const endDate = new Date(profile.subscription_end_date).toLocaleDateString('es-ES');
+                    subscriptionInfoDiv.innerHTML = `
+                        <p>Tu plan actual es: <span class="plan-name">${profile.subscription_plan}</span></p>
+                        <p>Estado: <span class="status-active">Activo</span></p>
+                        <p>Tu suscripción se renueva el: ${endDate}</p>
+                    `;
+                } else {
+                    subscriptionInfoDiv.innerHTML = '<p>Actualmente no tienes ninguna suscripción activa.</p>';
+                }
+
             } else {
                 window.location.href = 'login.html';
             }
@@ -1195,6 +1301,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+
     const consentCookie = {
         necesarias: true,
         analiticas: false,
@@ -1226,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', function() {
             banner.classList.add('cookie-banner-hidden');
         }
     }
-    
+
     if (acceptAllBtn) {
         acceptAllBtn.addEventListener('click', () => {
             consentCookie.analiticas = true;
@@ -1247,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
             if (modal) {
-                hideBanner(); // Oculta el banner al abrir el modal
+                hideBanner();
                 modal.classList.add('active');
             }
         });
@@ -1273,36 +1380,29 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         executeScripts();
     }
-});
-// --- LÓGICA PARA EL MODAL DE 'MÁS INFORMACIÓN' EN ASESORIA.HTML ---
-document.addEventListener('DOMContentLoaded', () => {
+
+    // --- LÓGICA PARA EL MODAL DE 'MÁS INFORMACIÓN' EN ASESORIA.HTML ---
     const infoModal = document.getElementById('info-modal');
-    if (!infoModal) return; // Si no estamos en la página de asesoría, no hacer nada
+    if (infoModal) {
+        const infoButtons = document.querySelectorAll('.btn-mas-info');
+        const modalTitle = document.getElementById('info-modal-title');
+        const modalDetails = document.getElementById('info-modal-details');
+        const modalContactBtn = document.getElementById('info-modal-contact-btn');
 
-    const infoButtons = document.querySelectorAll('.btn-mas-info');
-    const modalTitle = document.getElementById('info-modal-title');
-    const modalDetails = document.getElementById('info-modal-details');
-    const modalContactBtn = document.getElementById('info-modal-contact-btn');
+        infoButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                const title = button.dataset.title;
+                const details = button.dataset.details;
+                modalTitle.textContent = title;
+                modalDetails.textContent = details;
 
-    infoButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault(); // Evita que el enlace '#' mueva la página
+                modalContactBtn.onclick = () => { // Usamos onclick para sobreescribir
+                    infoModal.classList.remove('active');
+                };
 
-            // 1. Coger la información de los atributos 'data-*' del botón
-            const title = button.dataset.title;
-            const details = button.dataset.details;
-
-            // 2. Rellenar el modal con esa información
-            modalTitle.textContent = title;
-            modalDetails.textContent = details;
-
-            // 3. Hacer que el botón del modal lleve al formulario
-            modalContactBtn.addEventListener('click', () => {
-                infoModal.classList.remove('active'); // Cierra el modal al pulsar
+                infoModal.classList.add('active');
             });
-
-            // 4. Mostrar el modal
-            infoModal.classList.add('active');
         });
-    });
+    }
 });
