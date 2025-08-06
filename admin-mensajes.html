@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Mensajes - Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="admin-page">
+
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul></ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <h2>Gestionar Mensajes</h2>
+            <p>Lee y responde a las conversaciones con los usuarios.</p>
+        </section>
+
+        <section class="admin-content-container">
+            <div class="admin-actions">
+                <a href="admin.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+            </div>
+            
+            <div id="admin-chat-container" class="admin-chat-container">
+                <div id="conversations-list" class="conversations-list">
+                    <p class="chat-info">Cargando conversaciones...</p>
+                </div>
+
+                <div id="chat-window" class="chat-window">
+                    <div id="chat-header" class="chat-header">
+                        <h3 id="chat-with-username">Selecciona una conversación</h3>
+                    </div>
+                    <div id="message-history" class="message-history">
+                        <p class="chat-info">Aquí aparecerán los mensajes.</p>
+                    </div>
+                    <form id="message-form" class="message-form" style="display: none;">
+                        <textarea id="message-input" placeholder="Escribe tu respuesta..." required></textarea>
+                        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+   
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>
