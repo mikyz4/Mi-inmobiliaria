@@ -1051,32 +1051,36 @@ a.service-item-link .service-item {
     margin: 0;
     color: var(--accent-color);
 }
-/* --- ESTILOS MEJORADOS PARA LISTA DE CONVERSACIONES (WHATSAPP STYLE) --- */
+/* --- ESTILOS MEJORADOS PARA LISTA DE CONVERSACIONES DE ADMIN (WHATSAPP STYLE) --- */
 
-.conversations-list {
+#admin-chat-container .conversations-list {
+    background-color: var(--primary-color);
+    padding: 8px;
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Un pequeño espacio entre conversaciones */
+    gap: 5px;
 }
 
-.conversation-item {
+#admin-chat-container .conversation-item {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 12px 10px;
+    padding: 12px;
     border-radius: 8px;
+    cursor: pointer;
+    border: none;
     transition: background-color 0.2s;
 }
 
-.conversation-item:hover {
-    background-color: #1E1E1E; /* Un gris un poco más claro al pasar el ratón */
+#admin-chat-container .conversation-item:hover {
+    background-color: #2a2a2a;
 }
 
-.conversation-item.active {
+#admin-chat-container .conversation-item.active {
     background-color: var(--accent-color);
 }
 
-.conversation-item .avatar {
+#admin-chat-container .conversation-item .avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -1086,59 +1090,68 @@ a.service-item-link .service-item {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 1.2rem;
-    flex-shrink: 0; /* Evita que el avatar se encoja */
+    font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
-.conversation-details {
+#admin-chat-container .conversation-item.active .avatar {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+}
+
+#admin-chat-container .conversation-details {
     flex-grow: 1;
-    overflow: hidden; /* Importante para que el texto no se desborde */
+    overflow: hidden;
 }
 
-.conversation-header {
+#admin-chat-container .conversation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 4px;
 }
 
-/* El nombre de usuario en la tarjeta de conversación */
-.conversation-item .conversation-user {
+#admin-chat-container .conversation-user {
     font-size: 1.1rem;
     font-weight: bold;
     color: var(--font-color-primary);
     margin: 0;
-}
-
-.conversation-item.active .conversation-user {
-    color: var(--primary-color);
-}
-
-.last-message-preview {
-    font-size: 0.9rem;
-    color: var(--font-color-secondary);
-    white-space: nowrap; /* Evita que el texto salte de línea */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Añade "..." si el texto es muy largo */
-    margin-top: 4px;
+    text-overflow: ellipsis;
 }
 
-.conversation-item.active .last-message-preview {
-    color: #121212;
-}
-
-.conversation-meta {
-    text-align: right;
-}
-
-/* La hora del último mensaje */
-.conversation-item .conversation-time {
+#admin-chat-container .conversation-time {
     font-size: 0.8rem;
     color: var(--font-color-secondary);
     flex-shrink: 0;
-    margin-left: 10px;
 }
-.conversation-item.active .conversation-time {
-     color: var(--primary-color);
+
+#admin-chat-container .last-message-preview {
+    font-size: 0.9rem;
+    color: var(--font-color-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+}
+
+#admin-chat-container .conversation-item.active .conversation-user,
+#admin-chat-container .conversation-item.active .conversation-time,
+#admin-chat-container .conversation-item.active .last-message-preview {
+    color: var(--primary-color);
+}
+
+.conversation-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 10px;
 }
 
 .unread-badge {
@@ -1147,15 +1160,14 @@ a.service-item-link .service-item {
     font-size: 0.8rem;
     font-weight: bold;
     border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 5px;
 }
 
-/* Ocultar la insignia si no hay mensajes no leídos */
 .unread-badge:empty {
     display: none;
 }
