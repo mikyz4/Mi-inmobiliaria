@@ -1069,91 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
             images[currentImage].classList.add('active');
         }, 5000);
     }
-
-    const anuncioForm = document.getElementById('anuncioForm');
-    if (anuncioForm) {
-        if (!anuncioForm.querySelector('#tipo')) {
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
-            formGroup.innerHTML = `
-                <label for="tipo">Tipo de Propiedad</label>
-                <select id="tipo" name="tipo" required>
-                    <option value="">Selecciona un tipo</option>
-                    <option value="Piso">Piso</option>
-                    <option value="Casa">Casa</option>
-                    <option value="Ático">Ático</option>
-                </select>`;
-            const descripcionGroup = Array.from(anuncioForm.querySelectorAll('.form-group')).find(el => el.querySelector('#descripcion'));
-            if(descripcionGroup) descripcionGroup.after(formGroup);
-        }
-
-        anuncioForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const submitButton = anuncioForm.querySelector('button[type="submit"]');
-            submitButton.textContent = 'Enviando...';
-            submitButton.disabled = true;
-
-            try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) throw new Error('Debes estar logueado para crear un anuncio.');
-
-                const formData = new FormData(anuncioForm);
-                let imagenPrincipalUrl = '';
-                const imagenesAdicionalesUrls = [];
-                const fileInputs = [
-                    anuncioForm.querySelector('#imagen1'), 
-                    anuncioForm.querySelector('#imagen2'), 
-                    anuncioForm.querySelector('#imagen3'), 
-                    anuncioForm.querySelector('#imagen4')
-                ];
-
-                for (let i = 0; i < fileInputs.length; i++) {
-                    const file = fileInputs[i]?.files[0];
-                    if (file) {
-                        const fileName = `${user.id}/${Date.now()}-${file.name}`;
-                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-anuncios').upload(fileName, file);
-                        if (uploadError) throw uploadError;
-
-                        const { data: publicUrlData } = supabaseClient.storage.from('imagenes-anuncios').getPublicUrl(fileName);
-                        
-                        if (i === 0) {
-                            imagenPrincipalUrl = publicUrlData.publicUrl;
-                        } else {
-                            imagenesAdicionalesUrls.push(publicUrlData.publicUrl);
-                        }
-                    }
-                }
-                if (!imagenPrincipalUrl) throw new Error('La imagen principal es obligatoria.');
-
-                const nuevoAnuncio = {
-                    titulo: formData.get('titulo'),
-                    direccion: formData.get('direccion'),
-                    email_contacto: formData.get('email'),
-                    descripcion: formData.get('descripcion'),
-                    tipo: formData.get('tipo'),
-                    precio: parseFloat(formData.get('precio')),
-                    habitaciones: parseInt(formData.get('habitaciones')),
-                    banos: parseInt(formData.get('banos')),
-                    superficie: parseInt(formData.get('superficie')),
-                    imagen_principal_url: imagenPrincipalUrl,
-                    imagenes_adicionales_urls: imagenesAdicionalesUrls,
-                    user_id: user.id
-                };
-
-                const { error: insertError } = await supabaseClient.from('anuncios').insert([nuevoAnuncio]);
-                if (insertError) throw insertError;
-
-                window.location.href = 'Gracias.html';
-
-            } catch (error) {
-                console.error('Error al enviar el anuncio:', error);
-                alert('Hubo un error al enviar tu anuncio: ' + error.message);
-                submitButton.textContent = 'Enviar Anuncio';
-                submitButton.disabled = false;
-            }
-        });
-    }
-
+    
     let deferredPrompt; 
     const installBtn = document.getElementById('installBtn');
     if (installBtn) {
@@ -1262,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         loadUserData();
     }
-
+    
     // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
     const banner = document.getElementById('cookie-consent-banner');
     const modal = document.getElementById('cookie-settings-modal');
@@ -1278,7 +1194,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-
 
     const consentCookie = {
         necesarias: true,
@@ -1311,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             banner.classList.add('cookie-banner-hidden');
         }
     }
-
+    
     if (acceptAllBtn) {
         acceptAllBtn.addEventListener('click', () => {
             consentCookie.analiticas = true;
@@ -1332,6 +1247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
             if (modal) {
+                hideBanner(); // Oculta el banner al abrir el modal
                 modal.classList.add('active');
             }
         });

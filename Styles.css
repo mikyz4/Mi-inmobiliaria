@@ -268,6 +268,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     color: var(--primary-color);
     border: none;
     cursor: pointer;
+    /* --- LÍNEAS AÑADIDAS PARA CENTRAR --- */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -453,6 +454,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     overflow: hidden; /* Para que los bordes redondeados se apliquen a los items */
 }
 
+/* Clase que se añade con JS para mostrar el menú */
 .user-dropdown-menu.show {
     display: block;
 }
@@ -792,6 +794,10 @@ a.service-item-link .service-item {
     transform: translateY(0);
 }
 
+.cookie-banner-hidden {
+    display: none;
+}
+
 .cookie-banner-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -845,3 +851,9 @@ a.service-item-link .service-item {
     margin-top: 8px;
 }
 
+/* --- MODIFICACIÓN PARA EL COLOR DEL ENLACE DE COOKIES --- */
+.cookie-banner-content p a {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-decoration: underline;
+}
