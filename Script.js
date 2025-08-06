@@ -846,7 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (imageFile) {
                         const { data: { user } } = await supabaseClient.auth.getUser();
                         const fileName = `${user.id}/${Date.now()}-${imageFile.name}`;
-                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-posts').upload(fileName, file);
+                        const { error: uploadError } = await supabaseClient.storage.from('imagenes-posts').upload(fileName, imageFile);
                         if (uploadError) throw uploadError;
                         const { data: publicUrlData } = supabaseClient.storage.from('imagenes-posts').getPublicUrl(fileName);
                         imageUrl = publicUrlData.publicUrl;
