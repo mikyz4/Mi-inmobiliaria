@@ -1159,7 +1159,7 @@ a.service-item-link .service-item {
 .unread-badge:empty {
     display: none;
 }
-/* --- ESTILOS PARA EL DOBLE CHECK DE LEÍDO --- */
+/* --- ESTILOS PARA EL DOBLE CHECK DE LEÍDO (VERSIÓN CORREGIDA) --- */
 .message-meta {
     display: flex;
     align-items: center;
@@ -1169,7 +1169,6 @@ a.service-item-link .service-item {
     margin-top: 5px;
 }
 
-/* Alinea los checks a la derecha en los mensajes enviados */
 .message.sent .message-meta {
     justify-content: flex-end;
 }
@@ -1181,19 +1180,16 @@ a.service-item-link .service-item {
 
 .read-receipts .fa-check {
     font-size: 0.8rem;
+    color: var(--font-color-secondary); /* Ambos grises por defecto */
+    transition: color 0.3s ease;
 }
 
-/* El primer check siempre es gris */
-.read-receipts .tick-1 {
-    color: var(--font-color-secondary);
-}
-
-/* El segundo check empieza gris y cambia de color al leerse */
+/* Solapamos el segundo tick ligeramente sobre el primero */
 .read-receipts .tick-2 {
-    color: var(--font-color-secondary);
-    margin-left: -4px; /* Solapa ligeramente los checks */
+    margin-left: -5px; 
 }
 
-.read-receipts.read .tick-2 {
-    color: #4FC3F7; /* Un color azul claro para el "leído" */
+/* Cuando el contenedor tiene la clase .read, AMBOS ticks se ponen azules */
+.read-receipts.read .fa-check {
+    color: #4FC3F7; /* Azul para "leído" */
 }

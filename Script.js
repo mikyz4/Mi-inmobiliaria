@@ -1183,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const displayMessage = (message) => {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
-            messageDiv.setAttribute('data-message-id', message.id); // <-- Añadido para identificar el mensaje
+            messageDiv.setAttribute('data-message-id', message.id);
             
             const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
             messageDiv.classList.add(messageClass);
@@ -1265,9 +1265,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     schema: 'public', 
                     table: 'messages',
                     filter: `conversation_id=eq.${conversationId}`
-                }, payload => {
+                }, async (payload) => { // <-- Convertido a async
                     if (payload.new.sender_id !== currentUser.id) {
                        displayMessage(payload.new);
+                       // Marcar como leído al recibir en tiempo real
+                       await supabaseClient
+                        .from('messages')
+                        .update({ is_read: true })
+                        .eq('id', payload.new.id);
                     }
                 })
                 .on('postgres_changes', {
@@ -1288,7 +1293,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 conversation_id: conversationId,
                 sender_id: currentUser.id,
                 content: content,
-                is_read: false // <-- Aseguramos que se envía como no leído
+                is_read: false
             };
             
             messageInput.value = '';
@@ -1303,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error enviando mensaje:', error);
                 alert('No se pudo enviar tu mensaje. Inténtalo de nuevo.');
             } else {
-                displayMessage(data); // Mostramos el mensaje real de la DB con su ID
+                displayMessage(data);
             }
         });
 
@@ -1337,7 +1342,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (newConvError) {
                     console.error('Error creando conversación:', newConvError);
-                    messageHistory.innerHTML = '<p class="chat-info">Error al crear tu sala de chat.</p>';
                     return;
                 }
                 conversation = newConversation;
@@ -1346,6 +1350,14 @@ document.addEventListener('DOMContentLoaded', function() {
             conversationId = conversation.id;
             
             await loadMessages();
+            
+            // Marcar mensajes como leídos al cargar el chat
+            await supabaseClient
+                .from('messages')
+                .update({ is_read: true })
+                .eq('conversation_id', conversationId)
+                .neq('sender_id', currentUser.id);
+
             subscribeToChanges();
         };
 
