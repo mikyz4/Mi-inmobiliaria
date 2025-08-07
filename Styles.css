@@ -1159,27 +1159,41 @@ a.service-item-link .service-item {
 .unread-badge:empty {
     display: none;
 }
-/* --- ESTILOS PARA CHECKS DE LECTURA --- */
+/* --- ESTILOS PARA EL DOBLE CHECK DE LEÍDO --- */
 .message-meta {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Alinea el contenido (hora y checks) a la derecha */
-    gap: 5px; /* Espacio entre la hora y el check */
+    gap: 8px; /* Espacio entre la hora y los checks */
+    font-size: 0.75rem;
+    color: var(--font-color-secondary);
+    margin-top: 5px;
 }
 
-.message.received .message-meta {
-    justify-content: flex-start; /* En los recibidos, la hora va a la izquierda */
+/* Alinea los checks a la derecha en los mensajes enviados */
+.message.sent .message-meta {
+    justify-content: flex-end;
 }
 
-.checkmark {
-    font-weight: bold;
-    font-size: 0.9rem;
+.read-receipts {
+    display: inline-flex;
+    align-items: center;
 }
 
-.checkmark.sent {
-    color: var(--font-color-secondary); /* Color gris para enviado */
+.read-receipts .fa-check {
+    font-size: 0.8rem;
 }
 
-.checkmark.read {
-    color: #4FC3F7; /* Color azul claro para leído */
+/* El primer check siempre es gris */
+.read-receipts .tick-1 {
+    color: var(--font-color-secondary);
+}
+
+/* El segundo check empieza gris y cambia de color al leerse */
+.read-receipts .tick-2 {
+    color: var(--font-color-secondary);
+    margin-left: -4px; /* Solapa ligeramente los checks */
+}
+
+.read-receipts.read .tick-2 {
+    color: #4FC3F7; /* Un color azul claro para el "leído" */
 }
