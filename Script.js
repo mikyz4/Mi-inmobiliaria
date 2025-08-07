@@ -1741,8 +1741,6 @@ if (adminChatContainer) {
 
     initAdminChat();
 }
-
-});
 // --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
 const adminChatContainer = document.getElementById('admin-chat-container');
 if (adminChatContainer) {
