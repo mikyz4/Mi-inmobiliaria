@@ -1556,6 +1556,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         initChat();
     }
+
+});
 // --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
 const adminChatContainer = document.getElementById('admin-chat-container');
 if (adminChatContainer) {
@@ -1741,8 +1743,6 @@ if (adminChatContainer) {
 
     initAdminChat();
 }
-
-});
 // --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
 const adminChatContainer = document.getElementById('admin-chat-container');
 if (adminChatContainer) {
@@ -1793,11 +1793,18 @@ if (adminChatContainer) {
                 schema: 'public', 
                 table: 'messages',
                 filter: `conversation_id=eq.${conversationId}`
-            }, payload => {
+            }, async (payload) => { // <--- Convertida a async
                 if (payload.new.sender_id !== currentUser.id) {
                     displayAdminChatMessage(payload.new);
+                    // >>> INICIO: CÓDIGO AÑADIDO PARA MARCAR COMO LEÍDO EN TIEMPO REAL <<<
+                    // Si el admin tiene esta ventana de chat abierta, el nuevo mensaje se marca como leído automáticamente.
+                    await supabaseClient
+                        .from('messages')
+                        .update({ is_read: true })
+                        .eq('id', payload.new.id);
+                    // >>> FIN: CÓDIGO AÑADIDO <<<
                 }
-                loadConversations(); // Recarga la lista para actualizar la vista previa y el contador
+                // No es necesario recargar las conversaciones aquí, ya que el contador de no leídos de esta no cambiará.
             })
             .subscribe();
     };
@@ -1805,14 +1812,19 @@ if (adminChatContainer) {
     const selectConversation = async (conversationId, username) => {
         selectedConversationId = conversationId;
 
-        // Marcar mensajes como leídos
-        const { error: updateError } = await supabaseClient
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .eq('is_read', false);
-        
-        if (updateError) console.error("Error al marcar mensajes como leídos:", updateError);
+        // >>> INICIO: CÓDIGO MODIFICADO PARA MARCAR MENSAJES COMO LEÍDOS <<<
+        // Al abrir la conversación, marca todos los mensajes recibidos (no del admin) como leídos.
+        if(currentUser) {
+            const { error: updateError } = await supabaseClient
+                .from('messages')
+                .update({ is_read: true })
+                .eq('conversation_id', conversationId)
+                .neq('sender_id', currentUser.id) // Solo marca los mensajes que NO son del admin
+                .eq('is_read', false); // Solo actualiza los que ya están como no leídos
+            
+            if (updateError) console.error("Error al marcar mensajes como leídos:", updateError);
+        }
+        // >>> FIN: CÓDIGO MODIFICADO <<<
 
         // Recargar la lista de conversaciones para que el contador de no leídos se actualice a 0
         loadConversations();
@@ -1863,6 +1875,9 @@ if (adminChatContainer) {
             return;
         }
 
+        // Guardar la posición del scroll antes de recargar
+        const scrollPosition = conversationsList.scrollTop;
+
         conversationsList.innerHTML = '';
         data.forEach(conv => {
             const item = document.createElement('div');
@@ -1898,6 +1913,9 @@ if (adminChatContainer) {
             item.addEventListener('click', () => selectConversation(conv.id, conv.username));
             conversationsList.appendChild(item);
         });
+
+        // Restaurar la posición del scroll
+        conversationsList.scrollTop = scrollPosition;
     };
 
     messageForm.addEventListener('submit', async (e) => {
@@ -1923,7 +1941,7 @@ if (adminChatContainer) {
             console.error(error);
             messageHistory.lastChild.remove();
         } else {
-            loadConversations();
+            // No es necesario llamar a loadConversations aquí, el trigger se encargará
         }
     });
 
@@ -1935,16 +1953,28 @@ if (adminChatContainer) {
             return;
         }
         currentUser = user;
-        loadConversations();
+        await loadConversations();
 
-        supabaseClient.channel('new_conversations_and_messages')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
-                loadConversations();
-            })
+        supabaseClient.channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                 // Si el mensaje es para la conversación actual, la suscripción individual ya se encarga.
+                 // Si es para OTRA conversación, recargamos la lista para actualizar el contador.
                  if (payload.new.conversation_id !== selectedConversationId) {
                     loadConversations();
+                } else {
+                    // Si es para la conversación actual y lo envió el usuario, lo marcamos como leído.
+                    if (payload.new.sender_id !== currentUser.id) {
+                         supabaseClient
+                            .from('messages')
+                            .update({ is_read: true })
+                            .eq('id', payload.new.id)
+                            .then();
+                    }
                 }
+            })
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
+                // Si se crea una conversación totalmente nueva, recargamos la lista.
+                loadConversations();
             })
             .subscribe();
     };
