@@ -1572,230 +1572,230 @@ document.addEventListener('DOMContentLoaded', function() {
         initChat();
     }
 
-    // --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
-    const adminChatContainer = document.getElementById('admin-chat-container');
-    if (adminChatContainer) {
-        const conversationsList = document.getElementById('conversations-list');
-        const chatWindow = document.getElementById('chat-window');
-        const messageHistory = document.getElementById('message-history');
-        const messageForm = document.getElementById('message-form');
-        const messageInput = document.getElementById('message-input');
-        const chatWithUsername = document.getElementById('chat-with-username');
+// --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
+const adminChatContainer = document.getElementById('admin-chat-container');
+if (adminChatContainer) {
+    const conversationsList = document.getElementById('conversations-list');
+    const chatWindow = document.getElementById('chat-window');
+    const messageHistory = document.getElementById('message-history');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const chatWithUsername = document.getElementById('chat-with-username');
 
-        let currentUser = null; // El admin logueado
-        let selectedConversationId = null;
-        let messagesSubscription = null;
+    let currentUser = null; // El admin logueado
+    let selectedConversationId = null;
+    let messagesSubscription = null;
 
-        // --- MODIFICACIÓN: Función para mostrar mensajes de admin con checks de leído ---
-        const displayAdminChatMessage = (message) => {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            
-            const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
-            messageDiv.classList.add(messageClass);
+    const displayAdminChatMessage = (message) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
+        messageDiv.classList.add(messageClass);
+        const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        
+        const p = document.createElement('p');
+        p.textContent = message.content;
 
-            const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-            
-            const p = document.createElement('p');
-            p.textContent = message.content;
+        const meta = document.createElement('div');
+        meta.className = 'message-meta';
+        meta.innerHTML += `<span>${time}</span>`;
 
-            const meta = document.createElement('div');
-            meta.className = 'message-meta';
-            meta.innerHTML += `<span>${time}</span>`;
+        if (message.sender_id === currentUser.id) {
+            // Para los mensajes del propio admin, los mostraremos como "entregados" (gris).
+            meta.innerHTML += `<span class="checkmark sent"><i class="fas fa-check-double"></i></span>`;
+        }
 
-            // Si el mensaje fue enviado por el admin, añadimos el check
-            if (message.sender_id === currentUser.id) {
-                // Como es el chat del admin, los mensajes de los usuarios se marcan como leídos al abrir el chat.
-                // Para los mensajes del propio admin, asumimos que el usuario los leerá, pero no tenemos esa info aquí.
-                // Por convención, los mostraremos como "entregados" (gris).
-                // Podríamos añadir una lógica más compleja si el usuario también notificara la lectura.
-                meta.innerHTML += `<span class="checkmark sent"><i class="fas fa-check-double"></i></span>`;
-            }
+        messageDiv.appendChild(p);
+        messageDiv.appendChild(meta);
+        
+        const infoMessage = messageHistory.querySelector('.chat-info');
+        if (infoMessage) {
+            infoMessage.remove();
+        }
+        
+        messageHistory.appendChild(messageDiv);
+        messageHistory.scrollTop = messageHistory.scrollHeight;
+    };
 
-            messageDiv.appendChild(p);
-            messageDiv.appendChild(meta);
-            
-            const infoMessage = messageHistory.querySelector('.chat-info');
-            if (infoMessage) {
-                infoMessage.remove();
-            }
-            
-            messageHistory.appendChild(messageDiv);
-            messageHistory.scrollTop = messageHistory.scrollHeight;
-        };
-
-        const subscribeToConversation = (conversationId) => {
-            if (messagesSubscription) {
-                supabaseClient.removeChannel(messagesSubscription);
-            }
-            messagesSubscription = supabaseClient.channel(`admin_chat_${conversationId}`)
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, 
-                payload => {
-                    if (payload.new.sender_id !== currentUser.id) {
-                        // Al recibir un nuevo mensaje, lo marcamos como leído inmediatamente
-                        // ya que el admin tiene el chat abierto.
-                        supabaseClient.from('messages').update({ is_read: true }).eq('id', payload.new.id).then();
-                        displayAdminChatMessage(payload.new);
-                    }
-                    loadConversations(); // Recarga la lista para actualizar la vista previa y el contador
-                })
-                .subscribe();
-        };
-
-        const selectConversation = async (conversationId, username) => {
-            selectedConversationId = conversationId;
-
-            // --- LÓGICA PARA MARCAR COMO LEÍDO (YA ESTABA CORRECTA) ---
-            const { error: updateError } = await supabaseClient
-                .from('messages')
-                .update({ is_read: true })
-                .eq('conversation_id', conversationId)
-                .eq('sender_id', username.id) // Asegúrate de marcar solo los del usuario
-                .eq('is_read', false);
-            
-            if (updateError) console.error("Error al marcar mensajes como leídos:", updateError);
-
-            // Recargar la lista para que el contador de no leídos se actualice
-            loadConversations();
-
-            // Resalta la conversación activa en la lista
-            document.querySelectorAll('.conversation-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`[data-conversation-id="${conversationId}"]`).classList.add('active');
-
-            messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
-            chatWithUsername.textContent = `Chat con ${username}`;
-            messageForm.style.display = 'flex';
-            messageInput.value = '';
-            messageInput.focus();
-
-            const { data: messages, error } = await supabaseClient
-                .from('messages')
-                .select('*')
-                .eq('conversation_id', conversationId)
-                .order('created_at', { ascending: true });
-
-            if (error) {
-                messageHistory.innerHTML = '<p class="chat-info">Error al cargar mensajes.</p>';
-                return;
-            }
-
-            messageHistory.innerHTML = '';
-            if(messages.length === 0) {
-                messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación. ¡Envía el primero!</p>';
-            } else {
-                messages.forEach(displayAdminChatMessage);
-            }
-            
-            subscribeToConversation(conversationId);
-        };
-
-        const loadConversations = async () => {
-            if (!currentUser) return;
-
-            const { data, error } = await supabaseClient.rpc('get_conversations_with_details', {
-                admin_id: currentUser.id
-            });
-
-            if (error) {
-                conversationsList.innerHTML = '<p class="chat-info">Error al cargar conversaciones. Revisa la función en Supabase.</p>';
-                console.error(error);
-                return;
-            }
-            
-            if (data.length === 0) {
-                conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones iniciadas.</p>';
-                return;
-            }
-
-            conversationsList.innerHTML = '';
-            data.forEach(conv => {
-                const item = document.createElement('div');
-                item.className = 'conversation-item';
-                item.setAttribute('data-conversation-id', conv.id);
-                if (conv.id === selectedConversationId) {
-                    item.classList.add('active');
+    const subscribeToConversation = (conversationId) => {
+        if (messagesSubscription) {
+            supabaseClient.removeChannel(messagesSubscription);
+        }
+        messagesSubscription = supabaseClient.channel(`admin_chat_${conversationId}`)
+            .on('postgres_changes', { 
+                event: 'INSERT', 
+                schema: 'public', 
+                table: 'messages',
+                filter: `conversation_id=eq.${conversationId}`
+            }, payload => {
+                if (payload.new.sender_id !== currentUser.id) {
+                    displayAdminChatMessage(payload.new);
+                    // Marcamos como leído el mensaje que acaba de llegar en tiempo real
+                    supabaseClient.from('messages').update({ is_read: true }).eq('id', payload.new.id).then();
                 }
-                
-                const userInitial = (conv.username || 'U').charAt(0).toUpperCase();
+                loadConversations(); // Recarga la lista para actualizar la vista previa y el contador
+            })
+            .subscribe();
+    };
 
-                const lastMessageTime = conv.last_message_at 
-                    ? new Date(conv.last_message_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-                    : '';
-                    
-                const unreadCount = conv.unread_count || 0;
-                const lastMessagePreview = conv.last_message_content || 'Conversación iniciada.';
+    const selectConversation = async (conversationId, username) => {
+        selectedConversationId = conversationId;
 
-                item.innerHTML = `
-                    <div class="avatar">${userInitial}</div>
-                    <div class="conversation-details">
-                        <div class="conversation-header">
-                            <span class="conversation-user">${conv.username || 'Usuario sin nombre'}</span>
-                            <span class="conversation-time">${lastMessageTime}</span>
-                        </div>
-                        <p class="last-message-preview">${lastMessagePreview}</p>
-                    </div>
-                    <div class="conversation-meta">
-                        ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
-                    </div>
-                `;
+        // CORRECCIÓN de la versión anterior: Marca como leídos los mensajes del usuario en el chat abierto.
+        const { error: updateError } = await supabaseClient
+            .from('messages')
+            .update({ is_read: true })
+            .eq('conversation_id', conversationId)
+            .eq('is_read', false);
+        
+        if (updateError) console.error("Error al marcar mensajes como leídos:", updateError);
 
-                item.addEventListener('click', () => selectConversation(conv.id, conv.username));
-                conversationsList.appendChild(item);
-            });
-        };
-
-        messageForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const content = messageInput.value.trim();
-            if (!content || !selectedConversationId || !currentUser) return;
-
-            const messageData = {
-                conversation_id: selectedConversationId,
-                sender_id: currentUser.id,
-                content: content,
-                is_read: false // El admin lo envía como no leído para el usuario
-            };
-
-            displayAdminChatMessage({
-                ...messageData,
-                created_at: new Date().toISOString()
-            });
-            messageInput.value = '';
-
-            const { error } = await supabaseClient.from('messages').insert(messageData);
-            if (error) {
-                alert('Error al enviar el mensaje.');
-                console.error(error);
-                messageHistory.lastChild.remove();
+        // Recargar la lista de conversaciones para que el contador de no leídos se actualice a 0
+        loadConversations();
+        
+        // Resalta la conversación activa
+         document.querySelectorAll('.conversation-item').forEach(item => {
+            if (item.getAttribute('data-conversation-id') === conversationId) {
+                item.classList.add('active');
             } else {
-                loadConversations();
+                item.classList.remove('active');
             }
         });
 
-        const initAdminChat = async () => {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                alert('Acceso denegado. Debes ser administrador.');
-                window.location.href = 'Index.html';
-                return;
-            }
-            currentUser = user;
-            loadConversations();
+        messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
+        chatWithUsername.textContent = `Chat con ${username}`;
+        messageForm.style.display = 'flex';
+        messageInput.value = '';
+        messageInput.focus();
 
-            // Suscripción para refrescar la lista de conversaciones si llega un mensaje nuevo
-            // a una conversación que no está seleccionada.
-            supabaseClient.channel('new_conversations_and_messages')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
-                    loadConversations();
-                })
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                     if (payload.new.conversation_id !== selectedConversationId) {
-                        loadConversations();
-                    }
-                })
-                .subscribe();
+        const { data: messages, error } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true });
+
+        if (error) {
+            messageHistory.innerHTML = '<p class="chat-info">Error al cargar mensajes.</p>';
+            return;
+        }
+
+        messageHistory.innerHTML = '';
+        if(messages.length === 0) {
+            messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación. ¡Envía el primero!</p>';
+        } else {
+            messages.forEach(displayAdminChatMessage);
+        }
+        
+        subscribeToConversation(conversationId);
+    };
+
+    const loadConversations = async () => {
+        if (!currentUser) return;
+
+        const { data, error } = await supabaseClient.rpc('get_conversations_with_details', {
+            admin_id: currentUser.id
+        });
+
+        if (error) {
+            conversationsList.innerHTML = '<p class="chat-info">Error al cargar conversaciones. Revisa la función en Supabase.</p>';
+            console.error(error);
+            return;
+        }
+        
+        if (data.length === 0) {
+            conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones iniciadas.</p>';
+            return;
+        }
+
+        const currentActiveId = document.querySelector('.conversation-item.active')?.getAttribute('data-conversation-id');
+        conversationsList.innerHTML = '';
+        data.forEach(conv => {
+            const item = document.createElement('div');
+            item.className = 'conversation-item';
+            item.setAttribute('data-conversation-id', conv.id);
+            if (conv.id === currentActiveId) {
+                item.classList.add('active');
+            }
+            
+            const userInitial = (conv.username || 'U').charAt(0).toUpperCase();
+
+            const lastMessageTime = conv.last_message_at 
+                ? new Date(conv.last_message_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                : '';
+                
+            const unreadCount = conv.unread_count || 0;
+            const lastMessagePreview = conv.last_message_content || 'Conversación iniciada.';
+
+            item.innerHTML = `
+                <div class="avatar">${userInitial}</div>
+                <div class="conversation-details">
+                    <div class="conversation-header">
+                        <span class="conversation-user">${conv.username || 'Usuario sin nombre'}</span>
+                        <span class="conversation-time">${lastMessageTime}</span>
+                    </div>
+                    <p class="last-message-preview">${lastMessagePreview}</p>
+                </div>
+                <div class="conversation-meta">
+                    ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                </div>
+            `;
+
+            item.addEventListener('click', () => selectConversation(conv.id, conv.username));
+            conversationsList.appendChild(item);
+        });
+    };
+
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = messageInput.value.trim();
+        if (!content || !selectedConversationId || !currentUser) return;
+
+        const messageData = {
+            conversation_id: selectedConversationId,
+            sender_id: currentUser.id,
+            content: content,
+            is_read: false
         };
 
-        initAdminChat();
-    }
+        displayAdminChatMessage({
+            ...messageData,
+            created_at: new Date().toISOString()
+        });
+        messageInput.value = '';
+
+        const { error } = await supabaseClient.from('messages').insert(messageData);
+        if (error) {
+            alert('Error al enviar el mensaje.');
+            console.error(error);
+            messageHistory.lastChild.remove();
+        } else {
+            loadConversations();
+        }
+    });
+
+    const initAdminChat = async () => {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            alert('Acceso denegado. Debes ser administrador.');
+            window.location.href = 'Index.html';
+            return;
+        }
+        currentUser = user;
+        await loadConversations();
+
+        supabaseClient.channel('new_conversations_and_messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
+                loadConversations();
+            })
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                 if (payload.new.conversation_id !== selectedConversationId) {
+                    loadConversations();
+                }
+            })
+            .subscribe();
+    };
+
+    initAdminChat();
+}
+
 });
