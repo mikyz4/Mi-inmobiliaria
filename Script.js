@@ -1169,7 +1169,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-        // --- LÓGICA DE MENSAJERÍA ---
+
+    // --- LÓGICA DE MENSAJERÍA (USUARIO) ---
     const chatContainer = document.querySelector('.chat-container');
     if (chatContainer) {
         const messageHistory = document.getElementById('message-history');
@@ -1182,6 +1183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const displayMessage = (message) => {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
+            messageDiv.setAttribute('data-message-id', message.id); // <-- Añadido para identificar el mensaje
             
             const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
             messageDiv.classList.add(messageClass);
@@ -1189,11 +1191,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
             
             const p = document.createElement('p');
-            p.textContent = message.content; // Seguro contra inyección de HTML
+            p.textContent = message.content;
 
             const meta = document.createElement('div');
             meta.className = 'message-meta';
-            meta.textContent = time;
+            
+            let readReceiptHTML = '';
+            if (messageClass === 'sent') {
+                const readClass = message.is_read ? 'read' : '';
+                readReceiptHTML = `
+                    <span class="read-receipts ${readClass}" data-receipt-for="${message.id}">
+                        <i class="fas fa-check tick-1"></i>
+                        <i class="fas fa-check tick-2"></i>
+                    </span>
+                `;
+            }
+
+            meta.innerHTML = `<span>${time}</span>${readReceiptHTML}`;
 
             messageDiv.appendChild(p);
             messageDiv.appendChild(meta);
@@ -1229,13 +1243,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 messages.forEach(displayMessage);
             }
         };
+        
+        const handleRealtimeUpdate = (payload) => {
+            const updatedMessage = payload.new;
+            if (updatedMessage.is_read) {
+                const receipt = document.querySelector(`[data-receipt-for="${updatedMessage.id}"]`);
+                if (receipt) {
+                    receipt.classList.add('read');
+                }
+            }
+        };
 
-        const subscribeToMessages = () => {
+        const subscribeToChanges = () => {
             if (messagesSubscription) {
                 supabaseClient.removeChannel(messagesSubscription);
             }
 
-            messagesSubscription = supabaseClient.channel(`messages_for_${conversationId}`)
+            messagesSubscription = supabaseClient.channel(`public:messages:conv=${conversationId}`)
                 .on('postgres_changes', { 
                     event: 'INSERT', 
                     schema: 'public', 
@@ -1246,6 +1270,12 @@ document.addEventListener('DOMContentLoaded', function() {
                        displayMessage(payload.new);
                     }
                 })
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`
+                }, handleRealtimeUpdate)
                 .subscribe();
         };
 
@@ -1257,21 +1287,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const messageData = {
                 conversation_id: conversationId,
                 sender_id: currentUser.id,
-                content: content
+                content: content,
+                is_read: false // <-- Aseguramos que se envía como no leído
             };
             
-            displayMessage({
-                ...messageData,
-                created_at: new Date().toISOString()
-            });
             messageInput.value = '';
 
-            const { error } = await supabaseClient.from('messages').insert(messageData);
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .insert(messageData)
+                .select()
+                .single();
 
             if (error) {
                 console.error('Error enviando mensaje:', error);
                 alert('No se pudo enviar tu mensaje. Inténtalo de nuevo.');
-                messageHistory.lastChild.remove(); // Elimina el mensaje que se mostró si falla el envío
+            } else {
+                displayMessage(data); // Mostramos el mensaje real de la DB con su ID
             }
         });
 
@@ -1314,218 +1346,250 @@ document.addEventListener('DOMContentLoaded', function() {
             conversationId = conversation.id;
             
             await loadMessages();
-            subscribeToMessages();
+            subscribeToChanges();
         };
 
         initChat();
     }
-// --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
-const adminChatContainer = document.getElementById('admin-chat-container');
-if (adminChatContainer) {
-    const conversationsList = document.getElementById('conversations-list');
-    const chatWindow = document.getElementById('chat-window');
-    const messageHistory = document.getElementById('message-history');
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const chatWithUsername = document.getElementById('chat-with-username');
 
-    let currentUser = null; // El admin logueado
-    let selectedConversationId = null;
-    let messagesSubscription = null;
+    // --- LÓGICA DE MENSAJERÍA PARA EL PANEL DE ADMINISTRADOR ---
+    const adminChatContainer = document.getElementById('admin-chat-container');
+    if (adminChatContainer) {
+        const conversationsList = document.getElementById('conversations-list');
+        const chatWindow = document.getElementById('chat-window');
+        const messageHistory = document.getElementById('message-history');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const chatWithUsername = document.getElementById('chat-with-username');
 
-    const displayAdminChatMessage = (message) => {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
-        messageDiv.classList.add(messageClass);
-        const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
-        const p = document.createElement('p');
-        p.textContent = message.content;
+        let currentUser = null; // El admin logueado
+        let selectedConversationId = null;
+        let messagesSubscription = null;
 
-        const meta = document.createElement('div');
-        meta.className = 'message-meta';
-        meta.textContent = time;
+        const displayAdminChatMessage = (message) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.setAttribute('data-message-id', message.id);
+            
+            const messageClass = message.sender_id === currentUser.id ? 'sent' : 'received';
+            messageDiv.classList.add(messageClass);
 
-        messageDiv.appendChild(p);
-        messageDiv.appendChild(meta);
-        
-        const infoMessage = messageHistory.querySelector('.chat-info');
-        if (infoMessage) {
-            infoMessage.remove();
-        }
-        
-        messageHistory.appendChild(messageDiv);
-        messageHistory.scrollTop = messageHistory.scrollHeight;
-    };
+            const time = new Date(message.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            
+            const p = document.createElement('p');
+            p.textContent = message.content;
 
-    const subscribeToConversation = (conversationId) => {
-        if (messagesSubscription) {
-            supabaseClient.removeChannel(messagesSubscription);
-        }
-        messagesSubscription = supabaseClient.channel(`admin_chat_${conversationId}`)
-            .on('postgres_changes', { 
-                event: 'INSERT', 
-                schema: 'public', 
-                table: 'messages',
-                filter: `conversation_id=eq.${conversationId}`
-            }, payload => {
-                if (payload.new.sender_id !== currentUser.id) {
-                    displayAdminChatMessage(payload.new);
-                }
-                loadConversations(); // Recarga la lista para actualizar la vista previa y el contador
-            })
-            .subscribe();
-    };
+            const meta = document.createElement('div');
+            meta.className = 'message-meta';
 
-    const selectConversation = async (conversationId, username) => {
-        selectedConversationId = conversationId;
-
-        // Marcar mensajes como leídos
-        const { error: updateError } = await supabaseClient
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .eq('is_read', false);
-        
-        if (updateError) console.error("Error al marcar mensajes como leídos:", updateError);
-
-        // Recargar la lista de conversaciones para que el contador de no leídos se actualice a 0
-        loadConversations();
-
-        messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
-        chatWithUsername.textContent = `Chat con ${username}`;
-        messageForm.style.display = 'flex';
-        messageInput.value = '';
-        messageInput.focus();
-
-        const { data: messages, error } = await supabaseClient
-            .from('messages')
-            .select('*')
-            .eq('conversation_id', conversationId)
-            .order('created_at', { ascending: true });
-
-        if (error) {
-            messageHistory.innerHTML = '<p class="chat-info">Error al cargar mensajes.</p>';
-            return;
-        }
-
-        messageHistory.innerHTML = '';
-        if(messages.length === 0) {
-            messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación. ¡Envía el primero!</p>';
-        } else {
-            messages.forEach(displayAdminChatMessage);
-        }
-        
-        subscribeToConversation(conversationId);
-    };
-
-    const loadConversations = async () => {
-        if (!currentUser) return;
-
-        // Llama a la función RPC que creaste
-        const { data, error } = await supabaseClient.rpc('get_conversations_with_details', {
-            admin_id: currentUser.id
-        });
-
-        if (error) {
-            conversationsList.innerHTML = '<p class="chat-info">Error al cargar conversaciones. Revisa la función en Supabase.</p>';
-            console.error(error);
-            return;
-        }
-        
-        if (data.length === 0) {
-            conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones iniciadas.</p>';
-            return;
-        }
-
-        conversationsList.innerHTML = '';
-        data.forEach(conv => {
-            const item = document.createElement('div');
-            item.className = 'conversation-item';
-            item.setAttribute('data-conversation-id', conv.id);
-            if (conv.id === selectedConversationId) {
-                item.classList.add('active');
+            let readReceiptHTML = '';
+            if (messageClass === 'sent') {
+                const readClass = message.is_read ? 'read' : '';
+                readReceiptHTML = `
+                    <span class="read-receipts ${readClass}" data-receipt-for="${message.id}">
+                        <i class="fas fa-check tick-1"></i>
+                        <i class="fas fa-check tick-2"></i>
+                    </span>
+                `;
             }
             
-            const userInitial = (conv.username || 'U').charAt(0).toUpperCase();
+            meta.innerHTML = `<span>${time}</span>${readReceiptHTML}`;
 
-            const lastMessageTime = conv.last_message_at 
-                ? new Date(conv.last_message_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-                : '';
-                
-            const unreadCount = conv.unread_count || 0;
-            const lastMessagePreview = conv.last_message_content || 'Conversación iniciada.';
-
-            item.innerHTML = `
-                <div class="avatar">${userInitial}</div>
-                <div class="conversation-details">
-                    <div class="conversation-header">
-                        <span class="conversation-user">${conv.username || 'Usuario sin nombre'}</span>
-                        <span class="conversation-time">${lastMessageTime}</span>
-                    </div>
-                    <p class="last-message-preview">${lastMessagePreview}</p>
-                </div>
-                <div class="conversation-meta">
-                    ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
-                </div>
-            `;
-
-            item.addEventListener('click', () => selectConversation(conv.id, conv.username));
-            conversationsList.appendChild(item);
-        });
-    };
-
-    messageForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const content = messageInput.value.trim();
-        if (!content || !selectedConversationId || !currentUser) return;
-
-        const messageData = {
-            conversation_id: selectedConversationId,
-            sender_id: currentUser.id,
-            content: content
+            messageDiv.appendChild(p);
+            messageDiv.appendChild(meta);
+            
+            const infoMessage = messageHistory.querySelector('.chat-info');
+            if (infoMessage) {
+                infoMessage.remove();
+            }
+            
+            messageHistory.appendChild(messageDiv);
+            messageHistory.scrollTop = messageHistory.scrollHeight;
+        };
+        
+        const handleRealtimeAdminUpdate = (payload) => {
+            const updatedMessage = payload.new;
+            if (updatedMessage.is_read) {
+                const receipt = document.querySelector(`[data-receipt-for="${updatedMessage.id}"]`);
+                if (receipt) {
+                    receipt.classList.add('read');
+                }
+            }
         };
 
-        displayAdminChatMessage({
-            ...messageData,
-            created_at: new Date().toISOString()
-        });
-        messageInput.value = '';
+        const subscribeToConversation = (conversationId) => {
+            if (messagesSubscription) {
+                supabaseClient.removeChannel(messagesSubscription);
+            }
+            messagesSubscription = supabaseClient.channel(`admin_chat_for_${conversationId}`)
+                .on('postgres_changes', { 
+                    event: 'INSERT', 
+                    schema: 'public', 
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`
+                }, async (payload) => {
+                    if (payload.new.sender_id !== currentUser.id) {
+                        displayAdminChatMessage(payload.new);
+                        await supabaseClient
+                            .from('messages')
+                            .update({ is_read: true })
+                            .eq('id', payload.new.id);
+                    }
+                })
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`
+                }, handleRealtimeAdminUpdate)
+                .subscribe();
+        };
 
-        const { error } = await supabaseClient.from('messages').insert(messageData);
-        if (error) {
-            alert('Error al enviar el mensaje.');
-            console.error(error);
-            messageHistory.lastChild.remove();
-        } else {
+        const selectConversation = async (conversationId, username) => {
+            selectedConversationId = conversationId;
+            
+            if(currentUser) {
+                await supabaseClient
+                    .from('messages')
+                    .update({ is_read: true })
+                    .eq('conversation_id', conversationId)
+                    .neq('sender_id', currentUser.id)
+                    .eq('is_read', false);
+            }
+            
             loadConversations();
-        }
-    });
 
-    const initAdminChat = async () => {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-            alert('Acceso denegado. Debes ser administrador.');
-            window.location.href = 'Index.html';
-            return;
-        }
-        currentUser = user;
-        loadConversations();
+            messageHistory.innerHTML = '<p class="chat-info">Cargando mensajes...</p>';
+            chatWithUsername.textContent = `Chat con ${username}`;
+            messageForm.style.display = 'flex';
+            messageInput.value = '';
+            messageInput.focus();
 
-        supabaseClient.channel('new_conversations_and_messages')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
-                loadConversations();
-            })
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                 if (payload.new.conversation_id !== selectedConversationId) {
-                    loadConversations();
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', conversationId)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                messageHistory.innerHTML = '<p class="chat-info">Error al cargar mensajes.</p>';
+                return;
+            }
+
+            messageHistory.innerHTML = '';
+            if(messages.length === 0) {
+                messageHistory.innerHTML = '<p class="chat-info">No hay mensajes en esta conversación.</p>';
+            } else {
+                messages.forEach(displayAdminChatMessage);
+            }
+            
+            subscribeToConversation(conversationId);
+        };
+
+        const loadConversations = async () => {
+            if (!currentUser) return;
+            const { data, error } = await supabaseClient.rpc('get_conversations_with_details', {
+                admin_id: currentUser.id
+            });
+
+            if (error) {
+                conversationsList.innerHTML = '<p class="chat-info">Error al cargar conversaciones. Revisa la función en Supabase.</p>';
+                console.error(error);
+                return;
+            }
+            
+            if (data.length === 0) {
+                conversationsList.innerHTML = '<p class="chat-info">No hay conversaciones iniciadas.</p>';
+                return;
+            }
+
+            const scrollPosition = conversationsList.scrollTop;
+            conversationsList.innerHTML = '';
+            data.forEach(conv => {
+                const item = document.createElement('div');
+                item.className = 'conversation-item';
+                item.setAttribute('data-conversation-id', conv.id);
+                if (conv.id === selectedConversationId) {
+                    item.classList.add('active');
                 }
-            })
-            .subscribe();
-    };
+                
+                const userInitial = (conv.username || 'U').charAt(0).toUpperCase();
 
-    initAdminChat();
-}
+                const lastMessageTime = conv.last_message_at 
+                    ? new Date(conv.last_message_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                    : '';
+                    
+                const unreadCount = conv.unread_count || 0;
+                const lastMessagePreview = conv.last_message_content || 'Conversación iniciada.';
 
+                item.innerHTML = `
+                    <div class="avatar">${userInitial}</div>
+                    <div class="conversation-details">
+                        <div class="conversation-header">
+                            <span class="conversation-user">${conv.username || 'Usuario sin nombre'}</span>
+                            <span class="conversation-time">${lastMessageTime}</span>
+                        </div>
+                        <p class="last-message-preview">${lastMessagePreview}</p>
+                    </div>
+                    <div class="conversation-meta">
+                        ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                    </div>
+                `;
+
+                item.addEventListener('click', () => selectConversation(conv.id, conv.username));
+                conversationsList.appendChild(item);
+            });
+            conversationsList.scrollTop = scrollPosition;
+        };
+
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = messageInput.value.trim();
+            if (!content || !selectedConversationId || !currentUser) return;
+
+            const messageData = {
+                conversation_id: selectedConversationId,
+                sender_id: currentUser.id,
+                content: content,
+                is_read: false
+            };
+            
+            messageInput.value = '';
+            
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .insert(messageData)
+                .select()
+                .single();
+
+            if (error) {
+                alert('Error al enviar el mensaje.');
+                console.error(error);
+            } else {
+                 displayAdminChatMessage(data);
+            }
+        });
+
+        const initAdminChat = async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                alert('Acceso denegado. Debes ser administrador.');
+                window.location.href = 'Index.html';
+                return;
+            }
+            currentUser = user;
+            await loadConversations();
+
+            supabaseClient.channel('public-messages-admin')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+                     loadConversations();
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, payload => {
+                    loadConversations();
+                })
+                .subscribe();
+        };
+
+        initAdminChat();
+    }
 });
