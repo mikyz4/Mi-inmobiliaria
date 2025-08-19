@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas Gestión - Coordinación y Asesoría de Proyectos</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="page-gestora">
+
+    <header>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                <li><a href="#services">Servicios</a></li>
+                <li><a href="#news">Casos de Éxito</a></li>
+                <li><a href="#faq">Preguntas Frecuentes</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/reunion-negocios.jpg" alt="Equipo directivo en una reunión estratégica" class="carousel-image active">
+                <img src="Images/firma-contrato.jpg" alt="Cierre de un acuerdo con un apretón de manos" class="carousel-image">
+                <img src="Images/planning-proyecto.jpg" alt="Pizarra con un planning de proyecto detallado" class="carousel-image">
+
+                <div class="hero-content">
+                    <h1><span style="color: var(--accent-color);">Selettas Gestión</span></h1>
+                    <p>Tu Visión, Nuestra Estrategia. Gestión integral de proyectos y asesoramiento experto.</p>
+                    <a href="#contact" class="btn">Agendar una Reunión</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Nuestros Servicios de Gestión</h2>
+            <div class="services-container">
+                <div class="service-item">
+                    <i class="fas fa-sitemap"></i>
+                    <h3>Project Management Integral</h3>
+                    <p>Actuamos como el único interlocutor de tu proyecto, coordinando a todos los implicados (constructora, asesores legales, marketing...) para asegurar los objetivos y el presupuesto.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-file-signature"></i>
+                    <h3>Tramitaciones y Licencias</h3>
+                    <p>Agilizamos y gestionamos toda la burocracia. Nos encargamos de la obtención de licencias de obra, permisos y cualquier trámite administrativo para que no tengas que preocuparte de nada.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Asesoría de Inversión</h3>
+                    <p>Realizamos estudios de viabilidad para tus proyectos inmobiliarios o empresariales, analizamos el mercado y te ayudamos a estructurar la mejor estrategia financiera para maximizar el retorno.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="news">
+            <h2>Casos de Éxito Recientes</h2>
+            <div id="news-container" class="anuncios-container"></div>
+        </section>
+
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             <div class="faq-container">
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Puedo contrataros solo para la tramitación de una licencia?</h3>
+                    <p class="faq-answer">Sí. Aunque ofrecemos un servicio integral, nuestros servicios son modulares. Puedes contratarnos específicamente para la gestión de trámites, para un estudio de viabilidad o para cualquier otra de nuestras áreas de especialización.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Cómo funciona la gestión integral de un proyecto?</h3>
+                    <p class="faq-answer">Tú nos trasladas tu visión y objetivos. A partir de ahí, nuestro equipo diseña un plan estratégico, selecciona a los mejores proveedores (dentro o fuera de Grupo Selettas), supervisa cada fase y te reporta los avances de forma periódica, garantizando un control total con un único punto de contacto.</p>
+                </div>
+                 <div class="faq-item">
+                    <h3 class="faq-question">¿Qué nos diferencia de una gestoría tradicional?</h3>
+                    <p class="faq-answer">Vamos más allá del papeleo. Aportamos una visión estratégica y de negocio a cada proyecto. No solo tramitamos, sino que asesoramos, optimizamos y nos implicamos en el éxito de tu inversión como si fuera nuestra.</p>
+                </div>
+             </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contacta con Selettas Gestión</h2>
+            <form action="https://formsubmit.co/gestion.selettas@email.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="Cuéntanos sobre tu proyecto o necesidad" rows="5" required></textarea>
+                <button type="submit">Enviar Mensaje</button>
+            </form>
+        </section>
+    </main>
+
+    <div id="newsModal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img"><h3 id="news-modal-titulo"></h3><p id="news-modal-descripcion"></p></div></div>
+    <footer><p>&copy; 2025 Selettas Gestión | <a href="Legal.html">Aviso Legal</a></p></footer>
+    <a href="https://wa.me/34WWWWWWWWW" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas Automoción - Vehículos y Taller de Confianza</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="page-concesionario">
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                <li><a href="#services">Servicios</a></li>
+                <li><a href="#news">Vehículos</a></li>
+                <li><a href="#faq">Preguntas Frecuentes</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/coche-moderno.jpg" alt="Coche moderno en exposición" class="carousel-image active">
+                <img src="Images/mecanico-taller.jpg" alt="Mecánico trabajando en un motor" class="carousel-image">
+                <img src="Images/cliente-llaves-coche.jpg" alt="Cliente recibiendo las llaves de su nuevo coche" class="carousel-image">
+
+                <div class="hero-content">
+                    <h1><span style="color: var(--accent-color);">Selettas Automoción</span></h1>
+                    <p>Tu Coche, Nuestra Pasión. Venta, importación y mantenimiento en Gerona.</p>
+                    <a href="#contact" class="btn">Pide tu Cita</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Nuestros Servicios de Automoción</h2>
+            <div class="services-container">
+                <div class="service-item">
+                    <i class="fas fa-car-side"></i>
+                    <h3>Venta de Vehículos</h3>
+                    <p>Explora nuestra selección de vehículos nuevos y de ocasión certificados. Te ofrecemos las mejores opciones de financiación y un asesoramiento totalmente personalizado.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-tools"></i>
+                    <h3>Taller Mecánico Especializado</h3>
+                    <p>Confía en nuestros expertos para el mantenimiento y reparación de tu coche. Usamos diagnosis avanzada y recambios de primera calidad para todas las marcas.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-globe-europe"></i>
+                    <h3>Importación a la Carta</h3>
+                    <p>¿Buscas un modelo específico? Nos encargamos de todo el proceso de importación, desde la búsqueda en Europa hasta la matriculación final en España.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="news">
+            <h2>Últimas Entradas y Oportunidades</h2>
+            <div id="news-container" class="anuncios-container"></div>
+        </section>
+
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             <div class="faq-container">
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Qué tipo de vehículos vendéis?</h3>
+                    <p class="faq-answer">Nos especializamos en una amplia gama de vehículos, desde compactos y familiares hasta deportivos de alta gama. Trabajamos con las principales marcas del mercado y ofrecemos tanto coches nuevos como de ocasión, todos revisados y garantizados.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Ofrecéis garantía en los coches de ocasión?</h3>
+                    <p class="faq-answer">Sí, todos nuestros vehículos de ocasión pasan una exhaustiva revisión de más de 120 puntos y se entregan con una garantía completa de 12 meses, ampliable según tus necesidades, para tu total tranquilidad.</p>
+                </div>
+                 <div class="faq-item">
+                    <h3 class="faq-question">¿Puedo traer mi coche para una revisión aunque no lo haya comprado aquí?</h3>
+                    <p class="faq-answer">Por supuesto. Nuestro taller está abierto a cualquier vehículo, sin importar dónde lo hayas adquirido. Ofrecemos un servicio profesional y transparente para todas las marcas y modelos.</p>
+                </div>
+             </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contacta con Selettas Automoción</h2>
+            <form action="https://formsubmit.co/automocion.selettas@email.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="¿En qué podemos ayudarte?" rows="5" required></textarea>
+                <button type="submit">Enviar Consulta</button>
+            </form>
+        </section>
+    </main>
+    
+    <div id="newsModal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img"><h3 id="news-modal-titulo"></h3><p id="news-modal-descripcion"></p></div></div>
+    <footer><p>&copy; 2025 Selettas Automoción | <a href="Legal.html">Aviso Legal</a></p></footer>
+    <a href="https://wa.me/34XXXXXXXXX" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>

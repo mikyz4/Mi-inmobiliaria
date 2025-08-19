@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // --- NUEVO: IDENTIFICADOR DE PÁGINA ---
+    // Leemos el ID del body para que el script sepa en qué página se encuentra.
+    const pageId = document.body.id;
+
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -84,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 alert('¡Registro exitoso! Por favor, revisa tu email para confirmar la cuenta.');
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html'; // Corregido a minúscula
 
             } catch (error) {
                 alert('Error: ' + error.message);
@@ -105,11 +109,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (error) {
                 alert('Error al iniciar sesión: ' + error.message);
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html'; // Corregido a minúscula
             }
         });
     }
 
+    // --- CAMBIO: La función ahora construye el menú según la página ---
     const checkUserStatus = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         const user = session?.user;
@@ -122,14 +127,51 @@ document.addEventListener('DOMContentLoaded', function() {
             existingUserMenu.remove();
         }
         
-        navLinksContainer.innerHTML = '';
+        navLinksContainer.innerHTML = ''; // Limpiamos para construir el menú correcto
 
-        navLinksContainer.innerHTML += `
-            <li><a href="Index.html">Inicio</a></li>
-            <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
-            <li><a href="asesoria.html">Asesoría</a></li>
-            <li><a href="Anuncio.html">Publicar Anuncio</a></li>
-        `;
+        // Lógica de construcción del menú basada en el ID de la página
+        switch (pageId) {
+            case 'page-inmobiliaria':
+                navLinksContainer.innerHTML = `
+                    <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#news">Novedades</a></li>
+                    <li><a href="Ver-anuncios.html">Ver Anuncios</a></li>
+                    <li><a href="Anuncio.html">Publicar Anuncio</a></li>
+                    <li><a href="#faq">Preguntas</a></li>`;
+                break;
+            case 'page-concesionario':
+                navLinksContainer.innerHTML = `
+                    <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#news">Vehículos</a></li>
+                    <li><a href="#faq">Preguntas</a></li>`;
+                break;
+            case 'page-constructora':
+                navLinksContainer.innerHTML = `
+                    <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#news">Proyectos</a></li>
+                    <li><a href="#faq">Preguntas</a></li>`;
+                break;
+            case 'page-importadora':
+                navLinksContainer.innerHTML = `
+                    <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                    <li><a href="#services">Catálogo</a></li>
+                    <li><a href="#news">Novedades</a></li>
+                    <li><a href="#faq">Preguntas</a></li>`;
+                break;
+            case 'page-gestora':
+                navLinksContainer.innerHTML = `
+                    <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#news">Casos de Éxito</a></li>
+                    <li><a href="#faq">Preguntas</a></li>`;
+                break;
+            default: // Menú por defecto para otras páginas (login, registro, admin, etc.)
+                navLinksContainer.innerHTML = `<li><a href="index.html">Volver al Inicio</a></li>`;
+                break;
+        }
 
         const userMenuContainer = document.createElement('div');
         userMenuContainer.className = 'user-menu-container';
@@ -139,7 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (profile && profile.role === 'admin') {
                 navLinksContainer.innerHTML += `<li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>`;
             }
-            navLinksContainer.innerHTML += `<li><a href="Index.html#contact">Contacto</a></li>`;
+            if (pageId.startsWith('page-')) { // Solo añadir contacto si es una página principal
+                 navLinksContainer.innerHTML += `<li><a href="#contact">Contacto</a></li>`;
+            }
             
             const username = user.user_metadata.username || 'Usuario';
             userMenuContainer.innerHTML = `
@@ -160,11 +204,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
-                window.location.href = 'Index.html';
+                window.location.reload(); // Recarga la página actual en estado "deslogueado"
             });
 
         } else {
-            navLinksContainer.innerHTML += `<li><a href="Index.html#contact">Contacto</a></li>`;
+            if (pageId.startsWith('page-')) {
+                navLinksContainer.innerHTML += `<li><a href="#contact">Contacto</a></li>`;
+            }
             
             userMenuContainer.innerHTML = `
                 <button id="userMenuButton" class="user-menu-button">
@@ -213,120 +259,132 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Acceso denegado.');
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html'; // Corregido
                 return;
             }
             const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
             if (!profile || profile.role !== 'admin') {
                 alert('No tienes permisos de administrador para acceder a esta página.');
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html'; // Corregido
             }
         }
     })();
     
-    // --- LÓGICA DE LA PÁGINA DE INICIO (DINÁMICA) ---
-    const servicesContainer = document.querySelector('.services-container');
-    if (servicesContainer) {
-        async function loadServices() {
-            const asesoriaCardHTML = `
-                <a href="asesoria.html" class="service-item-link">
-                    <div class="service-item">
-                        <i class="fas fa-handshake"></i>
-                        <h3>Asesoría Inmobiliaria</h3>
-                        <p>Planes flexibles para comprar, vender o invertir con un experto a tu lado. Pulsa aquí para ver los planes.</p>
-                    </div>
-                </a>
-            `;
+    // --- CAMBIO: Se redefinen las funciones de carga para que sean "inteligentes" ---
+    
+    // Función para cargar SERVICIOS según una categoría
+    async function loadCategorizedServices(categoria) {
+        const servicesContainer = document.querySelector('.services-container');
+        if (!servicesContainer) return;
 
-            const { data, error } = await supabaseClient
-                .from('services')
-                .select('*')
-                .order('display_order', { ascending: true });
+        // CAMBIO: Se elimina el HTML estático de "Asesoría". Todo debe venir de Supabase.
+        const { data, error } = await supabaseClient
+            .from('services')
+            .select('*')
+            .eq('categoria', categoria) // Filtro inteligente
+            .order('display_order', { ascending: true });
 
-            let supabaseServicesHTML = '';
-            if (error) {
-                console.error("Error cargando servicios desde Supabase:", error);
-                supabaseServicesHTML = '<p>No se pudieron cargar los demás servicios.</p>';
-            } else if (!data || data.length === 0) {
-                 supabaseServicesHTML = '';
-            } else {
-                 supabaseServicesHTML = data.map(service => `
-                    <div class="service-item">
-                        <i class="fas ${service.icon}"></i>
-                        <h3>${service.title}</h3>
-                        <p>${service.text}</p>
-                    </div>
-                `).join('');
-            }
-            
-            servicesContainer.innerHTML = asesoriaCardHTML + supabaseServicesHTML;
-        }
-        loadServices();
-    }
-
-    const newsContainer = document.getElementById('news-container');
-    if(newsContainer) {
-        const newsModal = document.getElementById('newsModal');
-        async function loadPosts() {
-            const { data, error } = await supabaseClient
-                .from('posts')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error || !data || data.length === 0) {
-                newsContainer.innerHTML = '<p>No hay novedades recientes.</p>';
-                return;
-            }
-
-            newsContainer.innerHTML = '';
-            data.forEach(post => {
-                const card = document.createElement('div');
-                card.className = 'anuncio-card';
-                card.innerHTML = `
-                    <img src="${post.image_url || 'Images/Carrusel1.jpg'}" alt="${post.title}" loading="lazy">
-                    <div class="anuncio-card-content">
-                        <h3>${post.title}</h3>
-                    </div>`;
-                card.addEventListener('click', () => {
-                    if(newsModal) {
-                        newsModal.querySelector('#news-modal-img').src = post.image_url || 'Images/Carrusel1.jpg';
-                        newsModal.querySelector('#news-modal-titulo').textContent = post.title;
-                        newsModal.querySelector('#news-modal-descripcion').textContent = post.description;
-                        newsModal.classList.add('active');
-                    }
-                });
-                newsContainer.appendChild(card);
-            });
-        }
-        loadPosts();
-    }
-
-    const faqContainer = document.querySelector('.faq-container');
-    if (faqContainer) {
-        async function loadFaqs() {
-            const { data, error } = await supabaseClient
-                .from('faqs')
-                .select('*')
-                .order('display_order', { ascending: true });
-
-            if (error || !data || data.length === 0) {
-                faqContainer.innerHTML = '<p>No hay preguntas frecuentes para mostrar.</p>';
-                return;
-            }
-
-            faqContainer.innerHTML = data.map(faq => `
-                <div class="faq-item">
-                    <h3>${faq.question}</h3>
-                    <p>${faq.answer}</p>
+        if (error) {
+            console.error("Error cargando servicios desde Supabase:", error);
+            servicesContainer.innerHTML = '<p>No se pudieron cargar los servicios.</p>';
+        } else if (!data || data.length === 0) {
+            servicesContainer.innerHTML = '';
+        } else {
+            servicesContainer.innerHTML = data.map(service => `
+                <div class="service-item">
+                    <i class="fas ${service.icon}"></i>
+                    <h3>${service.title}</h3>
+                    <p>${service.text}</p>
                 </div>
             `).join('');
-
-            document.querySelectorAll('.faq-item h3').forEach(item => {
-                item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
-            });
         }
-        loadFaqs();
     }
+
+    // Función para cargar NOTICIAS/POSTS según una categoría
+    async function loadCategorizedPosts(categoria) {
+        const newsContainer = document.getElementById('news-container');
+        if (!newsContainer) return;
+
+        const newsModal = document.getElementById('newsModal');
+        const { data, error } = await supabaseClient
+            .from('posts')
+            .select('*')
+            .eq('categoria', categoria) // Filtro inteligente
+            .order('created_at', { ascending: false });
+        
+        if (error || !data || data.length === 0) {
+            newsContainer.innerHTML = '<p>No hay novedades recientes.</p>';
+            return;
+        }
+
+        newsContainer.innerHTML = '';
+        data.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'anuncio-card';
+            card.innerHTML = `
+                <img src="${post.image_url || 'Images/Carrusel1.jpg'}" alt="${post.title}" loading="lazy">
+                <div class="anuncio-card-content">
+                    <h3>${post.title}</h3>
+                </div>`;
+            card.addEventListener('click', () => {
+                if(newsModal) {
+                    newsModal.querySelector('#news-modal-img').src = post.image_url || 'Images/Carrusel1.jpg';
+                    newsModal.querySelector('#news-modal-titulo').textContent = post.title;
+                    newsModal.querySelector('#news-modal-descripcion').textContent = post.description;
+                    newsModal.classList.add('active');
+                }
+            });
+            newsContainer.appendChild(card);
+        });
+    }
+
+    // Función para cargar FAQS según una categoría
+    async function loadCategorizedFaqs(categoria) {
+        const faqContainer = document.querySelector('.faq-container');
+        if (!faqContainer) return;
+        
+        const { data, error } = await supabaseClient
+            .from('faqs')
+            .select('*')
+            .eq('categoria', categoria) // Filtro inteligente
+            .order('display_order', { ascending: true });
+
+        if (error || !data || data.length === 0) {
+            faqContainer.innerHTML = '<p>No hay preguntas frecuentes para mostrar.</p>';
+            return;
+        }
+
+        faqContainer.innerHTML = data.map(faq => `
+            <div class="faq-item">
+                <h3>${faq.question}</h3>
+                <p>${faq.answer}</p>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.faq-item h3').forEach(item => {
+            item.addEventListener('click', () => item.parentElement.classList.toggle('open'));
+        });
+    }
+
+    // --- NUEVO: DISTRIBUIDOR DE LÓGICA DE CONTENIDO ---
+    // Este bloque decide qué contenido cargar basado en la página actual.
+    const categoryMap = {
+        'page-inmobiliaria': 'inmobiliaria',
+        'page-concesionario': 'concesionario',
+        'page-constructora': 'constructora',
+        'page-importadora': 'importadora',
+        'page-gestora': 'gestora'
+    };
+    const pageCategory = categoryMap[pageId];
+
+    if (pageCategory) {
+        // Si estamos en una página de categoría, cargamos su contenido dinámico
+        // Nota: En la página de inmobiliaria, ahora todo (servicios, posts, faqs) se cargará con este método.
+        loadCategorizedServices(pageCategory);
+        loadCategorizedPosts(pageCategory);
+        loadCategorizedFaqs(pageCategory);
+    }
+    // --- FIN DEL NUEVO DISTRIBUIDOR ---
 
     // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
@@ -1586,7 +1644,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) {
                 alert('Acceso denegado. Debes ser administrador.');
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html'; // Corregido
                 return;
             }
             currentUser = user;

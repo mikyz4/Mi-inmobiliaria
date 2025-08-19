@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas Suministros - Materiales para Profesionales</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body id="page-importadora">
+
+    <header>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                <li><a href="index.html">Inicio Grupo Selettas</a></li>
+                <li><a href="#services">Catálogo</a></li>
+                <li><a href="#news">Novedades</a></li>
+                <li><a href="#faq">Preguntas Frecuentes</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/almacen-materiales.jpg" alt="Almacén con palets de materiales de construcción" class="carousel-image active">
+                <img src="Images/herramientas-obra.jpg" alt="Equipamiento y herramientas profesionales para obra" class="carousel-image">
+                <img src="Images/camion-entrega.jpg" alt="Camión de Selettas realizando una entrega en obra" class="carousel-image">
+
+                <div class="hero-content">
+                    <h1><span style="color: var(--accent-color);">Selettas Suministros</span></h1>
+                    <p>La Base de Tu Gran Proyecto. Importación y distribución de materiales de alta calidad.</p>
+                    <a href="#contact" class="btn">Solicitar Catálogo</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Soluciones para Profesionales</h2>
+            <div class="services-container">
+                <div class="service-item">
+                    <i class="fas fa-pallet"></i>
+                    <h3>Materiales de Construcción</h3>
+                    <p>Ofrecemos un amplio catálogo de materiales de primeras marcas: aislantes, morteros, cerámica, y todo lo necesario para garantizar la solidez de tu obra.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-hard-hat"></i>
+                    <h3>Equipamiento y Seguridad</h3>
+                    <p>Desde herramientas eléctricas hasta equipos de protección individual (EPIs). Te suministramos el mejor equipamiento para garantizar un trabajo eficiente y seguro.</p>
+                </div>
+                <div class="service-item">
+                    <i class="fas fa-truck"></i>
+                    <h3>Logística y Entrega en Obra</h3>
+                    <p>Nuestro servicio de logística garantiza una entrega puntual de los materiales directamente en tu proyecto, optimizando tus tiempos y evitando interrupciones.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="news">
+            <h2>Nuevos Materiales y Ofertas</h2>
+             <div id="news-container" class="anuncios-container"></div>
+        </section>
+
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             <div class="faq-container">
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Vendéis a particulares o solo a empresas?</h3>
+                    <p class="faq-answer">Nuestro principal cliente es el profesional y la empresa del sector, pero también ofrecemos venta directa a particulares que estén realizando sus propias reformas o proyectos de construcción.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">¿Cuál es vuestra zona de reparto?</h3>
+                    <p class="faq-answer">Ofrecemos servicio de entrega en toda la provincia de Gerona y zonas limítrofes. Para pedidos de gran volumen o proyectos especiales, podemos coordinar la logística a nivel nacional.</p>
+                </div>
+                 <div class="faq-item">
+                    <h3 class="faq-question">¿Podéis importar un material específico bajo pedido?</h3>
+                    <p class="faq-answer">Sí. Una de nuestras especialidades es la importación a la carta. Si necesitas un material, revestimiento o equipamiento que no se encuentra fácilmente, nuestro equipo se encarga de localizarlo y traerlo para ti.</p>
+                </div>
+             </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contacta con Selettas Suministros</h2>
+            <form action="https://formsubmit.co/suministros.selettas@email.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre de la Empresa/Autónomo" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="¿Qué materiales necesitas?" rows="5" required></textarea>
+                <button type="submit">Enviar Petición</button>
+            </form>
+        </section>
+    </main>
+
+    <div id="newsModal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img"><h3 id="news-modal-titulo"></h3><p id="news-modal-descripcion"></p></div></div>
+    <footer><p>&copy; 2025 Selettas Suministros | <a href="Legal.html">Aviso Legal</a></p></footer>
+    <a href="https://wa.me/34ZZZZZZZZZ" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+</body>
+</html>
