@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selettas - Asesoría Inmobiliaria</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <div id="notification-banner" class="notification-hidden"></div>
+
+    <header>
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <nav class="sidebar">
+            <span class="close-btn">&times;</span>
+            <ul>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="carousel-container">
+                <img src="Images/Carrusel1.jpg" alt="Vistas de Gerona" class="carousel-image active">
+                <img src="Images/Carrusel2.jpg" alt="Interior de una casa moderna" class="carousel-image">
+                <img src="Images/Carrusel3.jpg" alt="Familia recibiendo llaves" class="carousel-image">
+
+                <div class="hero-content">
+                    <h1><span style="color: var(--accent-color);">Selettas</span></h1>
+                    <p>Confianza y Asesoramiento Inmobiliario en Gerona</p>
+                    <a href="#contact" class="btn">Contactar</a>
+                    <button id="installBtn" class="btn" style="display: none; margin-top: 15px;">Instalar Aplicación</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Nuestros Servicios</h2>
+            <div class="services-container">
+                </div>
+        </section>
+        
+        <section id="news">
+            <h2>Últimas Novedades</h2>
+            <div id="news-container" class="anuncios-container">
+                </div>
+        </section>
+
+        <section id="faq">
+             <h2>Preguntas Frecuentes</h2>
+             <div class="faq-container">
+                </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contáctanos</h2>
+            <form action="https://formsubmit.co/infoselettas@gmail.com" method="POST">
+                <input type="text" name="name" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <textarea name="message" placeholder="Tu mensaje" rows="5" required></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
+    </main>
+    
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="news-modal-img" src="" alt="Imagen de la noticia" class="modal-img">
+            <h3 id="news-modal-titulo"></h3>
+            <p id="news-modal-descripcion"></p>
+        </div>
+    </div>
+
+    <div id="cookie-consent-banner" class="cookie-banner-hidden">
+        <div class="cookie-banner-content">
+            <p>
+                Utilizamos cookies para ofrecerte la mejor experiencia. Algunas son esenciales para el funcionamiento de la web, mientras que otras nos ayudan a mejorar nuestros servicios.
+                <a href="Legal.html#politica-cookies">Leer más</a>
+            </p>
+            <div class="cookie-banner-actions">
+                <button id="cookie-accept-all" class="btn">Aceptar Todas</button>
+                <button id="cookie-reject-all" class="btn btn-secondary">Rechazar Todas</button>
+                <button id="cookie-settings-btn" class="btn-link">Personalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cookie-settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Configuración de Cookies</h3>
+            <p>Puedes personalizar tus preferencias de cookies a continuación. Las cookies técnicas son necesarias y no se pueden desactivar.</p>
+            
+            <div class="cookie-category">
+                <div class="cookie-category-header">
+                    <label for="cookie-necesarias">Cookies Técnicas (Necesarias)</label>
+                    <input type="checkbox" id="cookie-necesarias" checked disabled>
+                </div>
+                <p class="cookie-category-description">
+                    Estas cookies son esenciales para que el sitio web funcione correctamente, como recordar tu sesión o tus preferencias de cookies.
+                </p>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-header">
+                    <label for="cookie-analiticas">Cookies de Análisis</label>
+                    <input type="checkbox" id="cookie-analiticas" checked>
+                </div>
+                <p class="cookie-category-description">
+                    Nos permiten entender cómo interactúas con la web (qué páginas visitas más, etc.) para mejorar nuestros servicios. Todos los datos son anónimos.
+                </p>
+            </div>
+
+            <button id="cookie-save-prefs" class="btn">Guardar Preferencias</button>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Selettas | <a href="Legal.html">Aviso Legal</a></p>
+    </footer>
+
+    <a href="https://wa.me/34632125872" target="_blank" class="whatsapp-button"><i class="fab fa-whatsapp"></i></a>
+    <button class="scroll-to-top"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="Script.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registrado con éxito:', registration.scope);
+          }).catch(error => {
+            console.log('Fallo en el registro de ServiceWorker:', error);
+          });
+        });
+      }
+    </script>
+</body>
+</html>
