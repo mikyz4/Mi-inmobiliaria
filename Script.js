@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!data || data.length === 0) { servicesContainer.innerHTML = ''; return; }
     
         const stripePriceIds = {
-            'Plan de Mantenimiento Anual': 'price_1RxkekCmMDt16rg71vwQXfEo',
+            'Plan de Mantenimiento Anual': 'price_1RxkeKCmMDt16rg7lvwQXfEo',
             'Club de Importacion Selettas': 'price_1RxkpxCmMDt16rg7VtRJXQXd',
             'Inspección Técnica Pre-Reforma': 'price_1Rxks1CmMDt16rg73g4vb1Fb',
             'Membresía Selettas PRO': 'price_1RxktfCmMDt16rg7hVb6xyiU',
