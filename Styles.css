@@ -106,7 +106,6 @@ section { padding: 60px 5%; text-align: center; }
     max-width: 1000px; margin: 0 auto; text-align: left;
     display: grid; gap: 20px;
 }
-/* NOTA: El .services-container se define más abajo con los nuevos estilos */
 .service-item, .faq-item {
     background-color: var(--secondary-color); padding: 25px; border-radius: 8px;
     border-left: 4px solid var(--accent-color);
@@ -157,7 +156,7 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 .anuncio-card {
     background-color: var(--secondary-color); border-radius: 8px;
     overflow: hidden; cursor: pointer; transition: transform 0.2s;
-    position: relative; /* Necesario para posicionar el botón de favoritos */
+    position: relative;
 }
 .anuncio-card:hover { transform: translateY(-5px); }
 .anuncio-card img { width: 100%; height: 200px; object-fit: cover; }
@@ -197,7 +196,7 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    display: none; /* Oculto por defecto, se mostrará con JS */
+    display: none;
     justify-content: center;
     align-items: center;
     font-size: 1.2rem;
@@ -214,11 +213,11 @@ button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 }
 
 .favorite-btn .fa-heart {
-    font-weight: 300; /* Corazón más fino por defecto (FontAwesome 6) */
+    font-weight: 300;
 }
 
 .favorite-btn.favorited .fa-heart {
-    font-weight: 900; /* Corazón relleno y más grueso */
+    font-weight: 900;
     color: var(--favorite-color);
 }
 
@@ -337,7 +336,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 /* --- ESTILOS PARA LA BARRA DE NOTIFICACIONES --- */
 #notification-banner {
     position: fixed;
-    top: -100px; /* Empieza oculta arriba */
+    top: -100px;
     left: 0;
     width: 100%;
     padding: 16px;
@@ -352,7 +351,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 
 #notification-banner.show {
-    transform: translateY(100px); /* Se desliza hacia abajo */
+    transform: translateY(100px);
 }
 
 .notification-success {
@@ -442,18 +441,17 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 
 .user-dropdown-menu {
-    display: none; /* Oculto por defecto */
+    display: none;
     position: absolute;
-    top: 55px; /* Un poco por debajo del botón */
+    top: 55px;
     right: 0;
     background-color: var(--secondary-color);
     border-radius: 8px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.5);
     min-width: 180px;
-    overflow: hidden; /* Para que los bordes redondeados se apliquen a los items */
+    overflow: hidden;
 }
 
-/* Clase que se añade con JS para mostrar el menú */
 .user-dropdown-menu.show {
     display: block;
 }
@@ -484,7 +482,6 @@ footer a { color: var(--accent-color); text-decoration: none;}
 #userLogoutBtn:hover {
     background-color: rgba(255, 138, 128, 0.1);
 }
-/* --- Estilos para las nuevas funciones de usuario --- */
 .dropdown-header {
     padding: 12px 16px;
     font-weight: bold;
@@ -603,15 +600,12 @@ footer a { color: var(--accent-color); text-decoration: none;}
     display: flex;
     gap: 10px;
 }
-/* --- Ajuste para Novedades en Página Principal --- */
 #news .anuncio-card-content h3 {
     color: var(--accent-color);
 }
-/* --- Ajuste para Títulos de Servicios --- */
 .service-item h3 {
     color: var(--accent-color);
 }
-/* --- Estilos para miniatura en lista de admin --- */
 .admin-item-card {
     display: flex;
     justify-content: space-between;
@@ -620,15 +614,15 @@ footer a { color: var(--accent-color); text-decoration: none;}
 }
 
 .admin-item-info {
-    flex-grow: 1; /* Hace que la info ocupe el espacio disponible */
+    flex-grow: 1;
 }
 
 .admin-item-thumbnail {
     width: 90px;
     height: 65px;
-    object-fit: cover; /* Recorta la imagen para que encaje sin deformarse */
+    object-fit: cover;
     border-radius: 5px;
-    flex-shrink: 0; /* Evita que la imagen se encoja */
+    flex-shrink: 0;
 }
 /* --- ESTILOS PARA LA PÁGINA DE ASESORÍA / PRECIOS --- */
 
@@ -689,7 +683,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
 .pricing-card .target-audience {
     color: var(--font-color-secondary);
     font-size: 0.9rem;
-    min-height: 40px; /* Para alinear tarjetas */
+    min-height: 40px;
     margin-bottom: 20px;
 }
 
@@ -710,7 +704,7 @@ footer a { color: var(--accent-color); text-decoration: none;}
     list-style: none;
     text-align: left;
     margin-bottom: 30px;
-    flex-grow: 1; /* Empuja el botón hacia abajo */
+    flex-grow: 1;
 }
 
 .features-list li {
@@ -767,16 +761,14 @@ footer a { color: var(--accent-color); text-decoration: none;}
     margin-top: 15px;
     margin-bottom: 25px;
 }
-/* --- ESTILOS PARA LA TARJETA DE SERVICIO-ENLACE --- */
 a.service-item-link {
-    text-decoration: none; /* Quita el subrayado del enlace */
-    color: inherit; /* Hereda el color del texto para que no se vea azul */
+    text-decoration: none;
+    color: inherit;
 }
 
 a.service-item-link .service-item {
-    height: 100%; /* Asegura que la tarjeta ocupe todo el alto del enlace */
+    height: 100%;
 }
-/* --- ESTILOS PARA BANNER DE COOKIES LEGAL --- */
 #cookie-consent-banner {
     position: fixed;
     bottom: 0;
@@ -850,33 +842,29 @@ a.service-item-link .service-item {
     margin-top: 8px;
 }
 
-/* --- MODIFICACIÓN PARA EL COLOR DEL ENLACE DE COOKIES --- */
 .cookie-banner-content p a {
     color: var(--accent-color);
     font-weight: bold;
     text-decoration: underline;
 }
-/* --- ESTILOS PARA BOTONES DUALES EN TARJETAS DE PRECIOS --- */
 .pricing-card-actions {
     display: flex;
     gap: 10px;
-    margin-top: auto; /* Empuja los botones al final de la tarjeta */
-    padding-top: 20px; /* Espacio antes de los botones */
+    margin-top: auto;
+    padding-top: 20px;
 }
 
 .pricing-card-actions .btn {
-    flex-grow: 1; /* Hace que ambos botones ocupen el mismo espacio */
-    padding: 10px 5px; /* Un poco menos de padding para que quepan bien */
+    flex-grow: 1;
+    padding: 10px 5px;
     font-size: 0.9rem;
 }
 
-/* --- ESTILOS PARA EL MODAL DE INFORMACIÓN --- */
 #info-modal-details {
-    margin-bottom: 25px; /* Más espacio antes del botón */
+    margin-bottom: 25px;
 }
-/* --- ESTILOS PARA TARJETA DE SUSCRIPCIÓN EN PERFIL --- */
 .subscription-card {
-    border-left-color: #FFD700; /* Un color dorado para destacar */
+    border-left-color: #FFD700;
 }
 
 .subscription-card h3 {
@@ -904,7 +892,6 @@ a.service-item-link .service-item {
     color: var(--delete-color);
     font-weight: bold;
 }
-/* --- ESTILOS PARA LA PÁGINA DE MENSAJERÍA --- */
 .chat-container {
     max-width: 800px;
     margin: 0 auto;
@@ -913,12 +900,12 @@ a.service-item-link .service-item {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    height: 70vh; /* Altura del contenedor del chat */
+    height: 70vh;
 }
 
 .message-history {
     flex-grow: 1;
-    overflow-y: auto; /* Permite scroll si hay muchos mensajes */
+    overflow-y: auto;
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -935,14 +922,14 @@ a.service-item-link .service-item {
 .message.sent {
     background-color: var(--accent-color);
     color: var(--primary-color);
-    align-self: flex-end; /* Alinea los mensajes enviados a la derecha */
+    align-self: flex-end;
     border-radius: 15px 15px 0 15px;
 }
 
 .message.received {
     background-color: #333;
     color: var(--font-color-primary);
-    align-self: flex-start; /* Alinea los mensajes recibidos a la izquierda */
+    align-self: flex-start;
     border-radius: 15px 15px 15px 0;
 }
 
@@ -964,7 +951,7 @@ a.service-item-link .service-item {
 
 #message-input {
     flex-grow: 1;
-    resize: none; /* Evita que el usuario pueda cambiar el tamaño del textarea */
+    resize: none;
     height: 50px;
 }
 
@@ -978,7 +965,6 @@ a.service-item-link .service-item {
     padding: 20px;
     color: var(--font-color-secondary);
 }
-/* --- ESTILOS PARA LA PÁGINA DE MENSAJERÍA DE ADMIN --- */
 .admin-chat-container {
     display: flex;
     height: 75vh;
@@ -1050,12 +1036,11 @@ a.service-item-link .service-item {
     margin: 0;
     color: var(--accent-color);
 }
-/* --- ESTILOS MEJORADOS PARA LISTA DE CONVERSACIONES (WHATSAPP STYLE) --- */
 
 .conversations-list {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Un pequeño espacio entre conversaciones */
+    gap: 5px;
 }
 
 .conversation-item {
@@ -1068,7 +1053,7 @@ a.service-item-link .service-item {
 }
 
 .conversation-item:hover {
-    background-color: #1E1E1E; /* Un gris un poco más claro al pasar el ratón */
+    background-color: #1E1E1E;
 }
 
 .conversation-item.active {
@@ -1086,12 +1071,12 @@ a.service-item-link .service-item {
     align-items: center;
     font-weight: bold;
     font-size: 1.2rem;
-    flex-shrink: 0; /* Evita que el avatar se encoja */
+    flex-shrink: 0;
 }
 
 .conversation-details {
     flex-grow: 1;
-    overflow: hidden; /* Importante para que el texto no se desborde */
+    overflow: hidden;
 }
 
 .conversation-header {
@@ -1100,7 +1085,6 @@ a.service-item-link .service-item {
     align-items: center;
 }
 
-/* El nombre de usuario en la tarjeta de conversación */
 .conversation-item .conversation-user {
     font-size: 1.1rem;
     font-weight: bold;
@@ -1115,9 +1099,9 @@ a.service-item-link .service-item {
 .last-message-preview {
     font-size: 0.9rem;
     color: var(--font-color-secondary);
-    white-space: nowrap; /* Evita que el texto salte de línea */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Añade "..." si el texto es muy largo */
+    text-overflow: ellipsis;
     margin-top: 4px;
 }
 
@@ -1129,7 +1113,6 @@ a.service-item-link .service-item {
     text-align: right;
 }
 
-/* La hora del último mensaje */
 .conversation-item .conversation-time {
     font-size: 0.8rem;
     color: var(--font-color-secondary);
@@ -1154,15 +1137,13 @@ a.service-item-link .service-item {
     margin-top: 5px;
 }
 
-/* Ocultar la insignia si no hay mensajes no leídos */
 .unread-badge:empty {
     display: none;
 }
-/* --- ESTILOS PARA EL DOBLE CHECK DE LEÍDO (VERSIÓN CORREGIDA) --- */
 .message-meta {
     display: flex;
     align-items: center;
-    gap: 8px; /* Espacio entre la hora y los checks */
+    gap: 8px;
     font-size: 0.75rem;
     color: var(--font-color-secondary);
     margin-top: 5px;
@@ -1179,22 +1160,19 @@ a.service-item-link .service-item {
 
 .read-receipts .fa-check {
     font-size: 0.8rem;
-    color: var(--font-color-secondary); /* Ambos grises por defecto */
+    color: var(--font-color-secondary);
     transition: color 0.3s ease;
 }
 
-/* Solapamos el segundo tick ligeramente sobre el primero */
 .read-receipts .tick-2 {
     margin-left: -5px; 
 }
 
-/* Cuando el contenedor tiene la clase .read, AMBOS ticks se ponen azules */
 .read-receipts.read .fa-check {
-    color: #4FC3F7; /* Azul para "leído" */
+    color: #4FC3F7;
 }
 /* --- ESTILOS PARA LA PÁGINA PRINCIPAL DE GRUPO SELETTAS --- */
 
-/* Subtítulo para las secciones */
 .section-subtitle {
     text-align: center;
     max-width: 800px;
@@ -1203,17 +1181,15 @@ a.service-item-link .service-item {
     font-size: 1.1em;
 }
 
-/* Grid para las tarjetas de servicios */
 .servicios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Diseño responsive */
-    gap: 30px; /* Espacio entre tarjetas */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Estilo de cada tarjeta de servicio */
 .servicio-card {
     background-color: #fff;
     padding: 30px;
@@ -1227,18 +1203,16 @@ a.service-item-link .service-item {
 }
 
 .servicio-card:hover {
-    transform: translateY(-10px); /* Efecto de levantar la tarjeta */
+    transform: translateY(-10px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-/* Icono dentro de la tarjeta */
 .servicio-card i {
     font-size: 48px;
     color: var(--accent-color);
     margin-bottom: 20px;
 }
 
-/* Título de la tarjeta */
 .servicio-card h3 {
     font-family: 'Poppins', sans-serif;
     font-size: 1.5em;
@@ -1246,15 +1220,13 @@ a.service-item-link .service-item {
     color: var(--primary-color);
 }
 
-/* Párrafo de la tarjeta */
 .servicio-card p {
     color: var(--font-color-secondary);
     line-height: 1.6;
-    flex-grow: 1; /* Hace que el texto ocupe el espacio disponible */
+    flex-grow: 1;
     margin-bottom: 25px;
 }
 
-/* Botón de la tarjeta */
 .servicio-card .btn {
     background-color: var(--accent-color);
     color: #fff;
@@ -1266,10 +1238,9 @@ a.service-item-link .service-item {
 }
 
 .servicio-card .btn:hover {
-    background-color: #e85a4f; /* Un tono más oscuro de tu color de acento */
+    background-color: #e85a4f;
 }
 
-/* Hero section específica para la página principal */
 #hero-main .hero-content {
     background: rgba(0, 0, 0, 0.5);
     padding: 30px;
@@ -1277,27 +1248,25 @@ a.service-item-link .service-item {
 }
 /* --- ESTILOS ADICIONALES PARA LAS SUBPÁGINAS DE SERVICIOS --- */
 
-/* Sección de Servicios Específicos (Subpáginas) */
-/* ----------------------------------------------- */
 
 .services-container {
     display: flex;
     justify-content: center;
-    align-items: stretch; /* Asegura que todos los items tengan la misma altura */
+    align-items: stretch;
     flex-wrap: wrap;
-    gap: 30px; /* Espacio entre los bloques de servicio */
+    gap: 30px;
     max-width: 1200px;
     margin: 40px auto 0 auto;
 }
 
 .service-item {
-    background-color: #ffffff; /* Fondo blanco para destacar */
+    background-color: #ffffff;
     padding: 30px 25px;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); /* Sombra sutil y profesional */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
     text-align: center;
-    flex-basis: 320px; /* Ancho base de cada item */
-    flex-grow: 1; /* Permite que los items crezcan para ocupar el espacio */
+    flex-basis: 320px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -1310,7 +1279,7 @@ a.service-item-link .service-item {
 
 .service-item i {
     font-size: 40px;
-    color: var(--accent-color); /* Usa el color de acento de tu marca */
+    color: var(--accent-color);
     margin-bottom: 20px;
 }
 
@@ -1324,15 +1293,12 @@ a.service-item-link .service-item {
 .service-item p {
     color: var(--font-color-secondary);
     line-height: 1.6;
-    flex-grow: 1; /* Empuja el contenido para alinear todo bien */
+    flex-grow: 1;
 }
 
 
-/* Sección de Preguntas Frecuentes (FAQ) */
-/* ----------------------------------------- */
-
 .faq-container {
-    max-width: 850px; /* Ancho ideal para la legibilidad */
+    max-width: 850px;
     margin: 40px auto 0 auto;
     padding: 0 15px;
 }
@@ -1360,10 +1326,8 @@ a.service-item-link .service-item {
     color: var(--font-color-secondary);
     line-height: 1.7;
     padding-left: 20px;
-    border-left: 3px solid var(--accent-color); /* Línea de acento que añade un toque visual */
+    border-left: 3px solid var(--accent-color);
 }
-/* --- CORRECCIÓN: Asegurar fondo oscuro en todos los modales --- */
-
 #newsModal .modal-content,
 #cookie-settings-modal .modal-content,
 #anuncioModal .modal-content,
