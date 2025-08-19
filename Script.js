@@ -293,8 +293,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'Membresía Selettas PRO': 'price_1RxktfCmMDt16rg7hVb6xyiU',
             'Búsqueda de Material Específico': 'price_1RxkuxCmMDt16rg7GZHGuNYG',
             'Iguala Mensual de Asesoramiento': 'price_1RxkwTCmMDt16rg7YiYH3v1w',
-            'pago_simbolico_estandar': 'price_1RxygGCmMDt16rg7FtM1q1Ro',
-            'pago_simbolico_urgente': 'price_1RxI0LCmMDt16rg78PL9I6kV'
+            'pago_simbolico_estandar': 'price_1RxygGCmMDt16rg7FtM1q1Ro',  // Este es el de 1€
+            'pago_simbolico_urgente': 'price_1RxI0LCmMDt16rg78PL9I6kV'   // Este es el de 5€ (Reserva de Servicio)
         };
 
         let servicesHTML = data.map(service => {
@@ -302,14 +302,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const priceId = stripePriceIds[service.title];
 
             if (priceId) {
+                // Es un servicio de pago directo
                 buttonsHTML = `<button class="btn btn-pagar" data-price-id="${priceId}">Contratar Ahora</button>`;
             } else {
+                // Lógica para servicios complejos según tus nuevas instrucciones
                 buttonsHTML = `
                     <div class="dual-buttons">
-                        <button class="btn btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_estandar}">Consulta (1€)</button>
-                        <button class="btn btn-secondary btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_urgente}">Consulta Urgente (5€)</button>
+                        <button class="btn btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_urgente}">Contratar</button>
+                        <button class="btn btn-secondary btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_estandar}">Más Información</button>
                     </div>
-                    <a href="#contact" class="btn-link-contact">O solicita más información</a>`;
+                    <a href="#contact" class="btn-link-contact">o contacta sin compromiso</a>`;
             }
 
             return `
@@ -1680,7 +1682,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // --- LÓGICA DE PAGO CON STRIPE (AÑADIR AL FINAL, FUERA DEL DOMCONTENTLOADED) ---
-// ¡RECUERDA REEMPLAZAR 'pk_test_...' CON TU CLAVE PUBLICABLE REAL DE STRIPE!
 const stripe = Stripe('pk_test_51Rxj6lCmMDt16rg7FAcK7N69ZS7QIh6YGLLC3KsrQdvZVuOnFjBctNPsnz1wdlkABkTHFhvepf7nZhA7pYUZlFBx00YMsSI6Dp');
 
 document.body.addEventListener('click', async function(event) {
