@@ -1362,3 +1362,12 @@ a.service-item-link .service-item {
     padding-left: 20px;
     border-left: 3px solid var(--accent-color); /* Línea de acento que añade un toque visual */
 }
+/* --- CORRECCIÓN: Asegurar fondo oscuro en todos los modales --- */
+
+#newsModal .modal-content,
+#cookie-settings-modal .modal-content,
+#anuncioModal .modal-content,
+#editModal .modal-content,
+#info-modal .modal-content {
+    background-color: var(--secondary-color);
+}
