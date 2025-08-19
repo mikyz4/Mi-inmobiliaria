@@ -289,12 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const stripePriceIds = {
             'Plan de Mantenimiento Anual': 'price_1RxkeKCmMDt16rg7lvwQXfEo',
             'Club de Importacion Selettas': 'price_1RxkpxCmMDt16rg7VtRJXQXd',
-            'Inspección Técnica Pre-Reforma': 'price_1Rxks1CmMDt16rg73g4vb1Fb',
+            'Inspección Técnica Pre-Reforma': 'price_1Rxks1CmMDt16rg73g4vblFb',
             'Membresía Selettas PRO': 'price_1RxktfCmMDt16rg7hVb6xyiU',
             'Búsqueda de Material Específico': 'price_1RxkuxCmMDt16rg7GZHGuNYG',
-            'Iguala Mensual de Asesoramiento': 'price_1RxkwTCmMDt16rg7YiYH3v1w',
-            'pago_simbolico_estandar': 'price_1RxygGCmMDt16rg7FtM1q1Ro',  // Este es el de 1€
-            'pago_simbolico_urgente': 'price_1RxI0LCmMDt16rg78PL9I6kV'   // Este es el de 5€ (Reserva de Servicio)
+            'Iguala Mensual de Asesoramiento': 'price_1RxkwTCmMDt16rg7YiYH3vlW',
+            'pago_simbolico_estandar': 'price_1RxkyGCmMDt16rg7FtMiq1Ro',  // Este es el de 1€
+            'pago_simbolico_urgente': 'price_1Rxl0LCmMDt16rg78PL9I6kV'   // Este es el de 5€ (Reserva de Servicio)
         };
 
         let servicesHTML = data.map(service => {
