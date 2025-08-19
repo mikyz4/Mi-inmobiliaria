@@ -1192,7 +1192,7 @@ a.service-item-link .service-item {
 .read-receipts.read .fa-check {
     color: #4FC3F7; /* Azul para "leído" */
 }
-/* --- ESTILOS PARA LA PÁGINA PRINCIPAL DE GRUPO SELETTAS --- */
+/* --- CAMBIO: ESTILOS UNIFICADOS Y CORREGIDOS PARA TARJETAS Y SUBPÁGINAS --- */
 
 /* Subtítulo para las secciones */
 .section-subtitle {
@@ -1203,7 +1203,7 @@ a.service-item-link .service-item {
     font-size: 1.1em;
 }
 
-/* Grid para las tarjetas de servicios */
+/* Grid para las tarjetas de servicios en la PÁGINA PRINCIPAL */
 .servicios-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1213,14 +1213,14 @@ a.service-item-link .service-item {
     padding: 20px;
 }
 
-/* Estilo de cada tarjeta de servicio */
+/* Estilo de cada tarjeta de servicio en la PÁGINA PRINCIPAL (.servicio-card) */
 .servicio-card {
-    background-color: #fff;
+    background-color: var(--secondary-color); /* CORREGIDO a tema oscuro */
     padding: 30px;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #2a2a2a;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1228,25 +1228,23 @@ a.service-item-link .service-item {
 
 .servicio-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: var(--accent-color);
+    box-shadow: 0 8px 30px rgba(44, 255, 142, 0.15); 
 }
 
-/* Icono dentro de la tarjeta */
 .servicio-card i {
     font-size: 48px;
     color: var(--accent-color);
     margin-bottom: 20px;
 }
 
-/* Título de la tarjeta */
 .servicio-card h3 {
     font-family: 'Poppins', sans-serif;
     font-size: 1.5em;
     margin-bottom: 15px;
-    color: var(--primary-color);
+    color: var(--font-color-primary); /* CORREGIDO a texto blanco */
 }
 
-/* Párrafo de la tarjeta */
 .servicio-card p {
     color: var(--font-color-secondary);
     line-height: 1.6;
@@ -1254,19 +1252,19 @@ a.service-item-link .service-item {
     margin-bottom: 25px;
 }
 
-/* Botón de la tarjeta */
 .servicio-card .btn {
     background-color: var(--accent-color);
-    color: #fff;
+    color: var(--primary-color); /* CORREGIDO a texto oscuro para contraste */
     padding: 12px 25px;
     border-radius: 5px;
     text-decoration: none;
     font-weight: 600;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .servicio-card .btn:hover {
-    background-color: #e85a4f;
+    background-color: #fff; /* Botón se vuelve blanco */
+    color: var(--primary-color);
 }
 
 /* Hero section específica para la página principal */
@@ -1275,9 +1273,8 @@ a.service-item-link .service-item {
     padding: 30px;
     border-radius: 10px;
 }
-/* --- ESTILOS ADICIONALES PARA LAS SUBPÁGINAS DE SERVICIOS --- */
 
-
+/* Contenedor de servicios en las SUB-PÁGINAS */
 .services-container {
     display: flex;
     justify-content: center;
@@ -1288,52 +1285,25 @@ a.service-item-link .service-item {
     margin: 40px auto 0 auto;
 }
 
-.service-item {
-    background-color: #ffffff;
-    padding: 30px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    text-align: center;
-    flex-basis: 320px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.service-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.service-item i {
-    font-size: 40px;
-    color: var(--accent-color);
-    margin-bottom: 20px;
-}
-
-.service-item h3 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.4em;
-    color: var(--primary-color);
-    margin-bottom: 15px;
-}
-
-.service-item p {
-    color: var(--font-color-secondary);
-    line-height: 1.6;
-    flex-grow: 1;
-}
+/*
+   NOTA: La clase .service-item ya está definida correctamente al principio
+   de tu CSS con el fondo oscuro. Estos estilos de abajo ya no son necesarios
+   porque los hemos unificado con los estilos originales. Dejamos este espacio
+   por si en el futuro quieres añadir estilos específicos solo para las sub-páginas.
+*/
 
 
+/* Sección de Preguntas Frecuentes (FAQ) en las SUB-PÁGINAS */
 .faq-container {
     max-width: 850px;
     margin: 40px auto 0 auto;
     padding: 0 15px;
 }
 
+/* Esta regla ya existe al principio pero la reforzamos para coherencia */
 .faq-item {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #333; /* CORREGIDO a borde oscuro */
+    background-color: var(--secondary-color);
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
@@ -1343,10 +1313,10 @@ a.service-item-link .service-item {
     margin-bottom: 0;
 }
 
-.faq-question {
+.faq-item .faq-question { /* Apuntamos directamente al h3 dentro de faq-item */
     font-family: 'Poppins', sans-serif;
     font-size: 1.25em;
-    color: var(--primary-color);
+    color: var(--font-color-primary); /* CORREGIDO a texto blanco */
     margin-bottom: 15px;
     font-weight: 600;
 }
@@ -1357,10 +1327,15 @@ a.service-item-link .service-item {
     padding-left: 20px;
     border-left: 3px solid var(--accent-color);
 }
+
+
+/* --- CORRECCIÓN FINAL Y REFORZADA: Asegurar fondo oscuro en todos los modales --- */
+/* Esta regla es una garantía final para que los modales siempre sean oscuros */
 #newsModal .modal-content,
 #cookie-settings-modal .modal-content,
 #anuncioModal .modal-content,
 #editModal .modal-content,
-#info-modal .modal-content {
-    background-color: var(--secondary-color);
+#info-modal .modal-content,
+.modal-content {
+    background-color: var(--secondary-color) !important;
 }
