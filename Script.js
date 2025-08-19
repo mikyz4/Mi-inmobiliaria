@@ -2,11 +2,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CONEXIÓN CON SUPABASE ---
     const SUPABASE_URL = 'https://qbxckejkiuvhltvkojbt.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
+    const SUPABASE_KEY = 'eyJhbGciOiJIIsoJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieGNrZWpraXV2aGx0dmtvamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MzQ0NTksImV4cCI6MjA2ODQxMDQ1OX0.BreLPlFz61GPHshBAMtb03qU8WDBtHwBedl16SK2avg';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- NUEVO: IDENTIFICADOR DE PÁGINA ---
-    // Leemos el ID del body para que el script sepa en qué página se encuentra.
+    // --- IDENTIFICADOR DE PÁGINA ---
     const pageId = document.body.id;
 
     // --- LÓGICA COMÚN (MENÚ, BOTONES FLOTANTES, MODALES) ---
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- LÓGICA DE AUTENTICACIÓN Y MENÚ DINÁMICO ---
+    // --- LÓGICA DE AUTENTICACIÓN Y REGISTRO ---
     const signUpForm = document.getElementById('signUpForm');
     if (signUpForm) {
         signUpForm.addEventListener('submit', async (e) => {
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 alert('¡Registro exitoso! Por favor, revisa tu email para confirmar la cuenta.');
-                window.location.href = 'index.html'; // Corregido a minúscula
+                window.location.href = 'index.html';
 
             } catch (error) {
                 alert('Error: ' + error.message);
@@ -109,12 +108,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (error) {
                 alert('Error al iniciar sesión: ' + error.message);
             } else {
-                window.location.href = 'index.html'; // Corregido a minúscula
+                window.location.href = 'index.html';
             }
         });
     }
     
-    // --- CAMBIO: La función ahora construye el menú según la página ---
+    // --- FUNCIÓN DE MENÚ DINÁMICO CORREGIDA ---
     const checkUserStatus = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         const user = session?.user;
@@ -127,11 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
             existingUserMenu.remove();
         }
         
-        navLinksContainer.innerHTML = ''; // Limpiamos para construir el menú correcto
+        navLinksContainer.innerHTML = ''; 
 
-        // Lógica de construcción del menú basada en el ID de la página
         switch (pageId) {
-            case 'page-grupo': // <-- ARREGLO: Se añade el caso para la página principal
+            case 'page-grupo':
                 navLinksContainer.innerHTML = `
                     <li><a href="#nuestros-servicios">Nuestros Servicios</a></li>
                     <li style="border-top: 1px solid #444; margin-top: 10px; padding-top: 10px;"><a href="inmobiliaria.html">Inmobiliaria</a></li>
@@ -177,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <li><a href="#news">Casos de Éxito</a></li>
                     <li><a href="#faq">Preguntas</a></li>`;
                 break;
-            default: // Menú por defecto para otras páginas (login, registro, admin, etc.)
+            default:
                 navLinksContainer.innerHTML = `<li><a href="index.html">Volver al Inicio</a></li>`;
                 break;
         }
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (profile && profile.role === 'admin') {
                 navLinksContainer.innerHTML += `<li><a href="admin.html" style="color: yellow; font-weight: bold;">PANEL ADMIN</a></li>`;
             }
-            if (pageId.startsWith('page-')) { // Solo añadir contacto si es una página principal
+            if (pageId.startsWith('page-')) {
                  navLinksContainer.innerHTML += `<li><a href="#contact">Contacto</a></li>`;
             }
             
@@ -213,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('userLogoutBtn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await supabaseClient.auth.signOut();
-                window.location.reload(); // Recarga la página actual en estado "deslogueado"
+                window.location.reload();
             });
 
         } else {
@@ -268,41 +266,61 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 alert('Acceso denegado.');
-                window.location.href = 'index.html'; // Corregido
+                window.location.href = 'index.html';
                 return;
             }
             const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
             if (!profile || profile.role !== 'admin') {
                 alert('No tienes permisos de administrador para acceder a esta página.');
-                window.location.href = 'index.html'; // Corregido
+                window.location.href = 'index.html';
             }
         }
     })();
     
+    // --- LÓGICA DE CARGA DE CONTENIDO CON BOTONES DE PAGO ---
     async function loadCategorizedServices(categoria) {
         const servicesContainer = document.querySelector('.services-container');
         if (!servicesContainer) return;
 
-        const { data, error } = await supabaseClient
-            .from('services')
-            .select('*')
-            .eq('categoria', categoria) 
-            .order('display_order', { ascending: true });
+        const { data, error } = await supabaseClient.from('services').select('*').eq('categoria', categoria).order('display_order', { ascending: true });
+        if (error) { console.error("Error cargando servicios:", error); servicesContainer.innerHTML = '<p>No se pudieron cargar los servicios.</p>'; return; } 
+        if (!data || data.length === 0) { servicesContainer.innerHTML = ''; return; }
+    
+        const stripePriceIds = {
+            'Plan de Mantenimiento Anual': 'price_1RxkekCmMDt16rg71vwQXfEo',
+            'Club de Importacion Selettas': 'price_1RxkpxCmMDt16rg7VtRJXQXd',
+            'Inspección Técnica Pre-Reforma': 'price_1Rxks1CmMDt16rg73g4vb1Fb',
+            'Membresía Selettas PRO': 'price_1RxktfCmMDt16rg7hVb6xyiU',
+            'Búsqueda de Material Específico': 'price_1RxkuxCmMDt16rg7GZHGuNYG',
+            'Iguala Mensual de Asesoramiento': 'price_1RxkwTCmMDt16rg7YiYH3v1w',
+            'pago_simbolico_estandar': 'price_1RxygGCmMDt16rg7FtM1q1Ro',
+            'pago_simbolico_urgente': 'price_1RxI0LCmMDt16rg78PL9I6kV'
+        };
 
-        if (error) {
-            console.error("Error cargando servicios desde Supabase:", error);
-            servicesContainer.innerHTML = '<p>No se pudieron cargar los servicios.</p>';
-        } else if (!data || data.length === 0) {
-            servicesContainer.innerHTML = '';
-        } else {
-            servicesContainer.innerHTML = data.map(service => `
+        let servicesHTML = data.map(service => {
+            let buttonsHTML = '';
+            const priceId = stripePriceIds[service.title];
+
+            if (priceId) {
+                buttonsHTML = `<button class="btn btn-pagar" data-price-id="${priceId}">Contratar Ahora</button>`;
+            } else {
+                buttonsHTML = `
+                    <div class="dual-buttons">
+                        <button class="btn btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_estandar}">Consulta (1€)</button>
+                        <button class="btn btn-secondary btn-pagar-simbolico" data-price-id="${stripePriceIds.pago_simbolico_urgente}">Consulta Urgente (5€)</button>
+                    </div>
+                    <a href="#contact" class="btn-link-contact">O solicita más información</a>`;
+            }
+
+            return `
                 <div class="service-item">
                     <i class="fas ${service.icon}"></i>
                     <h3>${service.title}</h3>
                     <p>${service.text}</p>
-                </div>
-            `).join('');
-        }
+                    <div class="service-item-actions">${buttonsHTML}</div>
+                </div>`;
+        }).join('');
+        servicesContainer.innerHTML = servicesHTML;
     }
 
     async function loadCategorizedPosts(categoria) {
@@ -384,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadCategorizedFaqs(pageCategory);
     }
     
+    // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
@@ -1658,5 +1677,42 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         initAdminChat();
+    }
+});
+// --- LÓGICA DE PAGO CON STRIPE (AÑADIR AL FINAL, FUERA DEL DOMCONTENTLOADED) ---
+// ¡RECUERDA REEMPLAZAR 'pk_test_...' CON TU CLAVE PUBLICABLE REAL DE STRIPE!
+const stripe = Stripe('pk_test_51Rxj6lCmMDt16rg7FAcK7N69ZS7QIh6YGLLC3KsrQdvZVuOnFjBctNPsnz1wdlkABkTHFhvepf7nZhA7pYUZlFBx00YMsSI6Dp');
+
+document.body.addEventListener('click', async function(event) {
+    const targetButton = event.target.closest('.btn-pagar, .btn-pagar-simbolico');
+    if (targetButton) {
+        const priceId = targetButton.dataset.priceId;
+        if (!priceId) {
+            alert('Error: No se ha encontrado el ID del producto.');
+            return;
+        }
+        
+        const originalText = targetButton.textContent;
+        targetButton.textContent = 'Procesando...';
+        targetButton.disabled = true;
+
+        try {
+            const response = await fetch('/.netlify/functions/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ priceId }),
+            });
+
+            const { sessionId, error } = await response.json();
+            if (error) { throw new Error(error); }
+
+            const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
+            if (stripeError) { throw new Error(stripeError.message); }
+
+        } catch (error) {
+            alert(`Error al procesar el pago: ${error.message}`);
+            targetButton.textContent = originalText;
+            targetButton.disabled = false;
+        }
     }
 });

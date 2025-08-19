@@ -1339,3 +1339,7 @@ a.service-item-link .service-item {
 .modal-content {
     background-color: var(--secondary-color) !important;
 }
+.service-item-actions { margin-top: auto; padding-top: 20px; }
+.dual-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+.dual-buttons .btn { flex: 1; font-size: 0.9rem; padding: 10px 5px; }
+.btn-link-contact { font-size: 0.9rem; color: var(--font-color-secondary); text-decoration: underline; display: inline-block; margin-top: 10px; }
