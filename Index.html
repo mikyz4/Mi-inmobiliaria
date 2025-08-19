@@ -18,9 +18,12 @@
         <div class="logo-container">
             <h2>Grupo Selettas</h2>
         </div>
-        <nav class="main-nav">
-             <div id="user-status-container"></div>
-        </nav>
+        
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <nav class="main-nav"></nav>
     </header>
 
     <main>
@@ -103,7 +106,7 @@
 
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-            // Solo ejecuta el carrusel si estamos en la página principal
+            // Este script para el carrusel de la página principal está bien.
             if (document.body.id === 'page-grupo') {
                 const images = document.querySelectorAll('#hero-main .carousel-image');
                 if (images.length > 0) {
