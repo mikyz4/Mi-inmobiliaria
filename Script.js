@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
+    
     // --- CAMBIO: La función ahora construye el menú según la página ---
     const checkUserStatus = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -131,6 +131,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Lógica de construcción del menú basada en el ID de la página
         switch (pageId) {
+            case 'page-grupo': // <-- ARREGLO: Se añade el caso para la página principal
+                navLinksContainer.innerHTML = `
+                    <li><a href="#nuestros-servicios">Nuestros Servicios</a></li>
+                    <li style="border-top: 1px solid #444; margin-top: 10px; padding-top: 10px;"><a href="inmobiliaria.html">Inmobiliaria</a></li>
+                    <li><a href="concesionario.html">Automoción</a></li>
+                    <li><a href="constructora.html">Constructora</a></li>
+                    <li><a href="importadora.html">Importadora</a></li>
+                    <li><a href="gestora.html">Gestoría</a></li>`;
+                break;
             case 'page-inmobiliaria':
                 navLinksContainer.innerHTML = `
                     <li><a href="index.html">Inicio Grupo Selettas</a></li>
@@ -270,18 +279,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
     
-    // --- CAMBIO: Se redefinen las funciones de carga para que sean "inteligentes" ---
-    
-    // Función para cargar SERVICIOS según una categoría
     async function loadCategorizedServices(categoria) {
         const servicesContainer = document.querySelector('.services-container');
         if (!servicesContainer) return;
 
-        // CAMBIO: Se elimina el HTML estático de "Asesoría". Todo debe venir de Supabase.
         const { data, error } = await supabaseClient
             .from('services')
             .select('*')
-            .eq('categoria', categoria) // Filtro inteligente
+            .eq('categoria', categoria) 
             .order('display_order', { ascending: true });
 
         if (error) {
@@ -300,7 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Función para cargar NOTICIAS/POSTS según una categoría
     async function loadCategorizedPosts(categoria) {
         const newsContainer = document.getElementById('news-container');
         if (!newsContainer) return;
@@ -309,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const { data, error } = await supabaseClient
             .from('posts')
             .select('*')
-            .eq('categoria', categoria) // Filtro inteligente
+            .eq('categoria', categoria)
             .order('created_at', { ascending: false });
         
         if (error || !data || data.length === 0) {
@@ -338,7 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para cargar FAQS según una categoría
     async function loadCategorizedFaqs(categoria) {
         const faqContainer = document.querySelector('.faq-container');
         if (!faqContainer) return;
@@ -346,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const { data, error } = await supabaseClient
             .from('faqs')
             .select('*')
-            .eq('categoria', categoria) // Filtro inteligente
+            .eq('categoria', categoria)
             .order('display_order', { ascending: true });
 
         if (error || !data || data.length === 0) {
@@ -366,8 +369,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- NUEVO: DISTRIBUIDOR DE LÓGICA DE CONTENIDO ---
-    // Este bloque decide qué contenido cargar basado en la página actual.
     const categoryMap = {
         'page-inmobiliaria': 'inmobiliaria',
         'page-concesionario': 'concesionario',
@@ -378,15 +379,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageCategory = categoryMap[pageId];
 
     if (pageCategory) {
-        // Si estamos en una página de categoría, cargamos su contenido dinámico
-        // Nota: En la página de inmobiliaria, ahora todo (servicios, posts, faqs) se cargará con este método.
         loadCategorizedServices(pageCategory);
         loadCategorizedPosts(pageCategory);
         loadCategorizedFaqs(pageCategory);
     }
-    // --- FIN DEL NUEVO DISTRIBUIDOR ---
-
-    // --- LÓGICA PARA VER ANUNCIOS PÚBLICOS Y FILTROS ---
+    
     const anunciosContainer = document.getElementById('anunciosContainer');
     if (anunciosContainer) {
         let todosLosAnuncios = [];
