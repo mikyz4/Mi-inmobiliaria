@@ -1,0 +1,7 @@
+{
+  "name": "mi-inmobiliaria",
+  "version": "1.0.0",
+  "dependencies": {
+    "stripe": "^16.2.0"
+  }
+}
